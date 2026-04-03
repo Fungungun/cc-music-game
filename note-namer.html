@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎵 Note Namer — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #FF8FAB, #FFB7C5); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+    .back-btn:hover { background: rgba(255,255,255,0.5); }
+
+    .clef-toggle { display: flex; gap: 10px; justify-content: center; margin: 14px 0; }
+    .clef-btn {
+      padding: 10px 28px; border-radius: 30px; border: 2px solid #ddd;
+      background: white; font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .clef-btn.active { background: #FF8FAB; color: white; border-color: #FF8FAB; }
+
+    .note-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 20px 0; }
+    .note-btn {
+      width: 68px; height: 68px; border-radius: 50%;
+      font-size: 1.5rem; font-weight: 900;
+      border: 3px solid #ddd; background: white;
+      cursor: pointer; transition: all 0.2s;
+      font-family: inherit; display: flex; align-items: center; justify-content: center;
+    }
+    .note-btn:hover { background: #FFB7C5; border-color: #FF8FAB; transform: scale(1.1); }
+    .note-btn.correct-ans { background: #b8f0c8; border-color: #4caf50; }
+    .note-btn.wrong-ans   { background: #fdd; border-color: #f44336; }
+    .note-btn:focus-visible { outline: 3px solid #4a90e2; outline-offset: 3px; }
+
+    .action-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div>
+      <h1>🎵 Note Namer</h1>
+      <div class="subtitle">Identify the note on the staff!</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Score -->
+    <div class="score-display">
+      <div class="score-item">Score <span id="score-correct">0/0</span></div>
+      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Clef Toggle -->
+    <div class="clef-toggle">
+      <button class="clef-btn active" id="btn-treble" onclick="setClef('treble')">Treble Clef</button>
+      <button class="clef-btn" id="btn-bass" onclick="setClef('bass')">Bass Clef</button>
+    </div>
+
+    <!-- Staff -->
+    <div class="staff-container">
+      <div id="staff"></div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Note Buttons -->
+    <div class="note-buttons" id="note-buttons">
+      <button class="note-btn" onclick="checkAnswer('C')" data-letter="C">C</button>
+      <button class="note-btn" onclick="checkAnswer('D')" data-letter="D">D</button>
+      <button class="note-btn" onclick="checkAnswer('E')" data-letter="E">E</button>
+      <button class="note-btn" onclick="checkAnswer('F')" data-letter="F">F</button>
+      <button class="note-btn" onclick="checkAnswer('G')" data-letter="G">G</button>
+      <button class="note-btn" onclick="checkAnswer('A')" data-letter="A">A</button>
+      <button class="note-btn" onclick="checkAnswer('B')" data-letter="B">B</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="nextNote()">New Note ↩</button>
+    </div>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Note Data ---- */
+    const TREBLE_NOTES = [
+      {abc:'c',    tone:'C4', name:'C'},
+      {abc:'d',    tone:'D4', name:'D'},
+      {abc:'e',    tone:'E4', name:'E'},
+      {abc:'f',    tone:'F4', name:'F'},
+      {abc:'g',    tone:'G4', name:'G'},
+      {abc:'a',    tone:'A4', name:'A'},
+      {abc:'b',    tone:'B4', name:'B'},
+      {abc:"c'",   tone:'C5', name:'C'},
+      {abc:"d'",   tone:'D5', name:'D'},
+      {abc:"e'",   tone:'E5', name:'E'},
+      {abc:"f'",   tone:'F5', name:'F'},
+      {abc:"g'",   tone:'G5', name:'G'},
+    ];
+    const BASS_NOTES = [
+      {abc:'C,',  tone:'C2', name:'C'},
+      {abc:'D,',  tone:'D2', name:'D'},
+      {abc:'E,',  tone:'E2', name:'E'},
+      {abc:'F,',  tone:'F2', name:'F'},
+      {abc:'G,',  tone:'G2', name:'G'},
+      {abc:'A,',  tone:'A2', name:'A'},
+      {abc:'B,',  tone:'B2', name:'B'},
+      {abc:'C',   tone:'C3', name:'C'},
+      {abc:'D',   tone:'D3', name:'D'},
+      {abc:'E',   tone:'E3', name:'E'},
+      {abc:'F',   tone:'F3', name:'F'},
+      {abc:'G',   tone:'G3', name:'G'},
+      {abc:'A',   tone:'A3', name:'A'},
+      {abc:'B',   tone:'B3', name:'B'},
+      {abc:'c',   tone:'C4', name:'C'},
+      {abc:'d',   tone:'D4', name:'D'},
+      {abc:'e',   tone:'E4', name:'E'},
+      {abc:'f',   tone:'F4', name:'F'},
+      {abc:'g',   tone:'G4', name:'G'},
+    ];
+
+    /* ---- State ---- */
+    let currentClef = 'treble';
+    let currentNote = null;
+    let wrongAttempts = 0;
+    let answeredThisRound = false;
+    const score = new SessionScore('note-namer');
+
+    /* ---- Init ---- */
+    function setClef(clef) {
+      currentClef = clef;
+      document.getElementById('btn-treble').classList.toggle('active', clef === 'treble');
+      document.getElementById('btn-bass').classList.toggle('active', clef === 'bass');
+      nextNote();
+    }
+
+    function pickNote() {
+      const pool = currentClef === 'treble' ? TREBLE_NOTES : BASS_NOTES;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function showNote(note) {
+      const clefStr = currentClef === 'bass' ? ' clef=bass' : '';
+      const abcStr = 'X:1\nT:\nM:4/4\nL:1/4\nK:C' + clefStr + '\n' + note.abc + '4|]';
+      renderAbc('staff', abcStr, {scale: 2.5, staffwidth: 220});
+    }
+
+    function nextNote() {
+      currentNote = pickNote();
+      wrongAttempts = 0;
+      answeredThisRound = false;
+      showNote(currentNote);
+      setFeedback('', 'empty');
+      resetButtons();
+    }
+
+    function resetButtons() {
+      document.querySelectorAll('.note-btn').forEach(function(btn) {
+        btn.classList.remove('correct-ans','wrong-ans');
+        btn.disabled = false;
+      });
+    }
+
+    function setFeedback(msg, type) {
+      const el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function checkAnswer(letter) {
+      if (answeredThisRound) return;
+
+      const btn = document.querySelector('.note-btn[data-letter="' + letter + '"]');
+
+      if (letter === currentNote.name) {
+        // Correct!
+        answeredThisRound = true;
+        if (btn) btn.classList.add('correct-ans');
+        playNote(currentNote.tone, '2n');
+        triggerStarburst(btn || document.getElementById('staff'));
+        setFeedback(randomCorrect(), 'correct');
+        score.onCorrect();
+        setTimeout(function() { nextNote(); }, 1200);
+      } else {
+        // Wrong
+        wrongAttempts++;
+        if (btn) {
+          btn.classList.add('wrong-ans');
+          addShake(btn);
+        }
+        setFeedback(randomWrong(), 'wrong');
+        score.onWrong();
+
+        if (wrongAttempts >= 2) {
+          // Reveal correct answer
+          const correctBtn = document.querySelector('.note-btn[data-letter="' + currentNote.name + '"]');
+          if (correctBtn) correctBtn.classList.add('correct-ans');
+          setFeedback('The answer was ' + currentNote.name + '! Have another go next time 😊', 'wrong');
+          answeredThisRound = true;
+          setTimeout(function() { nextNote(); }, 2000);
+        }
+      }
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function(e) {
+      const letters = ['C','D','E','F','G','A','B'];
+      if (letters.includes(e.key.toUpperCase())) {
+        checkAnswer(e.key.toUpperCase());
+      }
+    });
+
+    /* ---- Start ---- */
+    initSampler(function() {
+      nextNote();
+    });
+  </script>
+</body>
+</html>

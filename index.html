@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎹 CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: linear-gradient(135deg, #FFF8FB 0%, #F5F0FF 50%, #F0FFF8 100%); }
+    .page-header { background: linear-gradient(90deg, #FF8FAB, #FFB74D); color: white; }
+    .page-header h1 { color: white; }
+    .module-card[data-accent="pink"]   { background: linear-gradient(135deg, #FFB7C5, #FFD0DA); }
+    .module-card[data-accent="mint"]   { background: linear-gradient(135deg, #C7F2E3, #A8EED4); }
+    .module-card[data-accent="lavender"] { background: linear-gradient(135deg, #E0D4F7, #CEC0F5); }
+    .module-card[data-accent="yellow"] { background: linear-gradient(135deg, #FFF3B0, #FFE87A); }
+    .module-card[data-accent="coral"]  { background: linear-gradient(135deg, #FFD4A3, #FFBF7A); }
+    .module-card[data-accent="sky"]    { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
+    .module-card[data-accent="purple"] { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <h1>🎹 CC's Music Game</h1>
+  </header>
+
+  <main class="main-content">
+    <div class="hero">
+      <p class="tagline">Hi CC! Let's learn music theory! 🌟</p>
+    </div>
+
+    <div class="cards-grid" id="cards-grid">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <div class="total-stars" id="total-stars">
+      <!-- Total stars injected by JS -->
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    const MODULES = [
+      {
+        id: 'note-namer',
+        emoji: '🎵',
+        title: 'Note Namer',
+        desc: 'Identify notes on the staff',
+        accent: 'pink',
+        href: 'note-namer.html'
+      },
+      {
+        id: 'scale-builder',
+        emoji: '🎼',
+        title: 'Scale Builder',
+        desc: 'Build major & minor scales',
+        accent: 'mint',
+        href: 'scale-builder.html'
+      },
+      {
+        id: 'interval-quiz',
+        emoji: '🎶',
+        title: 'Interval Quiz',
+        desc: 'Name the musical interval',
+        accent: 'lavender',
+        href: 'interval-quiz.html'
+      },
+      {
+        id: 'chord-game',
+        emoji: '🎸',
+        title: 'Chord Game',
+        desc: 'Identify chords and cadences',
+        accent: 'yellow',
+        href: 'chord-game.html'
+      },
+      {
+        id: 'rhythm-tapper',
+        emoji: '🥁',
+        title: 'Rhythm Tapper',
+        desc: 'Tap along to the rhythm',
+        accent: 'coral',
+        href: 'rhythm-tapper.html'
+      },
+      {
+        id: 'terms-flashcards',
+        emoji: '📚',
+        title: 'Terms Flashcards',
+        desc: 'Italian & French music terms',
+        accent: 'sky',
+        href: 'terms-flashcards.html'
+      },
+      {
+        id: 'form-detective',
+        emoji: '🔍',
+        title: 'Form Detective',
+        desc: 'Identify musical forms',
+        accent: 'purple',
+        href: 'form-detective.html'
+      }
+    ];
+
+    function buildCards() {
+      const grid = document.getElementById('cards-grid');
+      let totalScore = 0;
+      let totalModules = MODULES.length;
+      let modulesWithScore = 0;
+
+      MODULES.forEach(function(mod) {
+        const data = getModuleData(mod.id);
+        const score = data.highScore || 0;
+        if (score > 0) modulesWithScore++;
+        totalScore += score;
+
+        const card = document.createElement('a');
+        card.className = 'module-card';
+        card.href = mod.href;
+        card.dataset.accent = mod.accent;
+        card.innerHTML =
+          '<span class="card-icon">' + mod.emoji + '</span>' +
+          '<div class="card-title">' + mod.title + '</div>' +
+          '<div class="card-desc">' + mod.desc + '</div>' +
+          '<div class="card-score">Best: ' + score + ' ✨</div>';
+        grid.appendChild(card);
+      });
+
+      // Total stars display
+      const starsEl = document.getElementById('total-stars');
+      const stars = Math.min(totalScore, 50);
+      let starStr = '';
+      for (let i = 0; i < Math.min(stars, 20); i++) starStr += '⭐';
+      starsEl.innerHTML =
+        '<div style="margin-bottom:6px;font-size:1rem;color:#666;">Total score across all modules: ' + totalScore + '</div>' +
+        '<div style="font-size:1.4rem;line-height:1.8;">' + (starStr || '🎵 Start playing to earn stars!') + '</div>';
+    }
+
+    buildCards();
+  </script>
+</body>
+</html>

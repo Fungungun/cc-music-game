@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🥁 Rhythm Tapper — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <style>
+    .page-header { background: linear-gradient(90deg, #E07B20, #FFD4A3); }
+    .page-header h1, .page-header a, .page-header span { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    .pattern-info {
+      text-align: center; padding: 16px 20px 8px;
+      font-size: 1.2rem; font-weight: 700;
+    }
+    .time-sig-badge {
+      display: inline-block; background: #FFD4A3; color: #7A3B00;
+      border-radius: 12px; padding: 4px 16px; font-size: 1rem; font-weight: 800;
+      margin-left: 10px;
+    }
+    .bpm-badge {
+      display: inline-block; background: #C7F2E3; color: #1A5C40;
+      border-radius: 12px; padding: 4px 14px; font-size: 0.9rem; font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .beat-row {
+      display: flex; justify-content: center; gap: 14px;
+      padding: 14px 10px;
+      flex-wrap: wrap;
+    }
+    .beat-dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #e0e0e0; transition: all 0.08s;
+    }
+    .beat-dot.active { background: #E07B20; transform: scale(1.5); }
+    .beat-dot.beat-1 { background: #FF8FAB; }
+
+    #tap-btn {
+      display: block; margin: 20px auto;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: linear-gradient(135deg, #FF8FAB, #FFB7C5);
+      border: none; font-size: 3rem;
+      box-shadow: 0 8px 24px rgba(224,123,32,0.35);
+      cursor: pointer; transition: transform 0.08s, box-shadow 0.08s;
+      font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 4px;
+    }
+    #tap-btn:active { transform: scale(0.94); box-shadow: 0 3px 10px rgba(224,123,32,0.3); }
+    #tap-btn .tap-label { font-size: 1.2rem; font-weight: 900; color: white; }
+
+    .controls-row {
+      display: flex; gap: 12px; justify-content: center;
+      flex-wrap: wrap; padding: 12px 16px;
+    }
+
+    .result-area {
+      text-align: center; padding: 20px; font-size: 1.1rem;
+    }
+    .stars-result { font-size: 3rem; }
+    .accuracy-msg { font-size: 1.3rem; font-weight: 700; margin-top: 8px; }
+
+    .phase-label {
+      text-align: center; font-size: 1.1rem; font-weight: 700;
+      color: #E07B20; min-height: 32px; padding: 4px;
+    }
+
+    .countdown-num {
+      font-size: 5rem; font-weight: 900; text-align: center;
+      color: #E07B20; animation: pop 0.4s ease-out;
+    }
+    @keyframes pop {
+      0%   { transform: scale(1.6); opacity: 0.5; }
+      100% { transform: scale(1);   opacity: 1;   }
+    }
+    .tap-flash { animation: tapFlash 0.15s ease-out; }
+    @keyframes tapFlash {
+      0%   { background: linear-gradient(135deg, #FFD4A3, #FFF); }
+      100% { background: linear-gradient(135deg, #FF8FAB, #FFB7C5); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading piano sounds... 🎹</p>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" title="Back">←</a>
+  <h1 class="page-title">🥁 Rhythm Tapper</h1>
+  <div class="score-display">
+    <span id="score-correct">0/0</span>
+    <span id="score-streak">🔥 0</span>
+  </div>
+</header>
+
+<div class="progress-container">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="progress-label">0 / 0</div>
+</div>
+
+<div class="main-content">
+  <div class="pattern-info">
+    <span id="pattern-name">All Quarter Notes</span>
+    <span class="time-sig-badge" id="time-sig">4/4</span>
+    <span class="bpm-badge" id="bpm-label">♩= 72</span>
+  </div>
+
+  <!-- Staff notation -->
+  <div class="staff-container" id="notation-area">
+    <div id="rhythm-staff"></div>
+  </div>
+
+  <!-- Beat dots (visual metronome) -->
+  <div class="beat-row" id="beat-row"></div>
+
+  <!-- Phase label (count-in / tapping / etc) -->
+  <div class="phase-label" id="phase-label">Press Start to begin!</div>
+
+  <!-- TAP button -->
+  <button id="tap-btn" onclick="handleTap()">
+    🥁
+    <span class="tap-label">TAP</span>
+  </button>
+
+  <!-- Result area (shown after pattern) -->
+  <div class="result-area" id="result-area" style="display:none;">
+    <div class="stars-result" id="result-stars"></div>
+    <div class="accuracy-msg" id="result-msg"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <button class="btn btn-primary" id="start-btn" onclick="startRhythm()" style="background:#E07B20;">▶ Start</button>
+    <button class="btn" id="next-btn" onclick="nextPattern()" style="background:#FFD4A3; display:none;">⏭ Next Pattern</button>
+    <button class="btn" id="again-btn" onclick="startRhythm()" style="background:#C7F2E3; display:none;">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+/* ===== RHYTHM PATTERNS ===== */
+/*
+  Each pattern has:
+  - abc: string for abcjs display (using L:1/8 for eighth-note base)
+  - beatCount: total number of beats (quarter-note beats) to generate click track
+  - beatsPerBar: for visual dots
+  - bpm: quarter-note BPM
+  - onsets: onset times in seconds from pattern start (pre-computed at bpm=72 or pattern bpm)
+*/
+
+const PATTERNS = [
+  {
+    name: 'All Quarter Notes',
+    sig: '4/4', bpm: 72, beatsPerBar: 4,
+    abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|c2 c2 c2 c2|c2 c2 c2 c2|c2 c2 c2 c2|]',
+    // 12 quarter notes at 72 BPM → quarter = 60/72 ≈ 0.833s
+    // Onsets at beat 0,1,2,...,11 (in quarter-note beats)
+    onsetBeats: [0,1,2,3, 4,5,6,7, 8,9,10,11],
+    bars: 3
+  },
+  {
+    name: 'Half + Quarters (4/4)',
+    sig: '4/4', bpm: 72, beatsPerBar: 4,
+    abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|c4 c2 c2|c2 c2 c4|c4 c4|]',
+    // bar1: half(0) q(2) q(3) | bar2: q(4) q(5) half(6) | bar3: half(8) half(10)
+    onsetBeats: [0,2,3, 4,5,6, 8,10],
+    bars: 3
+  },
+  {
+    name: 'Waltz — 3 Beats (3/4)',
+    sig: '3/4', bpm: 80, beatsPerBar: 3,
+    abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:C\n|c2 c2 c2|c2 c2 c2|c2 c2 c2|c6|]',
+    // 9 quarter notes + dotted half
+    onsetBeats: [0,1,2, 3,4,5, 6,7,8, 9],
+    bars: 4
+  },
+  {
+    name: 'Dotted Rhythm (3/4)',
+    sig: '3/4', bpm: 80, beatsPerBar: 3,
+    abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:C\n|c3 c c2|c3 c c2|c6|]',
+    // dotted quarter(0) eighth(1.5) quarter(2) | repeat | half.
+    onsetBeats: [0, 1.5, 2, 3, 4.5, 5, 6],
+    bars: 3
+  },
+  {
+    name: 'March (2/4)',
+    sig: '2/4', bpm: 90, beatsPerBar: 2,
+    abc: 'X:1\nT:\nM:2/4\nL:1/8\nK:C\n|c2 c2|c2 c2|c2 c2|c2 c2|]',
+    onsetBeats: [0,1, 2,3, 4,5, 6,7],
+    bars: 4
+  },
+  {
+    name: 'Half + Quarter (2/2)',
+    sig: '2/2', bpm: 60, beatsPerBar: 2,
+    // At 2/2, bpm refers to half-note BPM. Quarter = bpm/2 * 60 = half of the half-note beat.
+    // We'll treat each half-note as one beat. So at 60 half-note bpm, half = 1s.
+    abc: 'X:1\nT:\nM:2/2\nL:1/4\nK:C\n|c2 c2|c2 c2|c c c2|c4|]',
+    // beat positions in HALF-NOTE beats (bpm=60 half-notes → half=1s)
+    // bar1: half(0) half(1) | bar2: half(2) half(3) | bar3: q(4)q(4.5)half(5) | whole(6)
+    onsetBeats: [0,1, 2,3, 4,4.5,5, 6],
+    halfNoteBeat: true, // flag: use half-note as beat unit
+    bars: 4
+  },
+  {
+    name: 'Compound Duple (6/8)',
+    sig: '6/8', bpm: 88, beatsPerBar: 2,
+    // In 6/8 each "beat" is a dotted quarter = 3 eighth notes
+    // At 88 bpm (dotted quarter bpm), each beat = 60/88 ≈ 0.682s
+    // Each eighth = beat/3
+    abc: 'X:1\nT:\nM:6/8\nL:1/8\nK:C\n|c2c c2c|c2c c2c|c3 c3|]',
+    // Onset in dotted-quarter beats: 0, 1, 2, 3, 4, 5(dotted half)
+    // c2c = dotted-quarter (one compound beat), so onsets at 0,1,2,3
+    onsetBeats: [0,1, 2,3, 4,5],
+    compound: true, // beat = dotted quarter
+    bars: 3
+  },
+  {
+    name: 'Compound Triple (9/8)',
+    sig: '9/8', bpm: 80, beatsPerBar: 3,
+    abc: 'X:1\nT:\nM:9/8\nL:1/8\nK:C\n|c2c c2c c2c|c2c c2c c2c|]',
+    onsetBeats: [0,1,2, 3,4,5],
+    compound: true,
+    bars: 2
+  },
+];
+
+/* ===== STATE ===== */
+let score;
+let currentPatternIdx = 0;
+let phase = 'idle'; // idle | countdown | tapping | done
+let tapTimes = [];
+let patternStartTime = 0;
+let countInTimeout = null;
+let endTimeout = null;
+let metronomeIntervals = [];
+let currentBeat = -1;
+
+let clickSynth = null;
+
+function initClickSynth() {
+  if (clickSynth) return;
+  clickSynth = new Tone.MembraneSynth({
+    pitchDecay: 0.05,
+    octaves: 2,
+    envelope: { attack: 0.001, decay: 0.15, sustain: 0, release: 0 }
+  }).toDestination();
+}
+
+/* ===== PATTERN DISPLAY ===== */
+function showPattern(idx) {
+  const p = PATTERNS[idx];
+  document.getElementById('pattern-name').textContent = p.name;
+  document.getElementById('time-sig').textContent = p.sig;
+  document.getElementById('bpm-label').textContent = '♩= ' + p.bpm;
+
+  renderAbc('rhythm-staff', p.abc, { scale: 1.8, staffwidth: 520 });
+  buildBeatDots(p);
+
+  // reset
+  phase = 'idle';
+  tapTimes = [];
+  document.getElementById('result-area').style.display = 'none';
+  document.getElementById('start-btn').style.display = '';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('again-btn').style.display = 'none';
+  document.getElementById('phase-label').textContent = 'Press Start to begin!';
+  resetBeatDots();
+}
+
+function buildBeatDots(p) {
+  const row = document.getElementById('beat-row');
+  row.innerHTML = '';
+  const totalBeats = p.beatsPerBar * p.bars;
+  for (let i = 0; i < totalBeats; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'beat-dot' + (i % p.beatsPerBar === 0 ? ' beat-1' : '');
+    dot.id = 'beat-dot-' + i;
+    row.appendChild(dot);
+  }
+}
+
+function resetBeatDots() {
+  document.querySelectorAll('.beat-dot').forEach(d => d.classList.remove('active'));
+}
+
+function activateBeatDot(beatIdx) {
+  resetBeatDots();
+  const d = document.getElementById('beat-dot-' + beatIdx);
+  if (d) d.classList.add('active');
+}
+
+/* ===== RHYTHM GAME ===== */
+async function startRhythm() {
+  await ensureAudio();
+  initClickSynth();
+
+  const p = PATTERNS[currentPatternIdx];
+  phase = 'countdown';
+  tapTimes = [];
+  currentBeat = -1;
+
+  // Clear old timeouts
+  clearAllTimers();
+
+  document.getElementById('result-area').style.display = 'none';
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('again-btn').style.display = 'none';
+  document.getElementById('phase-label').textContent = '';
+  resetBeatDots();
+
+  // Beat duration in ms
+  const beatMs = (60 / p.bpm) * 1000;
+  const countInBeats = p.beatsPerBar; // count in one full bar
+
+  // Show countdown numbers
+  let remaining = countInBeats;
+  const phaseEl = document.getElementById('phase-label');
+  phaseEl.innerHTML = '<div class="countdown-num">' + countInBeats + '</div>';
+
+  const countInterval = setInterval(() => {
+    remaining--;
+    if (remaining > 0) {
+      phaseEl.innerHTML = '<div class="countdown-num">' + remaining + '</div>';
+      // Accent on beat 1
+      const freq = remaining === countInBeats ? 'C5' : 'G4';
+      clickSynth.triggerAttackRelease(freq, '16n');
+    }
+  }, beatMs);
+  metronomeIntervals.push(countInterval);
+
+  // Click on count-in start
+  clickSynth.triggerAttackRelease('C5', '16n');
+
+  // After count-in, start pattern
+  const startTimer = setTimeout(() => {
+    clearInterval(countInterval);
+    // Remove countInterval from array
+    phase = 'tapping';
+    phaseEl.textContent = '🎵 Tap along! (spacebar or the button)';
+    patternStartTime = performance.now();
+
+    // Schedule beat dots and metronome clicks
+    const totalBeats = p.beatsPerBar * p.bars;
+    for (let i = 0; i < totalBeats; i++) {
+      const t = setTimeout(() => {
+        activateBeatDot(i);
+        clickSynth.triggerAttackRelease(i % p.beatsPerBar === 0 ? 'C5' : 'G4', '16n');
+      }, i * beatMs);
+      metronomeIntervals.push(t);
+    }
+
+    // End of pattern
+    const patternDuration = totalBeats * beatMs;
+    const endTimer = setTimeout(() => {
+      phase = 'done';
+      phaseEl.textContent = '';
+      resetBeatDots();
+      showResult(p);
+    }, patternDuration + beatMs * 0.5);
+    metronomeIntervals.push(endTimer);
+
+  }, countInBeats * beatMs);
+  metronomeIntervals.push(startTimer);
+}
+
+function clearAllTimers() {
+  metronomeIntervals.forEach(t => { clearTimeout(t); clearInterval(t); });
+  metronomeIntervals = [];
+}
+
+function handleTap() {
+  if (phase !== 'tapping') return;
+  const now = performance.now() - patternStartTime;
+  tapTimes.push(now);
+
+  // Visual flash
+  const btn = document.getElementById('tap-btn');
+  btn.classList.remove('tap-flash');
+  void btn.offsetWidth;
+  btn.classList.add('tap-flash');
+}
+
+// Also handle spacebar
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' && phase === 'tapping') {
+    e.preventDefault();
+    handleTap();
+  }
+});
+
+/* ===== GRADING ===== */
+function gradeAccuracy(p, taps) {
+  const beatMs = (60 / p.bpm) * 1000;
+
+  // Convert onset beats to ms
+  const expectedMs = p.onsetBeats.map(b => b * beatMs);
+
+  if (taps.length === 0) return { stars: 0, pct: 0 };
+
+  let totalError = 0;
+  let matched = 0;
+
+  expectedMs.forEach(exp => {
+    // Find closest tap
+    let minDiff = Infinity;
+    taps.forEach(t => { const d = Math.abs(t - exp); if (d < minDiff) minDiff = d; });
+    if (minDiff < beatMs * 0.6) { // within 60% of a beat = acceptable
+      totalError += minDiff;
+      matched++;
+    }
+  });
+
+  const hitRate = matched / expectedMs.length;
+  if (hitRate < 0.5) return { stars: 1, pct: Math.round(hitRate * 100) };
+
+  const avgError = totalError / matched;
+  const pct = Math.round(hitRate * 100);
+
+  if (avgError < beatMs * 0.12 && hitRate >= 0.9) return { stars: 3, pct };
+  if (avgError < beatMs * 0.25 && hitRate >= 0.7) return { stars: 2, pct };
+  return { stars: 1, pct };
+}
+
+function showResult(p) {
+  const { stars, pct } = gradeAccuracy(p, tapTimes);
+
+  const starStr = ['', '⭐', '⭐⭐', '⭐⭐⭐'][stars] || '⭐';
+  const msgs = [
+    '',
+    'Good try CC! Keep practising! 💪',
+    'Well done CC! You\'re getting it! 🎵',
+    'Perfect timing CC! You\'re a rhythm star! 🌟'
+  ];
+
+  document.getElementById('result-stars').textContent = starStr;
+  document.getElementById('result-msg').textContent = msgs[stars] + ' (' + pct + '% hits)';
+  document.getElementById('result-area').style.display = 'block';
+  document.getElementById('next-btn').style.display = '';
+  document.getElementById('again-btn').style.display = '';
+
+  if (stars >= 2) {
+    score.onCorrect();
+    triggerStarburst(document.getElementById('result-area'));
+  } else {
+    score.onWrong();
+  }
+}
+
+function nextPattern() {
+  currentPatternIdx = (currentPatternIdx + 1) % PATTERNS.length;
+  showPattern(currentPatternIdx);
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  score = new SessionScore('rhythm-tapper');
+  showPattern(0);
+  initSampler(() => {
+    // sampler loaded — clickSynth initialised on first start
+  });
+});
+</script>
+</body>
+</html>

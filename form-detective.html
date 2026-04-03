@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔍 Form Detective — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <style>
+    .page-header { background: linear-gradient(90deg, #8B2FC9, #F0D4FF); }
+    .page-header h1, .page-header a, .page-header span { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    .mode-tabs {
+      display: flex; gap: 8px; justify-content: center;
+      flex-wrap: wrap; padding: 14px 16px 0;
+    }
+    .mode-tab {
+      padding: 10px 20px; border-radius: 30px; border: 2px solid #ddd;
+      background: white; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .mode-tab.active { background: #8B2FC9; color: white; border-color: #8B2FC9; }
+
+    .question-card {
+      background: white; border-radius: 20px; padding: 22px;
+      margin: 16px auto; max-width: 680px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .q-type-badge {
+      display: inline-block; background: #F0D4FF; color: #6A1A9A;
+      border-radius: 12px; padding: 4px 14px; font-size: 0.9rem;
+      font-weight: 700; margin-bottom: 10px;
+    }
+    .q-label { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
+
+    .play-melody-btn {
+      background: linear-gradient(135deg, #8B2FC9, #B060F0);
+      color: white; border: none; border-radius: 20px;
+      padding: 14px 32px; font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.1s; font-family: inherit;
+      margin: 12px auto; display: block;
+    }
+    .play-melody-btn:hover { transform: scale(1.04); }
+    .play-melody-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+    .answer-opts {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      justify-content: center; margin-top: 16px;
+    }
+    .answer-opt {
+      padding: 14px 22px; border-radius: 18px;
+      border: 3px solid #ddd; background: white;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all 0.18s; font-family: inherit;
+    }
+    .answer-opt:hover { background: #F0D4FF; border-color: #B060F0; transform: translateY(-2px); }
+    .answer-opt.correct-opt { background: #4CAF50; color: white; border-color: #2E7D32; }
+    .answer-opt.wrong-opt   { background: #FF6B6B; color: white; border-color: #C62828; }
+
+    .feedback { text-align: center; font-size: 1.2rem; font-weight: 700; min-height: 40px; padding: 8px; }
+    .feedback.correct { color: #4CAF50; }
+    .feedback.wrong   { color: #FF6B6B; }
+
+    .explanation {
+      background: #F9F0FF; border-radius: 12px; padding: 14px 18px;
+      margin-top: 12px; font-size: 1rem; display: none; line-height: 1.5;
+    }
+    .next-q-btn {
+      background: #8B2FC9; color: white; border: none;
+      border-radius: 20px; padding: 14px 32px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.1s; font-family: inherit;
+      margin: 12px auto; display: none;
+    }
+    .next-q-btn:hover { transform: scale(1.04); }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading piano sounds... 🎹</p>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" title="Back">←</a>
+  <h1 class="page-title">🔍 Form Detective</h1>
+  <div class="score-display">
+    <span id="score-correct">0/0</span>
+    <span id="score-streak">🔥 0</span>
+  </div>
+</header>
+
+<div class="progress-container">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="progress-label">0 / 0</div>
+</div>
+
+<!-- Mode tabs -->
+<div class="mode-tabs">
+  <button class="mode-tab active" data-mode="all">All Questions</button>
+  <button class="mode-tab" data-mode="form">Form (AB/ABA)</button>
+  <button class="mode-tab" data-mode="cadence">Cadences</button>
+  <button class="mode-tab" data-mode="timesig">Time Signatures</button>
+</div>
+
+<div class="main-content">
+  <div class="question-card" id="question-card">
+    <div class="q-type-badge" id="q-type">Form</div>
+    <div class="q-label" id="q-label">Listen to this melody, then identify its form.</div>
+
+    <div class="staff-container" style="min-height:100px;">
+      <div id="form-staff"></div>
+    </div>
+
+    <button class="play-melody-btn" id="play-btn" onclick="playCurrentMelody()">▶ Play Melody</button>
+
+    <div class="answer-opts" id="answer-opts"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="explanation" id="explanation"></div>
+    <button class="next-q-btn" id="next-btn" onclick="nextQuestion()">Next Question ⏭</button>
+  </div>
+</div>
+
+<script>
+/* ===== QUESTION DATA ===== */
+const QUESTIONS = [
+  /* ── FORM questions ─────────────────────────────────────── */
+  {
+    type: 'form',
+    label: 'Listen to this melody. What is its musical form?',
+    answer: 'Binary (AB)',
+    options: ['Binary (AB)', 'Ternary (ABA)'],
+    explanation: 'This piece has two contrasting sections (A then B), which makes it Binary (AB) form. Section A ends on the dominant chord, and Section B ends on the tonic.',
+    abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|: c2de f2ed | d2ef g4 :|\n|: g2ab c\'2ba | g2fe c4 :|',
+    notes: [
+      ['C4',0.5],['D4',0.25],['E4',0.25],['F4',0.5],['E4',0.25],['D4',0.25],
+      ['D4',0.5],['E4',0.25],['F4',0.25],['G4',1.0],
+      ['G4',0.5],['A4',0.25],['B4',0.25],['C5',0.5],['B4',0.25],['A4',0.25],
+      ['G4',0.5],['F4',0.25],['E4',0.25],['C4',1.0],
+    ]
+  },
+  {
+    type: 'form',
+    label: 'Listen to this melody. What is its musical form?',
+    answer: 'Ternary (ABA)',
+    options: ['Binary (AB)', 'Ternary (ABA)'],
+    explanation: 'This piece has three sections — the first section (A) returns at the end, making it Ternary (ABA) form. You can hear how the opening melody comes back after the middle contrasting part.',
+    abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:G\n|: d4 B2 | c4 A2 | B4 G2 | d6 :|\n|: e4 c2 | d4 B2 | c4 A2 | G6 :|\nd4 B2 | c4 A2 | B4 G2 | d6 |]',
+    notes: [
+      // Section A
+      ['D5',0.67],['D5',0.33],['B4',0.67],
+      ['C5',0.67],['C5',0.33],['A4',0.67],
+      ['B4',0.67],['B4',0.33],['G4',0.67],
+      ['D5',2.0],
+      // Section B
+      ['E5',0.67],['E5',0.33],['C5',0.67],
+      ['D5',0.67],['D5',0.33],['B4',0.67],
+      ['C5',0.67],['C5',0.33],['A4',0.67],
+      ['G4',2.0],
+      // Section A again
+      ['D5',0.67],['D5',0.33],['B4',0.67],
+      ['C5',0.67],['C5',0.33],['A4',0.67],
+      ['B4',0.67],['B4',0.33],['G4',0.67],
+      ['D5',2.0],
+    ]
+  },
+  {
+    type: 'form',
+    label: 'Listen carefully. Does this melody return to its opening section?',
+    answer: 'Ternary (ABA)',
+    options: ['Binary (AB)', 'Ternary (ABA)'],
+    explanation: 'Yes! The opening melody comes back at the end — that\'s the hallmark of Ternary (ABA) form. Think of it like a musical sandwich: A-B-A.',
+    abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:F\n|: f4 e2d2 | c4 d2e2 | f2g2 a4 | f8 :|\n|: a4 g2f2 | e4 f2g2 | a2g2 f4 | c8 :|\nf4 e2d2 | c4 d2e2 | f2g2 a4 | f8 |]',
+    notes: [
+      // A
+      ['F5',0.5],['F5',0.25],['E5',0.25],['D5',0.5],
+      ['C5',0.5],['D5',0.25],['E5',0.25],
+      ['F5',0.25],['G5',0.25],['A5',0.5],
+      ['F5',1.0],
+      // B
+      ['A5',0.5],['A5',0.25],['G5',0.25],['F5',0.5],
+      ['E5',0.5],['F5',0.25],['G5',0.25],
+      ['A5',0.25],['G5',0.25],['F5',0.5],
+      ['C5',1.0],
+      // A
+      ['F5',0.5],['F5',0.25],['E5',0.25],['D5',0.5],
+      ['C5',0.5],['D5',0.25],['E5',0.25],
+      ['F5',0.25],['G5',0.25],['A5',0.5],
+      ['F5',1.0],
+    ]
+  },
+  /* ── CADENCE questions ──────────────────────────────────── */
+  {
+    type: 'cadence',
+    label: 'Listen to this ending. What type of cadence is it?',
+    answer: 'Perfect Cadence (V→I)',
+    options: ['Perfect Cadence (V→I)', 'Plagal Cadence (IV→I)'],
+    explanation: 'A Perfect Cadence moves from chord V (the dominant) to chord I (the tonic). It sounds like a strong, conclusive ending — like the music is saying "The End!"',
+    abc: 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n[gbd\']2 [ceg]2|]',
+    notes: [['G4',0.5],['B4',0.5],['D5',0.5],['C4',0.5],['E4',0.5],['G4',1.0]]
+  },
+  {
+    type: 'cadence',
+    label: 'Listen to this ending. What type of cadence is it?',
+    answer: 'Plagal Cadence (IV→I)',
+    options: ['Perfect Cadence (V→I)', 'Plagal Cadence (IV→I)'],
+    explanation: 'A Plagal Cadence moves from chord IV (the subdominant) to chord I (the tonic). It has a gentle, "Amen" feeling — you\'ll hear it at the end of hymns!',
+    abc: 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n[fac\']2 [ceg]2|]',
+    notes: [['F4',0.5],['A4',0.5],['C5',0.5],['C4',0.5],['E4',0.5],['G4',1.0]]
+  },
+  {
+    type: 'cadence',
+    label: 'Listen to this ending in G major. Is it Perfect or Plagal?',
+    answer: 'Perfect Cadence (V→I)',
+    options: ['Perfect Cadence (V→I)', 'Plagal Cadence (IV→I)'],
+    explanation: 'In G major, the Perfect Cadence is D major (V) → G major (I). D major contains F# which gives it that bright, leading sound into the tonic G.',
+    abc: 'X:1\nT:\nM:4/4\nL:1/4\nK:G\n[d^fa]2 [gbd\']2|]',
+    notes: [['D4',0.5],['F#4',0.5],['A4',0.5],['G4',0.5],['B4',0.5],['D5',1.0]]
+  },
+  {
+    type: 'cadence',
+    label: 'Listen to this ending in G major. Is it Perfect or Plagal?',
+    answer: 'Plagal Cadence (IV→I)',
+    options: ['Perfect Cadence (V→I)', 'Plagal Cadence (IV→I)'],
+    explanation: 'In G major, the Plagal Cadence is C major (IV) → G major (I). The C major chord has a soft, gentle colour that resolves warmly to G.',
+    abc: 'X:1\nT:\nM:4/4\nL:1/4\nK:G\n[ceg]2 [gbd\']2|]',
+    notes: [['C4',0.5],['E4',0.5],['G4',0.5],['G4',0.5],['B4',0.5],['D5',1.0]]
+  },
+  /* ── TIME SIGNATURE questions ───────────────────────────── */
+  {
+    type: 'timesig',
+    label: 'Listen to this melody. How many beats are in each bar?',
+    answer: 'Simple Duple (2 beats)',
+    options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
+    explanation: 'Simple Duple time (2/4 or 2/2) has 2 beats per bar. You can feel a strong-weak pattern: ONE two, ONE two, like a march.',
+    abc: 'X:1\nT:\nM:2/4\nL:1/8\nK:C\n|ce ge|ce de|ce c2|]',
+    notes: [
+      ['C4',0.33],['E4',0.33],['G4',0.33],['E4',0.33],
+      ['C4',0.33],['E4',0.33],['D4',0.33],['E4',0.33],
+      ['C4',0.33],['E4',0.33],['C4',0.67],
+    ]
+  },
+  {
+    type: 'timesig',
+    label: 'Listen to this melody. How many beats are in each bar?',
+    answer: 'Simple Triple (3 beats)',
+    options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
+    explanation: 'Simple Triple time (3/4) has 3 beats per bar. It feels like a waltz: ONE two three, ONE two three. The first beat is the strongest.',
+    abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:G\n|G4 A2|B4 A2|G6|]',
+    notes: [
+      ['G4',0.67],['G4',0.33],['A4',0.67],
+      ['B4',0.67],['B4',0.33],['A4',0.67],
+      ['G4',2.0],
+    ]
+  },
+  {
+    type: 'timesig',
+    label: 'Listen to this melody. How many beats are in each bar?',
+    answer: 'Simple Quadruple (4 beats)',
+    options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
+    explanation: 'Simple Quadruple time (4/4) has 4 beats per bar. The pattern is strong-weak-medium-weak: ONE two THREE four. It\'s the most common time signature!',
+    abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|c2e2 g2e2|f2a2 c\'4|]',
+    notes: [
+      ['C4',0.5],['E4',0.5],['G4',0.5],['E4',0.5],
+      ['F4',0.5],['A4',0.5],['C5',1.0],
+    ]
+  },
+  {
+    type: 'timesig',
+    label: 'Listen to this melody. Does it feel like it has 2 big beats, each split into 3?',
+    answer: 'Compound Duple (6/8)',
+    options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
+    explanation: 'Compound Duple time (6/8) has 2 main beats, but each beat is divided into 3 equal parts (triplet feel). It sounds like a lilting, bouncy rhythm — think of a jig or a boat rocking!',
+    abc: 'X:1\nT:\nM:6/8\nL:1/8\nK:C\n|ceg ceg|fac\' gbd\'|c6|]',
+    notes: [
+      ['C4',0.22],['E4',0.22],['G4',0.22],['C4',0.22],['E4',0.22],['G4',0.22],
+      ['F4',0.22],['A4',0.22],['C5',0.22],['G4',0.22],['B4',0.22],['D5',0.22],
+      ['C4',1.33],
+    ]
+  },
+];
+
+/* ===== STATE ===== */
+let score;
+let currentMode = 'all';
+let questionQueue = [];
+let qIdx = 0;
+let answered = false;
+let wrongCount = 0;
+
+function buildQueue() {
+  let pool = currentMode === 'all' ? QUESTIONS.slice() : QUESTIONS.filter(q => q.type === currentMode);
+  // Shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  questionQueue = pool;
+  qIdx = 0;
+}
+
+function showQuestion(q) {
+  answered = false;
+  wrongCount = 0;
+
+  const typeLabels = { form: 'Musical Form', cadence: 'Cadence Type', timesig: 'Time Signature' };
+  document.getElementById('q-type').textContent = typeLabels[q.type] || q.type;
+  document.getElementById('q-label').textContent = q.label;
+
+  // Render notation
+  if (q.abc) {
+    renderAbc('form-staff', q.abc, { scale: 1.9, staffwidth: 480 });
+  } else {
+    document.getElementById('form-staff').innerHTML = '';
+  }
+
+  // Answer buttons
+  const optsEl = document.getElementById('answer-opts');
+  optsEl.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-opt';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, q, btn);
+    optsEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('explanation').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('play-btn').disabled = false;
+}
+
+async function playCurrentMelody() {
+  const q = questionQueue[qIdx];
+  if (!q || !q.notes) return;
+  document.getElementById('play-btn').disabled = true;
+  await playNotePairs(q.notes);
+  setTimeout(() => {
+    document.getElementById('play-btn').disabled = false;
+  }, q.notes.reduce((s, p) => s + p[1], 0) * 1000 + 500);
+}
+
+function checkAnswer(chosen, q, btn) {
+  if (answered) return;
+
+  const allBtns = document.querySelectorAll('.answer-opt');
+  const isCorrect = chosen === q.answer;
+
+  if (isCorrect) {
+    answered = true;
+    btn.classList.add('correct-opt');
+    score.onCorrect();
+    triggerStarburst(btn);
+
+    document.getElementById('feedback').textContent = randomCorrect();
+    document.getElementById('feedback').className = 'feedback correct';
+
+    document.getElementById('explanation').textContent = q.explanation;
+    document.getElementById('explanation').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'block';
+
+    allBtns.forEach(b => b.disabled = true);
+  } else {
+    wrongCount++;
+    addShake(btn);
+    btn.classList.add('wrong-opt');
+    score.onWrong();
+
+    document.getElementById('feedback').textContent = randomWrong();
+    document.getElementById('feedback').className = 'feedback wrong';
+
+    // After 2 wrong attempts, reveal correct answer
+    if (wrongCount >= 2) {
+      answered = true;
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.textContent === q.answer) b.classList.add('correct-opt');
+      });
+      document.getElementById('explanation').textContent = q.explanation;
+      document.getElementById('explanation').style.display = 'block';
+      document.getElementById('next-btn').style.display = 'block';
+    }
+
+    // Reset wrong button colour after a moment
+    setTimeout(() => btn.classList.remove('wrong-opt'), 1200);
+  }
+}
+
+function nextQuestion() {
+  qIdx = (qIdx + 1) % questionQueue.length;
+  if (qIdx === 0) {
+    // Reshuffled after going through all
+    buildQueue();
+  }
+  showQuestion(questionQueue[qIdx]);
+}
+
+/* ===== MODE TABS ===== */
+document.querySelectorAll('.mode-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    buildQueue();
+    showQuestion(questionQueue[0]);
+  });
+});
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  score = new SessionScore('form-detective');
+  buildQueue();
+  showQuestion(questionQueue[0]);
+  initSampler(() => {});
+});
+</script>
+</body>
+</html>

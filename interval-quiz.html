@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎶 Interval Quiz — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #9b7ee8, #E0D4F7); }
+    .page-header h1 { color: #3d1e8a; }
+    .back-btn { border-color: #9b7ee8; color: #3d1e8a; }
+
+    .interval-info {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .play-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .mode-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 8px 0;
+    }
+
+    .answer-grid { margin: 16px 0; }
+
+    .answer-btn {
+      min-width: 180px;
+      background: white;
+      border: 2px solid #ddd;
+    }
+    .answer-btn:hover { background: var(--lavender); border-color: #9b7ee8; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div>
+      <h1>🎶 Interval Quiz</h1>
+      <div class="subtitle">Name the musical interval!</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Score -->
+    <div class="score-display">
+      <div class="score-item">Score <span id="score-correct">0/0</span></div>
+      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Display mode -->
+    <div class="mode-row">
+      <button class="mode-btn active" id="btn-harmonic" onclick="setDisplayMode('harmonic')">Harmonic (together)</button>
+      <button class="mode-btn" id="btn-melodic" onclick="setDisplayMode('melodic')">Melodic (one by one)</button>
+    </div>
+
+    <!-- Staff -->
+    <div class="staff-container">
+      <div id="staff"></div>
+    </div>
+
+    <!-- Interval info -->
+    <div class="interval-info" id="interval-info">&nbsp;</div>
+
+    <!-- Play buttons -->
+    <div class="play-row">
+      <button class="btn btn-lavender" id="btn-play" onclick="playCurrentInterval()">▶ Play Notes</button>
+      <button class="btn btn-secondary" onclick="nextQuestion()">Skip →</button>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Answer buttons -->
+    <div class="answer-grid" id="answer-grid"></div>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    const INTERVALS = [
+      { name:'Perfect Unison', short:'P1', semitones:0 },
+      { name:'Major 2nd',      short:'M2', semitones:2 },
+      { name:'Minor 3rd',      short:'m3', semitones:3 },
+      { name:'Major 3rd',      short:'M3', semitones:4 },
+      { name:'Perfect 4th',    short:'P4', semitones:5 },
+      { name:'Diminished 5th', short:'d5', semitones:6 },
+      { name:'Perfect 5th',    short:'P5', semitones:7 },
+      { name:'Minor 6th',      short:'m6', semitones:8 },
+      { name:'Major 6th',      short:'M6', semitones:9 },
+      { name:'Minor 7th',      short:'m7', semitones:10 },
+      { name:'Major 7th',      short:'M7', semitones:11 },
+      { name:'Perfect Octave', short:'P8', semitones:12 },
+    ];
+
+    const ROOT_NOTES = ['C4','D4','E4','F4','G4','A4'];
+
+    /* ---- State ---- */
+    let currentRoot = 'C4';
+    let currentInterval = null;
+    let currentUpper = null;
+    let wrongAttempts = 0;
+    let answeredThisRound = false;
+    let displayMode = 'harmonic';
+    const score = new SessionScore('interval-quiz');
+
+    function setDisplayMode(mode) {
+      displayMode = mode;
+      document.getElementById('btn-harmonic').classList.toggle('active', mode === 'harmonic');
+      document.getElementById('btn-melodic').classList.toggle('active', mode === 'melodic');
+      renderCurrentStaff();
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function pickDistractors(correct, count) {
+      const others = INTERVALS.filter(function(i) { return i.short !== correct.short; });
+      const shuffled = others.sort(function() { return Math.random() - 0.5; });
+      return shuffled.slice(0, count);
+    }
+
+    function generateQuestion() {
+      currentRoot = pickRandom(ROOT_NOTES);
+      currentInterval = pickRandom(INTERVALS);
+      const rootMidi = Tonal.Note.midi(currentRoot);
+      const upperMidi = rootMidi + currentInterval.semitones;
+      currentUpper = Tonal.Note.fromMidi(upperMidi);
+      wrongAttempts = 0;
+      answeredThisRound = false;
+    }
+
+    function renderCurrentStaff() {
+      const abc1 = toneToAbc(currentRoot);
+      const abc2 = toneToAbc(currentUpper);
+      let abcStr;
+      if (displayMode === 'harmonic') {
+        abcStr = 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n[' + abc1 + abc2 + ']4|]';
+      } else {
+        abcStr = 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n' + abc1 + '2 ' + abc2 + '2|]';
+      }
+      renderAbc('staff', abcStr, {scale: 2.5, staffwidth: 200});
+    }
+
+    function buildAnswerButtons(correctInterval) {
+      const distractors = pickDistractors(correctInterval, 3);
+      const all = [correctInterval].concat(distractors).sort(function() { return Math.random() - 0.5; });
+      const grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      all.forEach(function(interval) {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = interval.name;
+        btn.setAttribute('data-short', interval.short);
+        btn.onclick = function() { checkAnswer(interval, btn); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(interval, btn) {
+      if (answeredThisRound) return;
+
+      if (interval.short === currentInterval.short) {
+        // Correct!
+        answeredThisRound = true;
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect(), 'correct');
+        triggerStarburst(btn);
+        score.onCorrect();
+        playCurrentInterval();
+        setTimeout(function() { nextQuestion(); }, 1800);
+      } else {
+        // Wrong
+        wrongAttempts++;
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        setFeedback(randomWrong(), 'wrong');
+        score.onWrong();
+
+        if (wrongAttempts >= 2) {
+          answeredThisRound = true;
+          // Reveal correct
+          document.querySelectorAll('.answer-btn').forEach(function(b) {
+            if (b.dataset.short === currentInterval.short) b.classList.add('correct-ans');
+          });
+          setFeedback('The answer was ' + currentInterval.name + '! Semitones: ' + currentInterval.semitones, 'wrong');
+          setTimeout(function() { nextQuestion(); }, 2500);
+        }
+      }
+    }
+
+    function setFeedback(msg, type) {
+      const el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function playCurrentInterval() {
+      if (!currentRoot || !currentUpper) return;
+      // First melodically, then harmonically
+      playMelodic([currentRoot, currentUpper], '4n', 100);
+      setTimeout(function() {
+        playChord([currentRoot, currentUpper], '2n');
+      }, 1000);
+    }
+
+    function nextQuestion() {
+      generateQuestion();
+      renderCurrentStaff();
+      buildAnswerButtons(currentInterval);
+      setFeedback('', 'empty');
+      document.getElementById('interval-info').textContent =
+        'Root: ' + currentRoot + ' — what is the interval?';
+    }
+
+    /* ---- Start ---- */
+    initSampler(function() {
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>

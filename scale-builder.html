@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎼 Scale Builder — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #4dbb95, #C7F2E3); }
+    .page-header h1 { color: #1a5c3a; }
+    .back-btn { border-color: #4dbb95; color: #1a5c3a; }
+
+    .scale-title {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin: 16px 0 4px;
+    }
+    .scale-hint-text {
+      text-align: center;
+      color: #555;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+    .note-counter {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a5c3a;
+      margin-bottom: 10px;
+    }
+    .note-progress {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .note-pip {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #ddd;
+      transition: background 0.2s;
+    }
+    .note-pip.done { background: #4caf50; }
+    .note-pip.next { background: #FFB7C5; }
+
+    .action-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+
+    .celebration {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a5c3a;
+      padding: 16px;
+      background: var(--mint);
+      border-radius: var(--radius);
+      margin: 12px 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div>
+      <h1>🎼 Scale Builder</h1>
+      <div class="subtitle">Click the notes of the scale on the keyboard!</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Score -->
+    <div class="score-display">
+      <div class="score-item">Scales Built <span id="score-correct">0/0</span></div>
+      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Scale Title -->
+    <div class="scale-title" id="scale-title">Build: C Major 🎼</div>
+    <div class="scale-hint-text" id="scale-hint-text">Click the 8 notes of C Major on the keyboard below</div>
+
+    <!-- Note progress pips -->
+    <div class="note-progress" id="note-progress"></div>
+    <div class="note-counter" id="note-counter">Note 1 of 8</div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Celebration Box -->
+    <div class="celebration" id="celebration">⭐⭐⭐ Scale complete! Well done CC! ⭐⭐⭐</div>
+
+    <!-- Piano Keyboard -->
+    <div class="keyboard-scroll">
+      <div id="keyboard-container"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-mint" onclick="showMeScale()">👁 Show Me</button>
+      <button class="btn btn-secondary" onclick="nextScale()">Try Another Scale 🎲</button>
+      <button class="btn btn-secondary" onclick="playCurrentScale()">▶ Play Scale</button>
+    </div>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    const SCALES = [
+      { name:'C Major',          notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
+      { name:'G Major',          notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
+      { name:'F Major',          notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'] },
+      { name:'D Major',          notes:['D4','E4','F#4','G4','A4','B4','C#5','D5'] },
+      { name:'A Major',          notes:['A3','B3','C#4','D4','E4','F#4','G#4','A4'] },
+      { name:'E Major',          notes:['E4','F#4','G#4','A4','B4','C#5','D#5','E5'] },
+      { name:'Bb Major',         notes:['Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'] },
+      { name:'Eb Major',         notes:['Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5'] },
+      { name:'Ab Major',         notes:['Ab3','Bb3','C4','Db4','Eb4','F4','G4','Ab4'] },
+      { name:'A Harmonic Minor', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'] },
+      { name:'E Harmonic Minor', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'] },
+      { name:'D Harmonic Minor', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'] },
+      { name:'G Harmonic Minor', notes:['G3','A3','Bb3','C4','D4','Eb4','F#4','G4'] },
+      { name:'C Harmonic Minor', notes:['C4','D4','Eb4','F4','G4','Ab4','B4','C5'] },
+    ];
+
+    /* ---- State ---- */
+    let currentScale = SCALES[0];
+    let currentNoteIndex = 0; // how many notes have been correctly tapped
+    let scaleComplete = false;
+    let showMode = false;
+    const score = new SessionScore('scale-builder');
+
+    /* ---- Build Keyboard ---- */
+    function buildKb() {
+      buildKeyboard('keyboard-container', {
+        startMidi: 48,  // C3
+        endMidi:   84,  // C6
+        onKeyClick: onKeyClick
+      });
+    }
+
+    function onKeyClick(toneNote, midiNum, el) {
+      if (scaleComplete) return;
+      if (showMode) {
+        // In show mode just play the note
+        playNote(toneNote, '4n');
+        return;
+      }
+
+      const expectedNote = currentScale.notes[currentNoteIndex];
+      // Normalize note names for comparison
+      const clickedMidi = Tonal.Note.midi(toneNote);
+      const expectedMidi = Tonal.Note.midi(expectedNote);
+
+      playNote(toneNote, '4n');
+
+      if (clickedMidi === expectedMidi) {
+        // Correct note!
+        el.classList.add('correct');
+        currentNoteIndex++;
+        updatePips();
+        updateCounter();
+        setFeedback('', 'empty');
+
+        if (currentNoteIndex === currentScale.notes.length) {
+          // Scale complete!
+          finishScale();
+        }
+      } else {
+        // Wrong note
+        el.classList.add('wrong-key');
+        addShake(el);
+        setFeedback(randomWrong(), 'wrong');
+        score.onWrong();
+        setTimeout(function() { el.classList.remove('wrong-key'); }, 600);
+      }
+    }
+
+    function updatePips() {
+      const container = document.getElementById('note-progress');
+      const pips = container.querySelectorAll('.note-pip');
+      pips.forEach(function(pip, i) {
+        pip.classList.remove('done','next');
+        if (i < currentNoteIndex) pip.classList.add('done');
+        else if (i === currentNoteIndex) pip.classList.add('next');
+      });
+    }
+
+    function updateCounter() {
+      const n = Math.min(currentNoteIndex + 1, currentScale.notes.length);
+      document.getElementById('note-counter').textContent = 'Note ' + n + ' of 8';
+    }
+
+    function buildPips() {
+      const container = document.getElementById('note-progress');
+      container.innerHTML = '';
+      for (let i = 0; i < currentScale.notes.length; i++) {
+        const pip = document.createElement('div');
+        pip.className = 'note-pip' + (i === 0 ? ' next' : '');
+        container.appendChild(pip);
+      }
+    }
+
+    function setFeedback(msg, type) {
+      const el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function loadScale(scale) {
+      currentScale = scale;
+      currentNoteIndex = 0;
+      scaleComplete = false;
+      showMode = false;
+      clearPianoHighlights();
+      document.getElementById('scale-title').textContent = 'Build: ' + scale.name + ' 🎼';
+      document.getElementById('scale-hint-text').textContent = 'Click the 8 notes of ' + scale.name + ' on the keyboard below';
+      document.getElementById('note-counter').textContent = 'Note 1 of 8';
+      document.getElementById('celebration').style.display = 'none';
+      setFeedback('', 'empty');
+      buildPips();
+    }
+
+    function nextScale() {
+      const idx = Math.floor(Math.random() * SCALES.length);
+      loadScale(SCALES[idx]);
+    }
+
+    function showMeScale() {
+      showMode = true;
+      clearPianoHighlights();
+      // Highlight all scale notes
+      const noteNames = currentScale.notes.map(function(n) { return n; });
+      // Need to normalize for keyboard keys (e.g. Bb3 vs A#3)
+      // Find matching keys by MIDI
+      const scaleMidis = noteNames.map(function(n) { return Tonal.Note.midi(n); });
+      document.querySelectorAll('.piano-key').forEach(function(k) {
+        const noteName = k.dataset.note;
+        const midi = Tonal.Note.midi(noteName);
+        if (scaleMidis.indexOf(midi) !== -1) {
+          k.classList.add('scale-hint');
+        }
+      });
+      playCurrentScale();
+      setFeedback('Here are the notes of ' + currentScale.name + '! 🎵', 'correct');
+    }
+
+    function playCurrentScale() {
+      playScale(currentScale.notes, 100);
+    }
+
+    function finishScale() {
+      scaleComplete = true;
+      score.onCorrect();
+      document.getElementById('note-counter').textContent = 'All 8 notes done! 🎉';
+      document.getElementById('celebration').style.display = 'block';
+      const cel = document.getElementById('celebration');
+      triggerStarburst(cel);
+      setFeedback(randomCorrect(), 'correct');
+      // Play scale ascending + descending
+      setTimeout(function() { playScale(currentScale.notes, 100); }, 400);
+    }
+
+    /* ---- Start ---- */
+    initSampler(function() {
+      buildKb();
+      loadScale(SCALES[0]);
+    });
+  </script>
+</body>
+</html>

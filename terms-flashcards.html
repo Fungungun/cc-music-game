@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📚 Terms Flashcards — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <style>
+    .page-header { background: linear-gradient(90deg, #5B9BD5, #D4EEFF); }
+    .page-header h1, .page-header a, .page-header span { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    .flashcard-area {
+      perspective: 1000px;
+      width: 360px;
+      height: 240px;
+      margin: 24px auto;
+      cursor: pointer;
+      user-select: none;
+    }
+    .flashcard-inner {
+      position: relative; width: 100%; height: 100%;
+      transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+      transform-style: preserve-3d;
+    }
+    .flashcard-area.flipped .flashcard-inner { transform: rotateY(180deg); }
+    .flashcard-face {
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border-radius: 24px; padding: 28px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+    }
+    .flashcard-front { background: #D4EEFF; }
+    .flashcard-back  { background: #C7F2E3; transform: rotateY(180deg); }
+
+    .card-term    { font-size: 2.2rem; font-weight: 900; text-align: center; line-height: 1.2; }
+    .card-grade   { font-size: 0.9rem; background: rgba(0,0,0,0.12); border-radius: 20px; padding: 3px 12px; margin-top: 10px; }
+    .card-hint    { font-size: 0.9rem; color: #666; margin-top: 14px; }
+    .card-meaning { font-size: 1.5rem; font-weight: 700; text-align: center; line-height: 1.3; }
+
+    .card-buttons { display: flex; gap: 16px; margin-top: 28px; }
+    .btn-got-it   { background: #4CAF50; color: white; border: none; border-radius: 20px; padding: 14px 28px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s; font-family: inherit; }
+    .btn-no-idea  { background: #FF6B6B; color: white; border: none; border-radius: 20px; padding: 14px 28px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s; font-family: inherit; }
+    .btn-got-it:hover, .btn-no-idea:hover { transform: scale(1.05); }
+
+    .counter-bar  { text-align: center; font-size: 1rem; color: #555; margin: 8px 0; }
+    .grade-tabs   { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 12px 16px 0; }
+    .grade-tab    { padding: 8px 20px; border-radius: 30px; border: 2px solid #ddd; background: white; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .grade-tab.active { background: #5B9BD5; color: white; border-color: #5B9BD5; }
+
+    .mastered-count { text-align: center; font-size: 1.1rem; font-weight: 700; color: #4CAF50; padding: 8px; }
+
+    .feedback-msg { text-align: center; font-size: 1.2rem; font-weight: 700; min-height: 36px; padding: 6px; }
+
+    .flip-hint { font-size: 0.85rem; color: #888; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading piano sounds... 🎹</p>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" title="Back">←</a>
+  <h1 class="page-title">📚 Terms Flashcards</h1>
+  <div class="score-display">
+    <span id="score-correct">0/0</span>
+    <span id="score-streak">🔥 0</span>
+  </div>
+</header>
+
+<div class="progress-container">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="progress-label">0 / 0</div>
+</div>
+
+<div class="grade-tabs">
+  <button class="grade-tab active" data-grade="all">All Grades</button>
+  <button class="grade-tab" data-grade="1">Grade 1</button>
+  <button class="grade-tab" data-grade="2">Grade 2</button>
+  <button class="grade-tab" data-grade="3">Grade 3</button>
+</div>
+
+<div class="main-content" style="text-align:center;">
+  <div class="mastered-count" id="mastered-count">⭐ 0 mastered</div>
+  <div class="counter-bar" id="counter-bar">Card 1 of 1</div>
+
+  <div class="flashcard-area" id="flashcard" onclick="flipCard()">
+    <div class="flashcard-inner">
+      <div class="flashcard-face flashcard-front">
+        <div class="card-term" id="card-term">—</div>
+        <div class="card-grade" id="card-grade">Grade 1</div>
+        <div class="flip-hint">👆 Tap to reveal meaning</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <div class="card-meaning" id="card-meaning">—</div>
+        <div class="card-buttons">
+          <button class="btn-got-it"  onclick="event.stopPropagation(); markCard(true)">✓ Got it!</button>
+          <button class="btn-no-idea" onclick="event.stopPropagation(); markCard(false)">✗ Not sure</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback-msg" id="feedback-msg"></div>
+
+  <div style="margin-top: 12px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <button class="btn btn-primary" onclick="nextCard()" style="background:#5B9BD5;">⏭ Skip</button>
+    <button class="btn" onclick="resetProgress()" style="background:#FFB7C5;">🔄 Reset Progress</button>
+  </div>
+</div>
+
+<script>
+/* ===== TERM DATA ===== */
+const ALL_TERMS = [
+  // Grade 1
+  {id:'adagio',      term:'Adagio',           meaning:'Slowly',                                       grade:1},
+  {id:'andante',     term:'Andante',           meaning:'At a walking pace',                            grade:1},
+  {id:'moderato',    term:'Moderato',          meaning:'At a moderate speed',                          grade:1},
+  {id:'allegro',     term:'Allegro',           meaning:'Fast and lively',                              grade:1},
+  {id:'presto',      term:'Presto',            meaning:'Very fast',                                    grade:1},
+  {id:'accel',       term:'Accelerando',       meaning:'Gradually getting faster (accel.)',            grade:1},
+  {id:'rall',        term:'Rallentando',       meaning:'Gradually getting slower (rall.)',             grade:1},
+  {id:'rit',         term:'Ritardando',        meaning:'Gradually getting slower (rit.)',              grade:1},
+  {id:'riten',       term:'Ritenuto',          meaning:'Immediately slower (riten.)',                  grade:1},
+  {id:'atempo',      term:'A tempo',           meaning:'Return to the original tempo',                 grade:1},
+  {id:'cresc',       term:'Crescendo',         meaning:'Gradually getting louder (cresc.)',            grade:1},
+  {id:'decresc',     term:'Decrescendo',       meaning:'Gradually getting quieter (decresc.)',         grade:1},
+  {id:'dim',         term:'Diminuendo',        meaning:'Gradually getting quieter (dim.)',             grade:1},
+  {id:'forte',       term:'Forte',             meaning:'Loud (f)',                                     grade:1},
+  {id:'piano',       term:'Piano',             meaning:'Soft (p)',                                     grade:1},
+  {id:'legato',      term:'Legato',            meaning:'Smoothly connected',                           grade:1},
+  {id:'staccato',    term:'Staccato',          meaning:'Short and detached',                           grade:1},
+  // Grade 2
+  {id:'lento',       term:'Lento',             meaning:'Slowly',                                       grade:2},
+  {id:'largo',       term:'Largo',             meaning:'Very slow and broad',                          grade:2},
+  {id:'allegretto',  term:'Allegretto',        meaning:'Fairly fast (a little slower than Allegro)',   grade:2},
+  {id:'vivace',      term:'Vivace',            meaning:'Lively and fast',                              grade:2},
+  {id:'vivo',        term:'Vivo',              meaning:'Lively',                                       grade:2},
+  {id:'allarg',      term:'Allargando',        meaning:'Broadening — becoming slower and louder',      grade:2},
+  {id:'piumosso',    term:'Più mosso',         meaning:'More movement / faster',                       grade:2},
+  {id:'menomosso',   term:'Meno mosso',        meaning:'Less movement / slower',                       grade:2},
+  {id:'pp',          term:'Pianissimo',        meaning:'Very soft (pp)',                               grade:2},
+  {id:'ff',          term:'Fortissimo',        meaning:'Very loud (ff)',                               grade:2},
+  {id:'mf',          term:'Mezzo forte',       meaning:'Moderately loud (mf)',                         grade:2},
+  {id:'mp',          term:'Mezzo piano',       meaning:'Moderately soft (mp)',                         grade:2},
+  {id:'maestoso',    term:'Maestoso',          meaning:'Majestically',                                 grade:2},
+  {id:'sostenuto',   term:'Sostenuto',         meaning:'Sustained',                                    grade:2},
+  {id:'sempre',      term:'Sempre',            meaning:'Always',                                       grade:2},
+  {id:'poco',        term:'Poco',              meaning:'A little',                                     grade:2},
+  {id:'molto',       term:'Molto',             meaning:'Very / much',                                  grade:2},
+  {id:'senza',       term:'Senza',             meaning:'Without',                                      grade:2},
+  {id:'cantabile',   term:'Cantabile',         meaning:'In a singing style',                           grade:2},
+  {id:'leggiero',    term:'Leggiero',          meaning:'Light and nimble',                             grade:2},
+  {id:'dalsegno',    term:'Dal segno',         meaning:'From the sign (D.S.)',                         grade:2},
+  {id:'dacapo',      term:'Da capo al fine',   meaning:'From the beginning to Fine (D.C. al Fine)',   grade:2},
+  {id:'mstaccato',   term:'Mezzo staccato',    meaning:'Moderately detached / portato',               grade:2},
+  // Grade 3
+  {id:'largamente',  term:'Largamente',        meaning:'Broadly',                                      grade:3},
+  {id:'larghetto',   term:'Larghetto',         meaning:'Rather broad (a little faster than Largo)',   grade:3},
+  {id:'prestissimo', term:'Prestissimo',       meaning:'As fast as possible',                          grade:3},
+  {id:'conmoto',     term:'Con moto',          meaning:'With motion',                                  grade:3},
+  {id:'calando',     term:'Calando',           meaning:'Getting softer and slower',                    grade:3},
+  {id:'morendo',     term:'Morendo',           meaning:'Dying away',                                   grade:3},
+  {id:'fp',          term:'Forte-piano',       meaning:'Loud then immediately soft (fp)',              grade:3},
+  {id:'sfz',         term:'Sforzando',         meaning:'With sudden emphasis (sfz)',                   grade:3},
+  {id:'agitato',     term:'Agitato',           meaning:'Agitated / restless',                          grade:3},
+  {id:'attacca',     term:'Attacca',           meaning:'Proceed without a break',                      grade:3},
+  {id:'animato',     term:'Animato',           meaning:'Animated / lively',                            grade:3},
+  {id:'tranquillo',  term:'Tranquillo',        meaning:'Tranquil / calm',                              grade:3},
+  {id:'conanima',    term:'Con anima',         meaning:'With soul / spirit',                           grade:3},
+  {id:'conbrio',     term:'Con brio',          meaning:'With vigour / spirit',                         grade:3},
+  {id:'congrazia',   term:'Con grazia',        meaning:'With grace',                                   grade:3},
+  {id:'conforza',    term:'Con forza',         meaning:'With force',                                   grade:3},
+  {id:'dolce',       term:'Dolce',             meaning:'Sweetly',                                      grade:3},
+  {id:'risoluto',    term:'Risoluto',          meaning:'Resolute and bold',                            grade:3},
+  {id:'benmarcato',  term:'Ben marcato',       meaning:'Well marked / well accented',                  grade:3},
+  {id:'maindroite',  term:'Main droite',       meaning:'Right hand — French (m.d.)',                  grade:3},
+  {id:'maingauche',  term:'Main gauche',       meaning:'Left hand — French (m.g.)',                   grade:3},
+  {id:'unacorda',    term:'Una corda',         meaning:'One string — use the soft pedal',              grade:3},
+  {id:'trecorde',    term:'Tre corde',         meaning:'Three strings — release the soft pedal',      grade:3},
+  {id:'adlib',       term:'Ad libitum',        meaning:'At liberty / freely (ad lib.)',               grade:3},
+  {id:'opus',        term:'Opus',              meaning:'A numbered musical work (op.)',                grade:3},
+  {id:'loco',        term:'Loco',              meaning:'At normal pitch — used after 8va',            grade:3},
+];
+
+/* ===== SRS (Spaced Repetition) ===== */
+const SRS_KEY = 'cc-terms-srs';
+
+function getSRS() {
+  try { return JSON.parse(localStorage.getItem(SRS_KEY)) || {}; } catch { return {}; }
+}
+function saveSRS(data) {
+  try { localStorage.setItem(SRS_KEY, JSON.stringify(data)); } catch {}
+}
+
+function getTermSRS(id, srs) {
+  return srs[id] || { nextDue: 0, interval: 0, reps: 0 };
+}
+
+function updateTermSRS(id, correct) {
+  const srs = getSRS();
+  const t = getTermSRS(id, srs);
+  const now = Date.now();
+  if (correct) {
+    t.reps = (t.reps || 0) + 1;
+    // SM-2 inspired: interval grows: 1, 3, 7, 14, 30 days...
+    const intervals = [0, 1, 3, 7, 14, 30, 60];
+    const idx = Math.min(t.reps, intervals.length - 1);
+    t.interval = intervals[idx];
+    t.nextDue = now + t.interval * 86400000;
+  } else {
+    t.reps = 0;
+    t.interval = 0;
+    t.nextDue = 0; // due immediately
+  }
+  srs[id] = t;
+  saveSRS(srs);
+}
+
+function getMastered() {
+  const srs = getSRS();
+  return ALL_TERMS.filter(t => {
+    const s = srs[t.id];
+    return s && s.reps >= 3;
+  }).length;
+}
+
+/* ===== STATE ===== */
+let currentGrade = 'all';
+let filteredTerms = [];
+let queue = [];
+let currentIdx = 0;
+let isFlipped = false;
+let score;
+
+function getFilteredTerms() {
+  if (currentGrade === 'all') return ALL_TERMS.slice();
+  return ALL_TERMS.filter(t => t.grade === parseInt(currentGrade));
+}
+
+function buildQueue() {
+  const srs = getSRS();
+  const now = Date.now();
+  filteredTerms = getFilteredTerms();
+
+  // Sort: due now (nextDue <= now) first, then by nextDue ascending (soonest first)
+  queue = filteredTerms.slice().sort((a, b) => {
+    const sa = getTermSRS(a.id, srs);
+    const sb = getTermSRS(b.id, srs);
+    const dueA = sa.nextDue || 0;
+    const dueB = sb.nextDue || 0;
+    const nowDueA = dueA <= now ? 0 : 1;
+    const nowDueB = dueB <= now ? 0 : 1;
+    if (nowDueA !== nowDueB) return nowDueA - nowDueB;
+    return dueA - dueB;
+  });
+
+  currentIdx = 0;
+}
+
+function showCard(idx) {
+  if (!queue.length) return;
+  idx = ((idx % queue.length) + queue.length) % queue.length;
+  currentIdx = idx;
+  const term = queue[idx];
+
+  document.getElementById('card-term').textContent = term.term;
+  document.getElementById('card-grade').textContent = 'Grade ' + term.grade;
+  document.getElementById('card-meaning').textContent = term.meaning;
+  document.getElementById('counter-bar').textContent =
+    'Card ' + (idx + 1) + ' of ' + queue.length;
+  document.getElementById('mastered-count').textContent =
+    '⭐ ' + getMastered() + ' mastered out of ' + filteredTerms.length;
+
+  // Reset flip
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  clearFeedback();
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+}
+
+function markCard(correct) {
+  const term = queue[currentIdx];
+  if (!term) return;
+  updateTermSRS(term.id, correct);
+
+  if (correct) {
+    score.onCorrect();
+    triggerStarburst(document.getElementById('flashcard'));
+    showFeedback(randomCorrect(), 'correct');
+    setTimeout(() => nextCard(), 1200);
+  } else {
+    score.onWrong();
+    showFeedback(randomWrong(), 'wrong');
+    // Move term to end of queue so CC sees it again soon
+    queue.splice(currentIdx, 1);
+    queue.push(term);
+    // don't advance index (next card will be what was after)
+    if (currentIdx >= queue.length) currentIdx = 0;
+    setTimeout(() => { showCard(currentIdx); }, 1200);
+  }
+  updateMastered();
+}
+
+function nextCard() {
+  showCard((currentIdx + 1) % queue.length);
+}
+
+function updateMastered() {
+  document.getElementById('mastered-count').textContent =
+    '⭐ ' + getMastered() + ' mastered out of ' + filteredTerms.length;
+}
+
+function showFeedback(msg, type) {
+  const el = document.getElementById('feedback-msg');
+  el.textContent = msg;
+  el.className = 'feedback-msg ' + (type || '');
+}
+function clearFeedback() {
+  const el = document.getElementById('feedback-msg');
+  el.textContent = '';
+  el.className = 'feedback-msg';
+}
+
+function resetProgress() {
+  if (!confirm('Reset all flashcard progress? This will clear your spaced repetition history.')) return;
+  try { localStorage.removeItem(SRS_KEY); } catch {}
+  buildQueue();
+  showCard(0);
+  score = new SessionScore('terms-flashcards');
+  showFeedback('Progress reset! Let\'s start fresh 🌟', 'correct');
+}
+
+/* ===== GRADE TABS ===== */
+document.querySelectorAll('.grade-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.grade-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentGrade = btn.dataset.grade;
+    buildQueue();
+    showCard(0);
+  });
+});
+
+/* ===== KEYBOARD NAVIGATION ===== */
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (!isFlipped) flipCard();
+  }
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'y' || e.key === 'Y') { if (isFlipped) markCard(true); }
+  if (e.key === 'n' || e.key === 'N') { if (isFlipped) markCard(false); }
+});
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  score = new SessionScore('terms-flashcards');
+  buildQueue();
+  showCard(0);
+
+  initSampler(() => {
+    // No audio needed for flashcards, but sampler init hides loading overlay
+  });
+});
+</script>
+</body>
+</html>
