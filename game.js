@@ -29,13 +29,17 @@ let _correctIdx = 0;
 let _wrongIdx = 0;
 
 function randomCorrect() {
-  const msg = CORRECT_MESSAGES[_correctIdx % CORRECT_MESSAGES.length];
+  const msgs = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[getCurrentLang()] && TRANSLATIONS[getCurrentLang()].correct)
+    ? TRANSLATIONS[getCurrentLang()].correct : CORRECT_MESSAGES;
+  const msg = msgs[_correctIdx % msgs.length];
   _correctIdx++;
   return msg;
 }
 
 function randomWrong() {
-  const msg = WRONG_MESSAGES[_wrongIdx % WRONG_MESSAGES.length];
+  const msgs = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[getCurrentLang()] && TRANSLATIONS[getCurrentLang()].wrong)
+    ? TRANSLATIONS[getCurrentLang()].wrong : WRONG_MESSAGES;
+  const msg = msgs[_wrongIdx % msgs.length];
   _wrongIdx++;
   return msg;
 }

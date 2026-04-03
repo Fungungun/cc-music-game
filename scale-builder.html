@@ -64,23 +64,35 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div>Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
   </div>
 
   <header class="page-header">
-    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
-    <div>
+    <a href="index.html" class="back-btn" aria-label="Back to menu" data-i18n="back">←</a>
+    <div style="flex:1;">
       <h1>🎼 Scale Builder</h1>
       <div class="subtitle">Click the notes of the scale on the keyboard!</div>
     </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
+
+  <!-- How to Play intro -->
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span data-i18n="how-to-play">How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p data-i18n="how-scale-builder">A scale name will appear at the top. Tap the correct notes on the piano keyboard in order from the lowest note to the highest. Each correct note lights up green!</p>
+    </div>
+  </div>
 
   <main class="main-content">
 
     <!-- Score -->
     <div class="score-display">
-      <div class="score-item">Scales Built <span id="score-correct">0/0</span></div>
-      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
     </div>
 
     <!-- Progress Bar -->
@@ -110,18 +122,34 @@
 
     <!-- Actions -->
     <div class="action-row">
-      <button class="btn btn-mint" onclick="showMeScale()">👁 Show Me</button>
-      <button class="btn btn-secondary" onclick="nextScale()">Try Another Scale 🎲</button>
-      <button class="btn btn-secondary" onclick="playCurrentScale()">▶ Play Scale</button>
+      <button class="btn btn-mint" onclick="showMeScale()" data-i18n="show-me">👁 Show Me</button>
+      <button class="btn btn-secondary" onclick="nextScale()" data-i18n="try-another">Try Another Scale 🎲</button>
+      <button class="btn btn-secondary" onclick="playCurrentScale()" data-i18n="play-scale">▶ Play Scale</button>
     </div>
 
   </main>
 
+  <script src="i18n.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
   <script src="game.js"></script>
   <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      const body = document.getElementById('intro-body');
+      const arrow = document.getElementById('intro-arrow');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
     const SCALES = [
       { name:'C Major',          notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
       { name:'G Major',          notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
@@ -141,7 +169,7 @@
 
     /* ---- State ---- */
     let currentScale = SCALES[0];
-    let currentNoteIndex = 0; // how many notes have been correctly tapped
+    let currentNoteIndex = 0;
     let scaleComplete = false;
     let showMode = false;
     const score = new SessionScore('scale-builder');
@@ -158,20 +186,17 @@
     function onKeyClick(toneNote, midiNum, el) {
       if (scaleComplete) return;
       if (showMode) {
-        // In show mode just play the note
         playNote(toneNote, '4n');
         return;
       }
 
       const expectedNote = currentScale.notes[currentNoteIndex];
-      // Normalize note names for comparison
       const clickedMidi = Tonal.Note.midi(toneNote);
       const expectedMidi = Tonal.Note.midi(expectedNote);
 
       playNote(toneNote, '4n');
 
       if (clickedMidi === expectedMidi) {
-        // Correct note!
         el.classList.add('correct');
         currentNoteIndex++;
         updatePips();
@@ -179,11 +204,9 @@
         setFeedback('', 'empty');
 
         if (currentNoteIndex === currentScale.notes.length) {
-          // Scale complete!
           finishScale();
         }
       } else {
-        // Wrong note
         el.classList.add('wrong-key');
         addShake(el);
         setFeedback(randomWrong(), 'wrong');
@@ -245,10 +268,7 @@
     function showMeScale() {
       showMode = true;
       clearPianoHighlights();
-      // Highlight all scale notes
       const noteNames = currentScale.notes.map(function(n) { return n; });
-      // Need to normalize for keyboard keys (e.g. Bb3 vs A#3)
-      // Find matching keys by MIDI
       const scaleMidis = noteNames.map(function(n) { return Tonal.Note.midi(n); });
       document.querySelectorAll('.piano-key').forEach(function(k) {
         const noteName = k.dataset.note;
@@ -273,7 +293,6 @@
       const cel = document.getElementById('celebration');
       triggerStarburst(cel);
       setFeedback(randomCorrect(), 'correct');
-      // Play scale ascending + descending
       setTimeout(function() { playScale(currentScale.notes, 100); }, 400);
     }
 

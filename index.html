@@ -16,16 +16,18 @@
     .module-card[data-accent="coral"]  { background: linear-gradient(135deg, #FFD4A3, #FFBF7A); }
     .module-card[data-accent="sky"]    { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
     .module-card[data-accent="purple"] { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
+    .module-card[data-accent="grape"]  { background: linear-gradient(135deg, #E8D0FF, #D4AAFF); }
   </style>
 </head>
 <body>
   <header class="page-header">
-    <h1>🎹 CC's Music Game</h1>
+    <h1 data-i18n="app-title">🎹 CC's Music Game</h1>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
 
   <main class="main-content">
     <div class="hero">
-      <p class="tagline">Hi CC! Let's learn music theory! 🌟</p>
+      <p class="tagline" data-i18n="app-tagline">Hi CC! Let's learn music theory! 🌟</p>
     </div>
 
     <div class="cards-grid" id="cards-grid">
@@ -37,6 +39,7 @@
     </div>
   </main>
 
+  <script src="i18n.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
@@ -45,82 +48,96 @@
     const MODULES = [
       {
         id: 'note-namer',
+        titleKey: 'mod-note-namer',
+        descKey: 'desc-note-namer',
         emoji: '🎵',
-        title: 'Note Namer',
-        desc: 'Identify notes on the staff',
         accent: 'pink',
         href: 'note-namer.html'
       },
       {
         id: 'scale-builder',
+        titleKey: 'mod-scale-builder',
+        descKey: 'desc-scale-builder',
         emoji: '🎼',
-        title: 'Scale Builder',
-        desc: 'Build major & minor scales',
         accent: 'mint',
         href: 'scale-builder.html'
       },
       {
         id: 'interval-quiz',
+        titleKey: 'mod-interval-quiz',
+        descKey: 'desc-interval-quiz',
         emoji: '🎶',
-        title: 'Interval Quiz',
-        desc: 'Name the musical interval',
         accent: 'lavender',
         href: 'interval-quiz.html'
       },
       {
         id: 'chord-game',
+        titleKey: 'mod-chord-game',
+        descKey: 'desc-chord-game',
         emoji: '🎸',
-        title: 'Chord Game',
-        desc: 'Identify chords and cadences',
         accent: 'yellow',
         href: 'chord-game.html'
       },
       {
         id: 'rhythm-tapper',
+        titleKey: 'mod-rhythm-tapper',
+        descKey: 'desc-rhythm-tapper',
         emoji: '🥁',
-        title: 'Rhythm Tapper',
-        desc: 'Tap along to the rhythm',
         accent: 'coral',
         href: 'rhythm-tapper.html'
       },
       {
         id: 'terms-flashcards',
+        titleKey: 'mod-terms-flashcards',
+        descKey: 'desc-terms-flashcards',
         emoji: '📚',
-        title: 'Terms Flashcards',
-        desc: 'Italian & French music terms',
         accent: 'sky',
         href: 'terms-flashcards.html'
       },
       {
         id: 'form-detective',
+        titleKey: 'mod-form-detective',
+        descKey: 'desc-form-detective',
         emoji: '🔍',
-        title: 'Form Detective',
-        desc: 'Identify musical forms',
         accent: 'purple',
         href: 'form-detective.html'
+      },
+      {
+        id: 'mock-test',
+        titleKey: 'mod-mock-test',
+        descKey: 'desc-mock-test',
+        emoji: '📝',
+        accent: 'grape',
+        href: 'mock-test.html'
       }
     ];
 
     function buildCards() {
       const grid = document.getElementById('cards-grid');
       let totalScore = 0;
-      let totalModules = MODULES.length;
-      let modulesWithScore = 0;
+
+      // Only count modules that have score data (exclude mock-test which uses different storage)
+      const scoredModules = ['note-namer','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective'];
 
       MODULES.forEach(function(mod) {
         const data = getModuleData(mod.id);
         const score = data.highScore || 0;
-        if (score > 0) modulesWithScore++;
-        totalScore += score;
+        if (scoredModules.indexOf(mod.id) !== -1) {
+          totalScore += score;
+        }
 
         const card = document.createElement('a');
         card.className = 'module-card';
         card.href = mod.href;
         card.dataset.accent = mod.accent;
+
+        const title = t(mod.titleKey);
+        const desc = t(mod.descKey);
+
         card.innerHTML =
           '<span class="card-icon">' + mod.emoji + '</span>' +
-          '<div class="card-title">' + mod.title + '</div>' +
-          '<div class="card-desc">' + mod.desc + '</div>' +
+          '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
+          '<div class="card-desc" data-i18n="' + mod.descKey + '">' + desc + '</div>' +
           '<div class="card-score">Best: ' + score + ' ✨</div>';
         grid.appendChild(card);
       });
@@ -131,7 +148,7 @@
       let starStr = '';
       for (let i = 0; i < Math.min(stars, 20); i++) starStr += '⭐';
       starsEl.innerHTML =
-        '<div style="margin-bottom:6px;font-size:1rem;color:#666;">Total score across all modules: ' + totalScore + '</div>' +
+        '<div style="margin-bottom:6px;font-size:1rem;color:#666;" data-i18n="overall-progress">' + t('overall-progress') + ': ' + totalScore + '</div>' +
         '<div style="font-size:1.4rem;line-height:1.8;">' + (starStr || '🎵 Start playing to earn stars!') + '</div>';
     }
 

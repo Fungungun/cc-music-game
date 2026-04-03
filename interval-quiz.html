@@ -46,23 +46,35 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div>Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
   </div>
 
   <header class="page-header">
-    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
-    <div>
+    <a href="index.html" class="back-btn" aria-label="Back to menu" data-i18n="back">←</a>
+    <div style="flex:1;">
       <h1>🎶 Interval Quiz</h1>
       <div class="subtitle">Name the musical interval!</div>
     </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
+
+  <!-- How to Play intro -->
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span data-i18n="how-to-play">How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p data-i18n="how-interval-quiz">Two notes will be shown on the staff. Count the distance between them and choose the correct interval name. You can press Play to hear both notes!</p>
+    </div>
+  </div>
 
   <main class="main-content">
 
     <!-- Score -->
     <div class="score-display">
-      <div class="score-item">Score <span id="score-correct">0/0</span></div>
-      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
     </div>
 
     <!-- Progress Bar -->
@@ -73,8 +85,8 @@
 
     <!-- Display mode -->
     <div class="mode-row">
-      <button class="mode-btn active" id="btn-harmonic" onclick="setDisplayMode('harmonic')">Harmonic (together)</button>
-      <button class="mode-btn" id="btn-melodic" onclick="setDisplayMode('melodic')">Melodic (one by one)</button>
+      <button class="mode-btn active" id="btn-harmonic" onclick="setDisplayMode('harmonic')" data-i18n="harmonic">Harmonic (together)</button>
+      <button class="mode-btn" id="btn-melodic" onclick="setDisplayMode('melodic')" data-i18n="melodic">Melodic (one by one)</button>
     </div>
 
     <!-- Staff -->
@@ -87,8 +99,8 @@
 
     <!-- Play buttons -->
     <div class="play-row">
-      <button class="btn btn-lavender" id="btn-play" onclick="playCurrentInterval()">▶ Play Notes</button>
-      <button class="btn btn-secondary" onclick="nextQuestion()">Skip →</button>
+      <button class="btn btn-lavender" id="btn-play" onclick="playCurrentInterval()" data-i18n="play-notes">▶ Play Notes</button>
+      <button class="btn btn-secondary" onclick="nextQuestion()" data-i18n="skip">Skip →</button>
     </div>
 
     <!-- Feedback -->
@@ -99,11 +111,27 @@
 
   </main>
 
+  <script src="i18n.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
   <script src="game.js"></script>
   <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      const body = document.getElementById('intro-body');
+      const arrow = document.getElementById('intro-arrow');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
     const INTERVALS = [
       { name:'Perfect Unison', short:'P1', semitones:0 },
       { name:'Major 2nd',      short:'M2', semitones:2 },
@@ -147,19 +175,15 @@
       return shuffled.slice(0, count);
     }
 
-    // Convert our short format (e.g. "M3") to Tonal interval format ("3M")
     function toTonalInterval(short) {
-      // "P5" → "5P", "M3" → "3M", "m6" → "6m", "d5" → "5d"
       return short.slice(1) + short[0];
     }
 
     function generateQuestion() {
       currentRoot = pickRandom(ROOT_NOTES);
       currentInterval = pickRandom(INTERVALS);
-      // Use Tonal.transpose for correct enharmonic spelling (e.g. G#5 not Ab5)
       try {
         currentUpper = Tonal.Note.transpose(currentRoot, toTonalInterval(currentInterval.short));
-        // Fallback: if result is empty, use MIDI arithmetic
         if (!currentUpper || Tonal.Note.get(currentUpper).empty) {
           const upperMidi = Tonal.Note.midi(currentRoot) + currentInterval.semitones;
           currentUpper = Tonal.Note.fromMidi(upperMidi);
@@ -203,7 +227,6 @@
       if (answeredThisRound) return;
 
       if (interval.short === currentInterval.short) {
-        // Correct!
         answeredThisRound = true;
         btn.classList.add('correct-ans');
         setFeedback(randomCorrect(), 'correct');
@@ -212,7 +235,6 @@
         playCurrentInterval();
         setTimeout(function() { nextQuestion(); }, 1800);
       } else {
-        // Wrong
         wrongAttempts++;
         btn.classList.add('wrong-ans');
         addShake(btn);
@@ -221,7 +243,6 @@
 
         if (wrongAttempts >= 2) {
           answeredThisRound = true;
-          // Reveal correct
           document.querySelectorAll('.answer-btn').forEach(function(b) {
             if (b.dataset.short === currentInterval.short) b.classList.add('correct-ans');
           });
@@ -239,7 +260,6 @@
 
     function playCurrentInterval() {
       if (!currentRoot || !currentUpper) return;
-      // First melodically, then harmonically
       playMelodic([currentRoot, currentUpper], '4n', 100);
       setTimeout(function() {
         playChord([currentRoot, currentUpper], '2n');

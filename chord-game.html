@@ -37,23 +37,35 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div>Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
   </div>
 
   <header class="page-header">
-    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
-    <div>
+    <a href="index.html" class="back-btn" aria-label="Back to menu" data-i18n="back">←</a>
+    <div style="flex:1;">
       <h1>🎸 Chord Game</h1>
       <div class="subtitle">Identify chords and cadences!</div>
     </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
+
+  <!-- How to Play intro -->
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span data-i18n="how-to-play">How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p data-i18n="how-chord-game">A chord will appear on the staff. Choose whether it is a major or minor chord, and whether it is in root position or first inversion. In Cadence mode, identify the type of cadence!</p>
+    </div>
+  </div>
 
   <main class="main-content">
 
     <!-- Score -->
     <div class="score-display">
-      <div class="score-item">Score <span id="score-correct">0/0</span></div>
-      <div class="score-item">Streak <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
     </div>
 
     <!-- Progress Bar -->
@@ -64,8 +76,8 @@
 
     <!-- Mode Toggle -->
     <div class="mode-toggle">
-      <button class="mode-btn active" id="btn-chords" onclick="setMode('chords')">🎵 Chord Identification</button>
-      <button class="mode-btn" id="btn-cadences" onclick="setMode('cadences')">🎶 Cadence Game</button>
+      <button class="mode-btn active" id="btn-chords" onclick="setMode('chords')" data-i18n="chord-id">🎵 Chord Identification</button>
+      <button class="mode-btn" id="btn-cadences" onclick="setMode('cadences')" data-i18n="cadence-game">🎶 Cadence Game</button>
     </div>
 
     <!-- Current question type badge -->
@@ -78,8 +90,8 @@
 
     <!-- Play row -->
     <div class="play-row">
-      <button class="btn btn-yellow" onclick="playCurrentChord()">▶ Play</button>
-      <button class="btn btn-secondary" onclick="nextQuestion()">Skip →</button>
+      <button class="btn btn-yellow" onclick="playCurrentChord()" data-i18n="play">▶ Play</button>
+      <button class="btn btn-secondary" onclick="nextQuestion()" data-i18n="skip">Skip →</button>
     </div>
 
     <!-- Feedback -->
@@ -90,11 +102,27 @@
 
   </main>
 
+  <script src="i18n.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
   <script src="game.js"></script>
   <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      const body = document.getElementById('intro-body');
+      const arrow = document.getElementById('intro-arrow');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
     /* ---- Data ---- */
     const CHORDS = [
       {id:'Cmaj-R', display:'C Major — Root Position',   abc:'[ceg]4',      notes:['C4','E4','G4'],   key:'C', quality:'Major', inv:'Root'},
@@ -152,7 +180,6 @@
       wrongAttempts = 0;
       answeredThisRound = false;
 
-      // Render staff
       const abcStr = 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n' + currentChord.abc + '|]';
       renderAbc('staff', abcStr, {scale: 2.5, staffwidth: 180});
 
@@ -160,7 +187,6 @@
         '<span class="question-type-badge chord-badge">Chord Identification</span>' +
         '<div style="margin-top:6px;font-size:1rem;color:#666;">What chord is this?</div>';
 
-      // Build answer buttons: correct + 3 distractors
       const distractors = CHORDS.filter(function(c) { return c.id !== currentChord.id; })
         .sort(function() { return Math.random() - 0.5; }).slice(0, 3);
       const all = [currentChord].concat(distractors).sort(function() { return Math.random() - 0.5; });
@@ -246,7 +272,6 @@
 
       if (wrongAttempts >= 2) {
         answeredThisRound = true;
-        // Reveal correct
         if (gameMode === 'chords') {
           document.querySelectorAll('.answer-btn').forEach(function(b) {
             if (b.dataset.id === correctId) b.classList.add('correct-ans');
