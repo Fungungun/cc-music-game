@@ -44,46 +44,59 @@ function randomWrong() {
 let sampler = null;
 let samplerReady = false;
 
+function hideOverlay(overlay) {
+  if (overlay) overlay.style.display = 'none';
+}
+
 function initSampler(onReady) {
   const overlay = document.getElementById('loading-overlay');
-  if (overlay) overlay.style.display = 'flex';
 
-  sampler = new Tone.Sampler({
-    urls: {
-      "A0":"A0.mp3","C1":"C1.mp3","Ds1":"Ds1.mp3","Fs1":"Fs1.mp3",
-      "A1":"A1.mp3","C2":"C2.mp3","Ds2":"Ds2.mp3","Fs2":"Fs2.mp3",
-      "A2":"A2.mp3","C3":"C3.mp3","Ds3":"Ds3.mp3","Fs3":"Fs3.mp3",
-      "A3":"A3.mp3","C4":"C4.mp3","Ds4":"Ds4.mp3","Fs4":"Fs4.mp3",
-      "A4":"A4.mp3","C5":"C5.mp3","Ds5":"Ds5.mp3","Fs5":"Fs5.mp3",
-      "A5":"A5.mp3","C6":"C6.mp3","Ds6":"Ds6.mp3","Fs6":"Fs6.mp3",
-      "A6":"A6.mp3","C7":"C7.mp3","Ds7":"Ds7.mp3","Fs7":"Fs7.mp3",
-      "A7":"A7.mp3","C8":"C8.mp3"
-    },
-    baseUrl: "https://tonejs.github.io/audio/salamander/",
-    onload: function() {
-      samplerReady = true;
-      if (overlay) overlay.style.display = 'none';
-      if (typeof onReady === 'function') onReady();
-    }
-  }).toDestination();
-
-  // Fallback timeout — hide overlay after 15 seconds even if not fully loaded
-  setTimeout(function() {
-    if (overlay) overlay.style.display = 'none';
-    if (!samplerReady) {
-      samplerReady = true;
-      if (typeof onReady === 'function') onReady();
-    }
-  }, 15000);
-
-  // Also use Tone.loaded() promise
-  Tone.loaded().then(function() {
+  // Guard: only call onReady once
+  let readyCalled = false;
+  function finish() {
+    if (readyCalled) return;
+    readyCalled = true;
     samplerReady = true;
-    if (overlay) overlay.style.display = 'none';
+    hideOverlay(overlay);
     if (typeof onReady === 'function') onReady();
-  }).catch(function() {
-    if (overlay) overlay.style.display = 'none';
-  });
+  }
+
+  // Overlay: tap/click to dismiss immediately (user escape hatch)
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.style.cursor = 'pointer';
+    // Add tap-to-skip hint
+    const hint = document.createElement('p');
+    hint.textContent = '(tap here to skip)';
+    hint.style.cssText = 'font-size:14px;color:#888;margin-top:8px;';
+    overlay.appendChild(hint);
+    overlay.addEventListener('click', finish, { once: true });
+  }
+
+  try {
+    sampler = new Tone.Sampler({
+      urls: {
+        "A0":"A0.mp3", "C1":"C1.mp3", "D#1":"Ds1.mp3", "F#1":"Fs1.mp3",
+        "A1":"A1.mp3", "C2":"C2.mp3", "D#2":"Ds2.mp3", "F#2":"Fs2.mp3",
+        "A2":"A2.mp3", "C3":"C3.mp3", "D#3":"Ds3.mp3", "F#3":"Fs3.mp3",
+        "A3":"A3.mp3", "C4":"C4.mp3", "D#4":"Ds4.mp3", "F#4":"Fs4.mp3",
+        "A4":"A4.mp3", "C5":"C5.mp3", "D#5":"Ds5.mp3", "F#5":"Fs5.mp3",
+        "A5":"A5.mp3", "C6":"C6.mp3", "D#6":"Ds6.mp3", "F#6":"Fs6.mp3",
+        "A6":"A6.mp3", "C7":"C7.mp3", "D#7":"Ds7.mp3", "F#7":"Fs7.mp3",
+        "A7":"A7.mp3", "C8":"C8.mp3"
+      },
+      baseUrl: "https://tonejs.github.io/audio/salamander/",
+      onload: finish,
+      onerror: finish
+    }).toDestination();
+  } catch(e) {
+    console.error("Sampler creation failed:", e);
+    finish();
+    return;
+  }
+
+  // Hard fallback: unblock after 5 seconds no matter what
+  setTimeout(finish, 5000);
 }
 
 async function ensureAudio() {

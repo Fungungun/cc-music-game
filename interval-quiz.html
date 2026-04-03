@@ -147,12 +147,27 @@
       return shuffled.slice(0, count);
     }
 
+    // Convert our short format (e.g. "M3") to Tonal interval format ("3M")
+    function toTonalInterval(short) {
+      // "P5" → "5P", "M3" → "3M", "m6" → "6m", "d5" → "5d"
+      return short.slice(1) + short[0];
+    }
+
     function generateQuestion() {
       currentRoot = pickRandom(ROOT_NOTES);
       currentInterval = pickRandom(INTERVALS);
-      const rootMidi = Tonal.Note.midi(currentRoot);
-      const upperMidi = rootMidi + currentInterval.semitones;
-      currentUpper = Tonal.Note.fromMidi(upperMidi);
+      // Use Tonal.transpose for correct enharmonic spelling (e.g. G#5 not Ab5)
+      try {
+        currentUpper = Tonal.Note.transpose(currentRoot, toTonalInterval(currentInterval.short));
+        // Fallback: if result is empty, use MIDI arithmetic
+        if (!currentUpper || Tonal.Note.get(currentUpper).empty) {
+          const upperMidi = Tonal.Note.midi(currentRoot) + currentInterval.semitones;
+          currentUpper = Tonal.Note.fromMidi(upperMidi);
+        }
+      } catch(e) {
+        const upperMidi = Tonal.Note.midi(currentRoot) + currentInterval.semitones;
+        currentUpper = Tonal.Note.fromMidi(upperMidi);
+      }
       wrongAttempts = 0;
       answeredThisRound = false;
     }
