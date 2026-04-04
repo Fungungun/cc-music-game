@@ -145,12 +145,18 @@
     ];
 
     const CADENCES = [
-      {id:'perf-C', type:'Perfect',  desc:'V → I in C major', abc:"[gbd']2 [ceg]2|]", chords:[['G4','B4','D5'],['C4','E4','G4']]},
-      {id:'plag-C', type:'Plagal',   desc:'IV → I in C major', abc:"[fac']2 [ceg]2|]", chords:[['F4','A4','C5'],['C4','E4','G4']]},
-      {id:'perf-G', type:'Perfect',  desc:'V → I in G major',  abc:"[d^fa]2 [gbd']2|]", chords:[['D4','F#4','A4'],['G4','B4','D5']]},
-      {id:'plag-G', type:'Plagal',   desc:'IV → I in G major',  abc:"[ceg]2 [gbd']2|]", chords:[['C4','E4','G4'],['G4','B4','D5']]},
-      {id:'perf-F', type:'Perfect',  desc:'V → I in F major',  abc:"[ceg]2 [fac']2|]", chords:[['C4','E4','G4'],['F4','A4','C5']]},
-      {id:'plag-F', type:'Plagal',   desc:'IV → I in F major', abc:"[_bd'f']2 [fac']2|]", chords:[['Bb4','D5','F5'],['F4','A4','C5']]},
+      // Grade 2: Perfect and Plagal
+      {id:'perf-C', type:'Perfect',     grade:2, desc:'V → I in C major',   abc:"[gbd']2 [ceg]2|]",    chords:[['G4','B4','D5'],['C4','E4','G4']]},
+      {id:'plag-C', type:'Plagal',      grade:2, desc:'IV → I in C major',  abc:"[fac']2 [ceg]2|]",    chords:[['F4','A4','C5'],['C4','E4','G4']]},
+      {id:'perf-G', type:'Perfect',     grade:2, desc:'V → I in G major',   abc:"[d^fa]2 [gbd']2|]",   chords:[['D4','F#4','A4'],['G4','B4','D5']]},
+      {id:'plag-G', type:'Plagal',      grade:2, desc:'IV → I in G major',  abc:"[ceg]2 [gbd']2|]",    chords:[['C4','E4','G4'],['G4','B4','D5']]},
+      {id:'perf-F', type:'Perfect',     grade:2, desc:'V → I in F major',   abc:"[ceg]2 [fac']2|]",    chords:[['C4','E4','G4'],['F4','A4','C5']]},
+      {id:'plag-F', type:'Plagal',      grade:2, desc:'IV → I in F major',  abc:"[_bd'f']2 [fac']2|]", chords:[['Bb4','D5','F5'],['F4','A4','C5']]},
+      // Grade 3: add Imperfect and Interrupted
+      {id:'imp-C',  type:'Imperfect',   grade:3, desc:'I → V in C major',   abc:"[ceg]2 [gbd']2|]",    chords:[['C4','E4','G4'],['G4','B4','D5']]},
+      {id:'imp-G',  type:'Imperfect',   grade:3, desc:'I → V in G major',   abc:"[gbd']2 [d^fa]2|]",   chords:[['G4','B4','D5'],['D4','F#4','A4']]},
+      {id:'int-C',  type:'Interrupted', grade:3, desc:'V → VI in C major',  abc:"[gbd']2 [ace']2|]",   chords:[['G4','B4','D5'],['A4','C5','E5']]},
+      {id:'int-G',  type:'Interrupted', grade:3, desc:'V → VI in G major',  abc:"[d^fa]2 [eBG']2|]",   chords:[['D4','F#4','A4'],['E4','G4','B4']]},
     ];
 
     /* ---- State ---- */
@@ -162,6 +168,10 @@
     const score = new SessionScore('chord-game');
 
     function setMode(mode) {
+      if (mode === 'cadences' && getGrade() < 2) {
+        setFeedback('Cadence mode is available from Grade 2. Switch to Grade 2 above! 🎵', 'wrong');
+        return;
+      }
       gameMode = mode;
       document.getElementById('btn-chords').classList.toggle('active', mode === 'chords');
       document.getElementById('btn-cadences').classList.toggle('active', mode === 'cadences');
@@ -207,7 +217,8 @@
 
     /* ---- Cadence Mode ---- */
     function nextCadenceQuestion() {
-      currentCadence = pickRandom(CADENCES);
+      var pool = CADENCES.filter(function(c){ return c.grade <= getGrade(); });
+      currentCadence = pickRandom(pool);
       wrongAttempts = 0;
       answeredThisRound = false;
 
@@ -216,12 +227,20 @@
 
       document.getElementById('type-badge').innerHTML =
         '<span class="question-type-badge cadence-badge">Cadence Game</span>' +
-        '<div style="margin-top:6px;font-size:1rem;color:#666;">What type of cadence is this?</div>';
+        '<div style="margin-top:6px;font-size:1rem;color:#666;">What type of cadence is this? (' + currentCadence.desc + ')</div>';
 
-      const cadenceTypes = [
-        { label: 'Perfect Cadence (V→I)',  value: 'Perfect' },
-        { label: 'Plagal Cadence (IV→I)',   value: 'Plagal' },
+      // Grade 2: Perfect/Plagal only; Grade 3: all 4 types
+      const grade = getGrade();
+      const cadenceTypes = grade >= 3 ? [
+        { label: 'Perfect Cadence (V→I)',    value: 'Perfect' },
+        { label: 'Plagal Cadence (IV→I)',    value: 'Plagal' },
+        { label: 'Imperfect Cadence (I→V)',  value: 'Imperfect' },
+        { label: 'Interrupted Cadence (V→VI)', value: 'Interrupted' },
+      ] : [
+        { label: 'Perfect Cadence (V→I)',    value: 'Perfect' },
+        { label: 'Plagal Cadence (IV→I)',    value: 'Plagal' },
       ];
+
       const grid = document.getElementById('answer-grid');
       grid.innerHTML = '';
       cadenceTypes.forEach(function(ct) {

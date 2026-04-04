@@ -174,6 +174,7 @@
     </div>
     <div class="info-bar-right">
       <span class="trial-pill" id="trial-pill"></span>
+      <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.85rem;color:#ccc;">⚙️</button>
     </div>
   </div>
 
@@ -408,6 +409,16 @@
     initWeakArea();
     initBadges();
     initOnboard();
+
+    /* ---- Reset data ---- */
+    function showResetConfirm() {
+      if (!confirm('Reset ALL progress data?\n\nThis will clear scores, streaks, flashcard history, and your name. Your trial timer will NOT be reset.\n\nThis cannot be undone.')) return;
+      var keep = ['mm-trial-start', 'mm-unlocked', 'mm-exam-board', 'cc-lang', 'mm-onboarded'];
+      Object.keys(localStorage).forEach(function(k) {
+        if (keep.indexOf(k) === -1) localStorage.removeItem(k);
+      });
+      location.reload();
+    }
 
     /* ---- Share ---- */
     function shareApp() {
