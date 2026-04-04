@@ -74,6 +74,9 @@
       <div class="progress-label" id="progress-label">0 / 0</div>
     </div>
 
+    <!-- Grade Selector -->
+    <div class="mode-row" id="grade-selector"></div>
+
     <!-- Mode Toggle -->
     <div class="mode-toggle">
       <button class="mode-btn active" id="btn-chords" onclick="setMode('chords')" data-i18n="chord-id">🎵 Chord Identification</button>
@@ -125,19 +128,19 @@
 
     /* ---- Data ---- */
     const CHORDS = [
-      {id:'Cmaj-R', display:'C Major — Root Position',   abc:'[ceg]4',      notes:['C4','E4','G4'],   key:'C', quality:'Major', inv:'Root'},
-      {id:'Gmaj-R', display:'G Major — Root Position',   abc:"[gbd']4",     notes:['G4','B4','D5'],   key:'G', quality:'Major', inv:'Root'},
-      {id:'Fmaj-R', display:'F Major — Root Position',   abc:"[fac']4",     notes:['F4','A4','C5'],   key:'F', quality:'Major', inv:'Root'},
-      {id:'Dmaj-R', display:'D Major — Root Position',   abc:'[d^fa]4',     notes:['D4','F#4','A4'],  key:'D', quality:'Major', inv:'Root'},
-      {id:'Amaj-R', display:'A Major — Root Position',   abc:"[a^c'e']4",   notes:['A4','C#5','E5'],  key:'A', quality:'Major', inv:'Root'},
-      {id:'Amin-R', display:'A Minor — Root Position',   abc:"[ac'e']4",    notes:['A4','C5','E5'],   key:'A', quality:'Minor', inv:'Root'},
-      {id:'Dmin-R', display:'D Minor — Root Position',   abc:'[dfa]4',      notes:['D4','F4','A4'],   key:'D', quality:'Minor', inv:'Root'},
-      {id:'Emin-R', display:'E Minor — Root Position',   abc:'[egb]4',      notes:['E4','G4','B4'],   key:'E', quality:'Minor', inv:'Root'},
-      {id:'Cmaj-1', display:'C Major — 1st Inversion',   abc:"[egc']4",     notes:['E4','G4','C5'],   key:'C', quality:'Major', inv:'1st'},
-      {id:'Gmaj-1', display:'G Major — 1st Inversion',   abc:"[bd'g']4",    notes:['B4','D5','G5'],   key:'G', quality:'Major', inv:'1st'},
-      {id:'Fmaj-1', display:'F Major — 1st Inversion',   abc:"[ac'f']4",    notes:['A4','C5','F5'],   key:'F', quality:'Major', inv:'1st'},
-      {id:'Dmin-1', display:'D Minor — 1st Inversion',   abc:"[fad']4",     notes:['F4','A4','D5'],   key:'D', quality:'Minor', inv:'1st'},
-      {id:'Emin-1', display:'E Minor — 1st Inversion',   abc:"[gbe']4",     notes:['G4','B4','E5'],   key:'E', quality:'Minor', inv:'1st'},
+      {id:'Cmaj-R', display:'C Major — Root Position',   abc:'[ceg]4',      notes:['C4','E4','G4'],   key:'C', quality:'Major', inv:'Root', grade:1},
+      {id:'Gmaj-R', display:'G Major — Root Position',   abc:"[gbd']4",     notes:['G4','B4','D5'],   key:'G', quality:'Major', inv:'Root', grade:1},
+      {id:'Fmaj-R', display:'F Major — Root Position',   abc:"[fac']4",     notes:['F4','A4','C5'],   key:'F', quality:'Major', inv:'Root', grade:1},
+      {id:'Dmaj-R', display:'D Major — Root Position',   abc:'[d^fa]4',     notes:['D4','F#4','A4'],  key:'D', quality:'Major', inv:'Root', grade:2},
+      {id:'Amaj-R', display:'A Major — Root Position',   abc:"[a^c'e']4",   notes:['A4','C#5','E5'],  key:'A', quality:'Major', inv:'Root', grade:2},
+      {id:'Amin-R', display:'A Minor — Root Position',   abc:"[ac'e']4",    notes:['A4','C5','E5'],   key:'A', quality:'Minor', inv:'Root', grade:2},
+      {id:'Dmin-R', display:'D Minor — Root Position',   abc:'[dfa]4',      notes:['D4','F4','A4'],   key:'D', quality:'Minor', inv:'Root', grade:2},
+      {id:'Emin-R', display:'E Minor — Root Position',   abc:'[egb]4',      notes:['E4','G4','B4'],   key:'E', quality:'Minor', inv:'Root', grade:2},
+      {id:'Cmaj-1', display:'C Major — 1st Inversion',   abc:"[egc']4",     notes:['E4','G4','C5'],   key:'C', quality:'Major', inv:'1st', grade:3},
+      {id:'Gmaj-1', display:'G Major — 1st Inversion',   abc:"[bd'g']4",    notes:['B4','D5','G5'],   key:'G', quality:'Major', inv:'1st', grade:3},
+      {id:'Fmaj-1', display:'F Major — 1st Inversion',   abc:"[ac'f']4",    notes:['A4','C5','F5'],   key:'F', quality:'Major', inv:'1st', grade:3},
+      {id:'Dmin-1', display:'D Minor — 1st Inversion',   abc:"[fad']4",     notes:['F4','A4','D5'],   key:'D', quality:'Minor', inv:'1st', grade:3},
+      {id:'Emin-1', display:'E Minor — 1st Inversion',   abc:"[gbe']4",     notes:['G4','B4','E5'],   key:'E', quality:'Minor', inv:'1st', grade:3},
     ];
 
     const CADENCES = [
@@ -176,7 +179,8 @@
 
     /* ---- Chord Mode ---- */
     function nextChordQuestion() {
-      currentChord = pickRandom(CHORDS);
+      const chordPool = CHORDS.filter(function(c) { return c.grade <= getGrade(); });
+      currentChord = pickRandom(chordPool);
       wrongAttempts = 0;
       answeredThisRound = false;
 
@@ -187,7 +191,8 @@
         '<span class="question-type-badge chord-badge">Chord Identification</span>' +
         '<div style="margin-top:6px;font-size:1rem;color:#666;">What chord is this?</div>';
 
-      const distractors = CHORDS.filter(function(c) { return c.id !== currentChord.id; })
+      const chordPool2 = CHORDS.filter(function(c) { return c.grade <= getGrade(); });
+      const distractors = chordPool2.filter(function(c) { return c.id !== currentChord.id; })
         .sort(function() { return Math.random() - 0.5; }).slice(0, 3);
       const all = [currentChord].concat(distractors).sort(function() { return Math.random() - 0.5; });
       buildAnswerBtns(all, function(choice, btn) {
@@ -301,6 +306,7 @@
 
     /* ---- Start ---- */
     initSampler(function() {
+      buildGradeSelector('grade-selector', function() { nextQuestion(); });
       nextQuestion();
     });
   </script>

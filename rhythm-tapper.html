@@ -107,6 +107,8 @@
   <div class="progress-label" id="progress-label">0 / 0</div>
 </div>
 
+<div class="mode-row" id="grade-selector" style="display:flex;gap:8px;justify-content:center;padding:10px 16px 0;"></div>
+
 <div class="main-content">
   <div class="pattern-info">
     <span id="pattern-name">All Quarter Notes</span>
@@ -159,72 +161,58 @@
 const PATTERNS = [
   {
     name: 'All Quarter Notes',
-    sig: '4/4', bpm: 72, beatsPerBar: 4,
+    sig: '4/4', bpm: 72, beatsPerBar: 4, grade: 1,
     abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|c2 c2 c2 c2|c2 c2 c2 c2|c2 c2 c2 c2|]',
-    // 12 quarter notes at 72 BPM → quarter = 60/72 ≈ 0.833s
-    // Onsets at beat 0,1,2,...,11 (in quarter-note beats)
     onsetBeats: [0,1,2,3, 4,5,6,7, 8,9,10,11],
     bars: 3
   },
   {
     name: 'Half + Quarters (4/4)',
-    sig: '4/4', bpm: 72, beatsPerBar: 4,
+    sig: '4/4', bpm: 72, beatsPerBar: 4, grade: 1,
     abc: 'X:1\nT:\nM:4/4\nL:1/8\nK:C\n|c4 c2 c2|c2 c2 c4|c4 c4|]',
-    // bar1: half(0) q(2) q(3) | bar2: q(4) q(5) half(6) | bar3: half(8) half(10)
     onsetBeats: [0,2,3, 4,5,6, 8,10],
     bars: 3
   },
   {
     name: 'Waltz — 3 Beats (3/4)',
-    sig: '3/4', bpm: 80, beatsPerBar: 3,
+    sig: '3/4', bpm: 80, beatsPerBar: 3, grade: 1,
     abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:C\n|c2 c2 c2|c2 c2 c2|c2 c2 c2|c6|]',
-    // 9 quarter notes + dotted half
     onsetBeats: [0,1,2, 3,4,5, 6,7,8, 9],
     bars: 4
   },
   {
     name: 'Dotted Rhythm (3/4)',
-    sig: '3/4', bpm: 80, beatsPerBar: 3,
+    sig: '3/4', bpm: 80, beatsPerBar: 3, grade: 1,
     abc: 'X:1\nT:\nM:3/4\nL:1/8\nK:C\n|c3 c c2|c3 c c2|c6|]',
-    // dotted quarter(0) eighth(1.5) quarter(2) | repeat | half.
     onsetBeats: [0, 1.5, 2, 3, 4.5, 5, 6],
     bars: 3
   },
   {
     name: 'March (2/4)',
-    sig: '2/4', bpm: 90, beatsPerBar: 2,
+    sig: '2/4', bpm: 90, beatsPerBar: 2, grade: 1,
     abc: 'X:1\nT:\nM:2/4\nL:1/8\nK:C\n|c2 c2|c2 c2|c2 c2|c2 c2|]',
     onsetBeats: [0,1, 2,3, 4,5, 6,7],
     bars: 4
   },
   {
-    name: 'Half + Quarter (2/2)',
-    sig: '2/2', bpm: 60, beatsPerBar: 2,
-    // At 2/2, bpm refers to half-note BPM. Quarter = bpm/2 * 60 = half of the half-note beat.
-    // We'll treat each half-note as one beat. So at 60 half-note bpm, half = 1s.
-    abc: 'X:1\nT:\nM:2/2\nL:1/4\nK:C\n|c2 c2|c2 c2|c c c2|c4|]',
-    // beat positions in HALF-NOTE beats (bpm=60 half-notes → half=1s)
-    // bar1: half(0) half(1) | bar2: half(2) half(3) | bar3: q(4)q(4.5)half(5) | whole(6)
-    onsetBeats: [0,1, 2,3, 4,4.5,5, 6],
-    halfNoteBeat: true, // flag: use half-note as beat unit
-    bars: 4
-  },
-  {
     name: 'Compound Duple (6/8)',
-    sig: '6/8', bpm: 88, beatsPerBar: 2,
-    // In 6/8 each "beat" is a dotted quarter = 3 eighth notes
-    // At 88 bpm (dotted quarter bpm), each beat = 60/88 ≈ 0.682s
-    // Each eighth = beat/3
+    sig: '6/8', bpm: 88, beatsPerBar: 2, grade: 2,
     abc: 'X:1\nT:\nM:6/8\nL:1/8\nK:C\n|c2c c2c|c2c c2c|c3 c3|]',
-    // Onset in dotted-quarter beats: 0, 1, 2, 3, 4, 5(dotted half)
-    // c2c = dotted-quarter (one compound beat), so onsets at 0,1,2,3
     onsetBeats: [0,1, 2,3, 4,5],
-    compound: true, // beat = dotted quarter
+    compound: true,
     bars: 3
   },
   {
+    name: 'Half + Quarter (2/2)',
+    sig: '2/2', bpm: 60, beatsPerBar: 2, grade: 3,
+    abc: 'X:1\nT:\nM:2/2\nL:1/4\nK:C\n|c2 c2|c2 c2|c c c2|c4|]',
+    onsetBeats: [0,1, 2,3, 4,4.5,5, 6],
+    halfNoteBeat: true,
+    bars: 4
+  },
+  {
     name: 'Compound Triple (9/8)',
-    sig: '9/8', bpm: 80, beatsPerBar: 3,
+    sig: '9/8', bpm: 80, beatsPerBar: 3, grade: 3,
     abc: 'X:1\nT:\nM:9/8\nL:1/8\nK:C\n|c2c c2c c2c|c2c c2c c2c|]',
     onsetBeats: [0,1,2, 3,4,5],
     compound: true,
@@ -456,13 +444,21 @@ function showResult(p) {
 }
 
 function nextPattern() {
-  currentPatternIdx = (currentPatternIdx + 1) % PATTERNS.length;
+  const pool = PATTERNS.filter(function(p) { return p.grade <= getGrade(); });
+  const next = pool[(pool.indexOf(PATTERNS[currentPatternIdx]) + 1) % pool.length] || pool[0];
+  currentPatternIdx = PATTERNS.indexOf(next);
   showPattern(currentPatternIdx);
 }
 
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('rhythm-tapper');
+  buildGradeSelector('grade-selector', function() {
+    // reset to first pattern in new grade pool
+    const pool = PATTERNS.filter(function(p) { return p.grade <= getGrade(); });
+    currentPatternIdx = PATTERNS.indexOf(pool[0]);
+    showPattern(currentPatternIdx);
+  });
   showPattern(0);
   initSampler(() => {
     // sampler loaded — clickSynth initialised on first start

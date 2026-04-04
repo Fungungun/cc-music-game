@@ -101,6 +101,9 @@
       <div class="progress-label" id="progress-label">0 / 0</div>
     </div>
 
+    <!-- Grade Selector -->
+    <div class="mode-row" id="grade-selector"></div>
+
     <!-- Scale Title -->
     <div class="scale-title" id="scale-title">Build: C Major 🎼</div>
     <div class="scale-hint-text" id="scale-hint-text">Click the 8 notes of C Major on the keyboard below</div>
@@ -151,20 +154,20 @@
     });
 
     const SCALES = [
-      { name:'C Major',          notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
-      { name:'G Major',          notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
-      { name:'F Major',          notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'] },
-      { name:'D Major',          notes:['D4','E4','F#4','G4','A4','B4','C#5','D5'] },
-      { name:'A Major',          notes:['A3','B3','C#4','D4','E4','F#4','G#4','A4'] },
-      { name:'E Major',          notes:['E4','F#4','G#4','A4','B4','C#5','D#5','E5'] },
-      { name:'Bb Major',         notes:['Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'] },
-      { name:'Eb Major',         notes:['Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5'] },
-      { name:'Ab Major',         notes:['Ab3','Bb3','C4','Db4','Eb4','F4','G4','Ab4'] },
-      { name:'A Harmonic Minor', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'] },
-      { name:'E Harmonic Minor', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'] },
-      { name:'D Harmonic Minor', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'] },
-      { name:'G Harmonic Minor', notes:['G3','A3','Bb3','C4','D4','Eb4','F#4','G4'] },
-      { name:'C Harmonic Minor', notes:['C4','D4','Eb4','F4','G4','Ab4','B4','C5'] },
+      { name:'C Major',          notes:['C4','D4','E4','F4','G4','A4','B4','C5'],   grade:1 },
+      { name:'G Major',          notes:['G3','A3','B3','C4','D4','E4','F#4','G4'],  grade:1 },
+      { name:'F Major',          notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'],  grade:1 },
+      { name:'D Major',          notes:['D4','E4','F#4','G4','A4','B4','C#5','D5'], grade:2 },
+      { name:'A Major',          notes:['A3','B3','C#4','D4','E4','F#4','G#4','A4'],grade:2 },
+      { name:'A Harmonic Minor', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'],  grade:2 },
+      { name:'E Harmonic Minor', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'], grade:2 },
+      { name:'D Harmonic Minor', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'], grade:2 },
+      { name:'E Major',          notes:['E4','F#4','G#4','A4','B4','C#5','D#5','E5'],grade:3 },
+      { name:'Bb Major',         notes:['Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'], grade:3 },
+      { name:'Eb Major',         notes:['Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5'],grade:3 },
+      { name:'Ab Major',         notes:['Ab3','Bb3','C4','Db4','Eb4','F4','G4','Ab4'],grade:3 },
+      { name:'G Harmonic Minor', notes:['G3','A3','Bb3','C4','D4','Eb4','F#4','G4'], grade:3 },
+      { name:'C Harmonic Minor', notes:['C4','D4','Eb4','F4','G4','Ab4','B4','C5'],  grade:3 },
     ];
 
     /* ---- State ---- */
@@ -261,8 +264,8 @@
     }
 
     function nextScale() {
-      const idx = Math.floor(Math.random() * SCALES.length);
-      loadScale(SCALES[idx]);
+      const pool = SCALES.filter(function(s) { return s.grade <= getGrade(); });
+      loadScale(pool[Math.floor(Math.random() * pool.length)]);
     }
 
     function showMeScale() {
@@ -298,8 +301,9 @@
 
     /* ---- Start ---- */
     initSampler(function() {
+      buildGradeSelector('grade-selector', function() { nextScale(); });
       buildKb();
-      loadScale(SCALES[0]);
+      nextScale();
     });
   </script>
 </body>

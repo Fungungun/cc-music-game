@@ -76,6 +76,9 @@
       <div class="progress-label" id="progress-label">0 / 0</div>
     </div>
 
+    <!-- Grade Selector -->
+    <div class="mode-row" id="grade-selector"></div>
+
     <!-- Clef Toggle -->
     <div class="clef-toggle">
       <button class="clef-btn active" id="btn-treble" onclick="setClef('treble')" data-i18n="treble-clef">Treble Clef</button>
@@ -260,6 +263,7 @@
 
     /* ---- Start ---- */
     initSampler(function() {
+      buildGradeSelector('grade-selector', function() {});
       nextNote();
     });
   </script>

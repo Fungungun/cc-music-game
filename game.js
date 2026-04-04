@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v1.2 · 2026-04-04";
+const APP_VERSION = "v1.3 · 2026-04-04";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -169,6 +169,30 @@ async function playNotePairs(pairs) {
     const dur  = pair[1];
     sampler.triggerAttackRelease(note, dur, t);
     t += dur;
+  });
+}
+
+/* ============ Grade System ============ */
+function getGrade() {
+  return parseInt(localStorage.getItem('cc-grade') || '2');
+}
+function setGrade(g) {
+  localStorage.setItem('cc-grade', String(g));
+}
+function buildGradeSelector(containerId, onChange) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  [1, 2, 3].forEach(function(g) {
+    var btn = document.createElement('button');
+    btn.className = 'mode-btn' + (g === getGrade() ? ' active' : '');
+    btn.textContent = 'Grade ' + g;
+    btn.onclick = function() {
+      setGrade(g);
+      container.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (onChange) onChange(g);
+    };
+    container.appendChild(btn);
   });
 }
 

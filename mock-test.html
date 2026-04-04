@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📝 AMEB Mock Test — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #7B3FC9, #F0D4FF); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    /* Grade select screen */
+    #grade-screen { text-align: center; padding: 32px 20px; }
+    .grade-select-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+    .grade-select-sub   { color: #666; margin-bottom: 28px; }
+    .grade-cards        { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .grade-card {
+      width: 140px; padding: 20px 16px; border-radius: 20px; cursor: pointer;
+      border: 3px solid #ddd; background: white; transition: all 0.2s;
+      font-family: inherit; text-align: center;
+    }
+    .grade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .grade-card.selected { border-color: #7B3FC9; background: #F0D4FF; }
+    .grade-card .gc-num  { font-size: 2rem; font-weight: 900; color: #7B3FC9; }
+    .grade-card .gc-label { font-size: 0.85rem; color: #666; margin-top: 4px; }
+    .grade-card .gc-qs   { font-size: 0.8rem; color: #999; margin-top: 2px; }
+
+    /* Quiz screen */
+    #quiz-screen { display: none; padding: 0 0 20px; }
+
+    .quiz-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 20px; background: #f9f9f9; border-bottom: 1px solid #eee;
+      font-size: 0.95rem; font-weight: 700;
+    }
+    .quiz-timer { color: #E07B20; font-size: 1.1rem; }
+    .quiz-timer.warning { color: #f44336; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    .q-counter { color: #666; }
+
+    .question-box {
+      padding: 20px 20px 10px;
+    }
+    .q-category {
+      display: inline-block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #7B3FC9; background: #F0D4FF;
+      border-radius: 20px; padding: 3px 12px; margin-bottom: 12px;
+    }
+    .q-text {
+      font-size: 1.15rem; font-weight: 700; line-height: 1.4; margin-bottom: 16px;
+    }
+    .q-staff { text-align: center; margin: 10px 0 16px; }
+
+    .options-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; padding: 0 20px 10px;
+    }
+    @media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+
+    .opt-btn {
+      padding: 14px 16px; border-radius: 16px; border: 2px solid #ddd;
+      background: white; font-size: 1rem; font-family: inherit;
+      cursor: pointer; text-align: left; font-weight: 600;
+      transition: all 0.15s; line-height: 1.3;
+    }
+    .opt-btn:hover:not(:disabled) { border-color: #7B3FC9; background: #F0D4FF; }
+    .opt-btn.correct  { background: #b8f0c8; border-color: #4CAF50; color: #1a5928; }
+    .opt-btn.wrong    { background: #fdd; border-color: #f44336; color: #7a1a1a; }
+    .opt-btn:disabled { cursor: default; opacity: 0.85; }
+
+    .q-explanation {
+      margin: 10px 20px; padding: 12px 16px; border-radius: 12px;
+      background: #e8f5e9; border-left: 4px solid #4CAF50;
+      font-size: 0.9rem; line-height: 1.5; display: none;
+    }
+    .q-explanation.wrong-exp { background: #fff3f3; border-color: #f44336; }
+
+    .next-row { text-align: center; padding: 16px 0 8px; }
+
+    /* Results screen */
+    #results-screen { display: none; text-align: center; padding: 32px 20px; }
+    .result-grade-badge {
+      display: inline-block; font-size: 2.5rem; font-weight: 900;
+      padding: 16px 40px; border-radius: 24px; margin: 16px 0;
+      background: #F0D4FF; color: #7B3FC9;
+    }
+    .result-grade-badge.pass      { background: #e8f5e9; color: #2e7d32; }
+    .result-grade-badge.merit     { background: #e3f2fd; color: #1565c0; }
+    .result-grade-badge.dist      { background: #fff8e1; color: #e65100; }
+    .result-grade-badge.high-dist { background: #f3e5f5; color: #6a1b9a; }
+    .result-score { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+    .result-pct   { font-size: 1rem; color: #666; margin-bottom: 20px; }
+    .result-breakdown { font-size: 0.9rem; color: #555; margin-bottom: 24px; line-height: 1.8; }
+    .ameb-scale {
+      display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .ameb-band {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;
+    }
+    .ameb-band.earned { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="flex:1;">
+      <h1>📝 AMEB Mock Test</h1>
+      <div class="subtitle">Theory of Music — Grades 1, 2 & 3</div>
+    </div>
+  </header>
+
+  <!-- GRADE SELECT SCREEN -->
+  <div id="grade-screen">
+    <div class="main-content" style="max-width:600px;">
+      <div class="grade-select-title">Choose your grade</div>
+      <div class="grade-select-sub">Questions are drawn from the real AMEB Theory of Music syllabus.</div>
+      <div class="grade-cards">
+        <button class="grade-card" onclick="selectGrade(1)">
+          <div class="gc-num">1</div>
+          <div class="gc-label">Grade 1</div>
+          <div class="gc-qs">10 questions</div>
+        </button>
+        <button class="grade-card" onclick="selectGrade(2)">
+          <div class="gc-num">2</div>
+          <div class="gc-label">Grade 2</div>
+          <div class="gc-qs">15 questions</div>
+        </button>
+        <button class="grade-card" onclick="selectGrade(3)">
+          <div class="gc-num">3</div>
+          <div class="gc-label">Grade 3</div>
+          <div class="gc-qs">20 questions</div>
+        </button>
+      </div>
+      <button class="btn btn-lavender" id="start-btn" onclick="startTest()" style="font-size:1.1rem;padding:16px 40px;display:none;">
+        Start Test 🚀
+      </button>
+      <p style="color:#888;font-size:0.85rem;margin-top:20px;">
+        Based on the AMEB Theory of Music syllabus (2023 edition).<br>
+        Pass: 65% · Merit: 75% · Distinction: 85% · High Distinction: 90%
+      </p>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen">
+    <div class="quiz-header">
+      <div class="q-counter" id="q-counter">Question 1 of 10</div>
+      <div class="quiz-timer" id="quiz-timer">⏱ 10:00</div>
+    </div>
+    <div class="progress-section" style="margin:0;">
+      <div class="progress-bar" style="border-radius:0;">
+        <div class="progress-fill" id="progress-fill" style="width:0%;border-radius:0;"></div>
+      </div>
+    </div>
+    <div class="question-box">
+      <div class="q-category" id="q-category">Music Terms</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-staff" id="q-staff"></div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="q-explanation" id="q-explanation"></div>
+    <div class="next-row">
+      <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()" style="display:none;">
+        Next Question →
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen">
+    <div class="main-content" style="max-width:500px;">
+      <div style="font-size:3rem;">🎓</div>
+      <div class="result-score" id="result-score"></div>
+      <div class="result-pct"  id="result-pct"></div>
+      <div class="result-grade-badge" id="result-badge"></div>
+      <div class="ameb-scale" id="ameb-scale"></div>
+      <div class="result-breakdown" id="result-breakdown"></div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-lavender" onclick="restartTest()">Try Again 🔄</button>
+        <a href="index.html" class="btn btn-secondary">Menu 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+  /* ================================================================
+     AMEB Theory of Music — Question Bank
+     Sources: AMEB Theory of Music Syllabus 2023; BlitzBooks Grade
+     1–3 Teacher Guides; official AMEB sample papers.
+  ================================================================ */
+
+  // Category constants
+  const CAT = {
+    TERMS:    'Music Terms',
+    NOTES:    'Note Names',
+    INTERVALS:'Intervals',
+    SCALES:   'Scales & Keys',
+    CHORDS:   'Chords',
+    RHYTHM:   'Rhythm & Time',
+    FORM:     'Musical Form',
+  };
+
+  /* ------------------------------------------------------------------
+     Each question:
+       category, grade (max grade where it appears), text,
+       staff (optional ABC string for notation display),
+       options: [{text, correct, explanation}]
+  ------------------------------------------------------------------ */
+  const ALL_QUESTIONS = [
+
+    // ── GRADE 1: MUSIC TERMS ──────────────────────────────────────
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Allegro mean?',
+      options: [
+        { text: 'Fast and lively', correct: true,  exp: 'Allegro means fast and lively. It is one of the most common tempo markings in music.' },
+        { text: 'Slowly', correct: false },
+        { text: 'At a walking pace', correct: false },
+        { text: 'Very fast', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Piano (p) mean?',
+      options: [
+        { text: 'Soft', correct: true,  exp: 'Piano (p) is a dynamic marking meaning soft or quiet.' },
+        { text: 'Loud', correct: false },
+        { text: 'Very loud', correct: false },
+        { text: 'Moderately loud', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Forte (f) mean?',
+      options: [
+        { text: 'Loud', correct: true, exp: 'Forte (f) is a dynamic marking meaning loud.' },
+        { text: 'Soft', correct: false },
+        { text: 'Very soft', correct: false },
+        { text: 'Getting louder', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Andante mean?',
+      options: [
+        { text: 'At a walking pace', correct: true, exp: 'Andante means at an easy walking pace — a moderate, comfortable tempo.' },
+        { text: 'Very fast', correct: false },
+        { text: 'Very slow', correct: false },
+        { text: 'Getting faster', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Crescendo (cresc.) mean?',
+      options: [
+        { text: 'Gradually getting louder', correct: true, exp: 'Crescendo means to gradually increase in volume.' },
+        { text: 'Gradually getting softer', correct: false },
+        { text: 'Very loud', correct: false },
+        { text: 'Return to original speed', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Legato mean?',
+      options: [
+        { text: 'Smoothly and connected', correct: true, exp: 'Legato means to play notes smoothly and in a connected manner, without gaps between them.' },
+        { text: 'Short and detached', correct: false },
+        { text: 'Gradually slower', correct: false },
+        { text: 'Immediately slower', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Staccato mean?',
+      options: [
+        { text: 'Short and detached', correct: true, exp: 'Staccato means to play notes short and detached, shown by a dot above or below the note head.' },
+        { text: 'Smoothly connected', correct: false },
+        { text: 'Gradually louder', correct: false },
+        { text: 'Return to original speed', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Ritardando (rit.) mean?',
+      options: [
+        { text: 'Gradually getting slower', correct: true, exp: 'Ritardando (rit.) means to gradually slow down. Rallentando (rall.) has the same meaning.' },
+        { text: 'Immediately slower', correct: false },
+        { text: 'Gradually getting faster', correct: false },
+        { text: 'Return to original speed', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does A tempo mean?',
+      options: [
+        { text: 'Return to the original speed', correct: true, exp: 'A tempo means return to the original tempo after a speed change such as rit. or accel.' },
+        { text: 'Gradually getting faster', correct: false },
+        { text: 'Slowly', correct: false },
+        { text: 'At a moderate speed', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 1,
+      text: 'What does Presto mean?',
+      options: [
+        { text: 'Very fast', correct: true, exp: 'Presto means very fast — it is one of the fastest tempo markings.' },
+        { text: 'Fast and lively', correct: false },
+        { text: 'At a moderate speed', correct: false },
+        { text: 'Slowly', correct: false },
+      ]},
+
+    // ── GRADE 1: RHYTHM & TIME ────────────────────────────────────
+    { category: CAT.RHYTHM, grade: 1,
+      text: 'How many beats are in each bar in 3/4 time?',
+      options: [
+        { text: '3', correct: true, exp: 'In 3/4 time, the top number tells us there are 3 beats per bar, and the bottom number (4) tells us each beat is a crotchet (quarter note).' },
+        { text: '4', correct: false },
+        { text: '2', correct: false },
+        { text: '6', correct: false },
+      ]},
+    { category: CAT.RHYTHM, grade: 1,
+      text: 'How many beats does a semibreve (whole note) receive in 4/4 time?',
+      options: [
+        { text: '4', correct: true, exp: 'A semibreve (whole note) lasts for 4 beats, filling a whole bar in 4/4 time.' },
+        { text: '2', correct: false },
+        { text: '1', correct: false },
+        { text: '3', correct: false },
+      ]},
+    { category: CAT.RHYTHM, grade: 1,
+      text: 'How many crotchets (quarter notes) equal one minim (half note)?',
+      options: [
+        { text: '2', correct: true, exp: 'A minim (half note) lasts for 2 beats, which is the same as 2 crotchets (quarter notes).' },
+        { text: '4', correct: false },
+        { text: '3', correct: false },
+        { text: '1', correct: false },
+      ]},
+    { category: CAT.RHYTHM, grade: 1,
+      text: 'Which time signature has 2 crotchet beats per bar?',
+      options: [
+        { text: '2/4', correct: true, exp: 'In 2/4 time, there are 2 beats per bar and each beat is a crotchet (quarter note). This is common in marches.' },
+        { text: '3/4', correct: false },
+        { text: '4/4', correct: false },
+        { text: '6/8', correct: false },
+      ]},
+
+    // ── GRADE 1: SCALES & KEYS ───────────────────────────────────
+    { category: CAT.SCALES, grade: 1,
+      text: 'How many sharps are in the key signature of G major?',
+      options: [
+        { text: '1 sharp (F#)', correct: true, exp: 'G major has one sharp: F#. The scale is G A B C D E F# G.' },
+        { text: '2 sharps', correct: false },
+        { text: 'No sharps or flats', correct: false },
+        { text: '1 flat', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 1,
+      text: 'Which major scale has no sharps and no flats?',
+      options: [
+        { text: 'C major', correct: true, exp: 'C major is the only major scale with no sharps or flats — all white keys on the piano.' },
+        { text: 'G major', correct: false },
+        { text: 'F major', correct: false },
+        { text: 'D major', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 1,
+      text: 'Which major scale has 1 flat (B♭) in its key signature?',
+      options: [
+        { text: 'F major', correct: true, exp: 'F major has one flat: B♭. The scale is F G A B♭ C D E F.' },
+        { text: 'G major', correct: false },
+        { text: 'D major', correct: false },
+        { text: 'C major', correct: false },
+      ]},
+
+    // ── GRADE 1: CHORDS ──────────────────────────────────────────
+    { category: CAT.CHORDS, grade: 1,
+      text: 'Which notes make up the C major tonic triad (root position)?',
+      options: [
+        { text: 'C – E – G', correct: true, exp: 'The C major tonic triad is built on the root note C, with a major 3rd (E) and a perfect 5th (G) above it.' },
+        { text: 'C – F – A', correct: false },
+        { text: 'D – F – A', correct: false },
+        { text: 'C – D – G', correct: false },
+      ]},
+    { category: CAT.CHORDS, grade: 1,
+      text: 'Which notes make up the G major tonic triad (root position)?',
+      options: [
+        { text: 'G – B – D', correct: true, exp: 'The G major tonic triad is G (root), B (major 3rd above G), D (perfect 5th above G).' },
+        { text: 'G – A – D', correct: false },
+        { text: 'G – B – E', correct: false },
+        { text: 'F – A – C', correct: false },
+      ]},
+
+    // ── GRADE 1: INTERVALS (by number only) ──────────────────────
+    { category: CAT.INTERVALS, grade: 1,
+      text: 'How do we count the size of an interval? If we count from C up to E, what is the interval number?',
+      options: [
+        { text: 'A 3rd', correct: true, exp: 'We count every note from the bottom note to the top note, including both. C(1) D(2) E(3) = a 3rd.' },
+        { text: 'A 2nd', correct: false },
+        { text: 'A 4th', correct: false },
+        { text: 'A 5th', correct: false },
+      ]},
+    { category: CAT.INTERVALS, grade: 1,
+      text: 'What interval is C up to G? (Count every note name, including both C and G)',
+      options: [
+        { text: 'A 5th', correct: true, exp: 'C(1) D(2) E(3) F(4) G(5) — counting C through to G gives us a 5th.' },
+        { text: 'A 4th', correct: false },
+        { text: 'A 6th', correct: false },
+        { text: 'A 3rd', correct: false },
+      ]},
+    { category: CAT.INTERVALS, grade: 1,
+      text: 'What interval is C up to F?',
+      options: [
+        { text: 'A 4th', correct: true, exp: 'C(1) D(2) E(3) F(4) — counting from C up to F gives us a 4th.' },
+        { text: 'A 3rd', correct: false },
+        { text: 'A 5th', correct: false },
+        { text: 'A 2nd', correct: false },
+      ]},
+
+    // ── GRADE 1: NOTE NAMES (text-based, no staff needed) ────────
+    { category: CAT.NOTES, grade: 1,
+      text: 'In the treble clef, the lines from bottom to top are: Every Good Boy Deserves Fruit. What note sits on the BOTTOM line?',
+      options: [
+        { text: 'E', correct: true, exp: 'The lines of the treble clef from bottom to top are E G B D F — "Every Good Boy Deserves Fruit".' },
+        { text: 'G', correct: false },
+        { text: 'B', correct: false },
+        { text: 'F', correct: false },
+      ]},
+    { category: CAT.NOTES, grade: 1,
+      text: 'In the treble clef, what note sits on the TOP line?',
+      options: [
+        { text: 'F', correct: true, exp: 'The top (5th) line of the treble clef is F. Remember: Every Good Boy Deserves Fruit.' },
+        { text: 'E', correct: false },
+        { text: 'D', correct: false },
+        { text: 'B', correct: false },
+      ]},
+    { category: CAT.NOTES, grade: 1,
+      text: 'In the treble clef, the spaces from bottom to top spell a word. What word?',
+      options: [
+        { text: 'FACE', correct: true, exp: 'The spaces of the treble clef from bottom to top are F A C E — they spell the word FACE!' },
+        { text: 'EGBDF', correct: false },
+        { text: 'BEAD', correct: false },
+        { text: 'CAFE', correct: false },
+      ]},
+    { category: CAT.NOTES, grade: 1,
+      text: 'In the bass clef, the lines from bottom to top are: Good Boys Deserve Fine Always. What note is on the BOTTOM line?',
+      options: [
+        { text: 'G', correct: true, exp: 'The bottom line of the bass clef is G. The lines are G B D F A — "Good Boys Deserve Fine Always".' },
+        { text: 'B', correct: false },
+        { text: 'D', correct: false },
+        { text: 'F', correct: false },
+      ]},
+
+    // ── GRADE 2: MUSIC TERMS ──────────────────────────────────────
+    { category: CAT.TERMS, grade: 2,
+      text: 'What does Cantabile mean?',
+      options: [
+        { text: 'In a singing style', correct: true, exp: 'Cantabile means in a singing, lyrical style — smooth and expressive like a song.' },
+        { text: 'Playfully', correct: false },
+        { text: 'Majestic', correct: false },
+        { text: 'Lightly', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 2,
+      text: 'What does Pianissimo (pp) mean?',
+      options: [
+        { text: 'Very soft', correct: true, exp: 'Pianissimo (pp) means very soft — quieter than piano (p).' },
+        { text: 'Moderately soft', correct: false },
+        { text: 'Moderately loud', correct: false },
+        { text: 'Very loud', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 2,
+      text: 'What does Da Capo al Fine (D.C. al Fine) mean?',
+      options: [
+        { text: 'Return to the beginning and play until Fine', correct: true, exp: 'Da Capo (D.C.) means "from the head" (from the beginning). Al Fine means "to the end". So D.C. al Fine means go back to the start and play until you reach the word Fine.' },
+        { text: 'From the sign to the end', correct: false },
+        { text: 'Repeat the last bar', correct: false },
+        { text: 'Play the coda', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 2,
+      text: 'What does Vivace mean?',
+      options: [
+        { text: 'Lively and fast', correct: true, exp: 'Vivace means lively and fast — faster than Allegro.' },
+        { text: 'Moderately fast', correct: false },
+        { text: 'At a walking pace', correct: false },
+        { text: 'Very slow', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 2,
+      text: 'What does Maestoso mean?',
+      options: [
+        { text: 'Majestic', correct: true, exp: 'Maestoso means majestic or stately — played in a grand, dignified manner.' },
+        { text: 'Playfully', correct: false },
+        { text: 'Lightly', correct: false },
+        { text: 'Sustained', correct: false },
+      ]},
+
+    // ── GRADE 2: SCALES & KEYS ───────────────────────────────────
+    { category: CAT.SCALES, grade: 2,
+      text: 'How many sharps are in the key signature of D major?',
+      options: [
+        { text: '2 sharps (F# and C#)', correct: true, exp: 'D major has 2 sharps: F# and C#. The scale is D E F# G A B C# D.' },
+        { text: '1 sharp', correct: false },
+        { text: '3 sharps', correct: false },
+        { text: '2 flats', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 2,
+      text: 'In A harmonic minor, which note is raised by a semitone compared to natural minor?',
+      options: [
+        { text: 'The 7th degree (G becomes G#)', correct: true, exp: 'In harmonic minor, the 7th degree is raised by a semitone to create a leading note. In A harmonic minor: A B C D E F G# A.' },
+        { text: 'The 6th degree', correct: false },
+        { text: 'The 3rd degree', correct: false },
+        { text: 'The 2nd degree', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 2,
+      text: 'Which notes make up the A harmonic minor scale (ascending)?',
+      options: [
+        { text: 'A B C D E F G# A', correct: true, exp: 'A harmonic minor raises the 7th degree (G to G#) to create a leading note. It uses the same key signature as C major (no sharps or flats) with G# as an accidental.' },
+        { text: 'A B C D E F G A', correct: false },
+        { text: 'A B C# D E F# G# A', correct: false },
+        { text: 'A Bb C D E F G A', correct: false },
+      ]},
+
+    // ── GRADE 2: INTERVALS (by quality) ──────────────────────────
+    { category: CAT.INTERVALS, grade: 2,
+      text: 'A Major 3rd contains how many semitones?',
+      options: [
+        { text: '4 semitones', correct: true, exp: 'A Major 3rd spans 4 semitones. For example, C to E is a Major 3rd: C→C#(1)→D(2)→D#(3)→E(4).' },
+        { text: '3 semitones', correct: false },
+        { text: '5 semitones', correct: false },
+        { text: '2 semitones', correct: false },
+      ]},
+    { category: CAT.INTERVALS, grade: 2,
+      text: 'A Minor 3rd contains how many semitones?',
+      options: [
+        { text: '3 semitones', correct: true, exp: 'A Minor 3rd spans 3 semitones. For example, A to C is a Minor 3rd: A→A#(1)→B(2)→C(3).' },
+        { text: '4 semitones', correct: false },
+        { text: '5 semitones', correct: false },
+        { text: '2 semitones', correct: false },
+      ]},
+    { category: CAT.INTERVALS, grade: 2,
+      text: 'What is the interval from C up to G? (by quality and number)',
+      options: [
+        { text: 'Perfect 5th', correct: true, exp: 'C to G is a Perfect 5th — it spans 7 semitones and is called "perfect" because it sounds especially stable and consonant.' },
+        { text: 'Major 5th', correct: false },
+        { text: 'Minor 5th', correct: false },
+        { text: 'Perfect 4th', correct: false },
+      ]},
+    { category: CAT.INTERVALS, grade: 2,
+      text: 'What is the interval from C up to F? (by quality and number)',
+      options: [
+        { text: 'Perfect 4th', correct: true, exp: 'C to F is a Perfect 4th — it spans 5 semitones. Perfect intervals are the unison, 4th, 5th, and octave.' },
+        { text: 'Major 4th', correct: false },
+        { text: 'Minor 4th', correct: false },
+        { text: 'Perfect 5th', correct: false },
+      ]},
+
+    // ── GRADE 2: RHYTHM ───────────────────────────────────────────
+    { category: CAT.RHYTHM, grade: 2,
+      text: 'In 6/8 time, how many beats are in each bar?',
+      options: [
+        { text: '2 beats (each divided into 3)', correct: true, exp: '6/8 is compound duple time — 2 main beats per bar, each divided into 3 eighth notes. The pulse is felt in 2, not 6.' },
+        { text: '6 beats', correct: false },
+        { text: '3 beats', correct: false },
+        { text: '4 beats', correct: false },
+      ]},
+    { category: CAT.RHYTHM, grade: 2,
+      text: 'What is an anacrusis?',
+      options: [
+        { text: 'An upbeat — notes before the first full bar', correct: true, exp: 'An anacrusis (also called an upbeat or pickup) is one or more notes that come before the first full bar of a piece. The famous opening of Beethoven\'s 5th Symphony is an anacrusis.' },
+        { text: 'A rest that fills a whole bar', correct: false },
+        { text: 'A dotted rhythm pattern', correct: false },
+        { text: 'A repeat sign', correct: false },
+      ]},
+
+    // ── GRADE 2: MUSICAL FORM ────────────────────────────────────
+    { category: CAT.FORM, grade: 2,
+      text: 'A piece has two contrasting sections — section A, then a different section B. What form is this?',
+      options: [
+        { text: 'Binary form (AB)', correct: true, exp: 'Binary form (AB) has two contrasting sections. Often section A ends on the dominant chord and section B ends on the tonic.' },
+        { text: 'Ternary form (ABA)', correct: false },
+        { text: 'Rondo form', correct: false },
+        { text: 'Through-composed', correct: false },
+      ]},
+    { category: CAT.FORM, grade: 2,
+      text: 'A piece has three sections — section A, then a contrasting section B, then section A returns at the end. What form is this?',
+      options: [
+        { text: 'Ternary form (ABA)', correct: true, exp: 'Ternary form (ABA) has three sections. The opening material (A) returns at the end after a contrasting middle section (B). Think of it as a musical sandwich.' },
+        { text: 'Binary form (AB)', correct: false },
+        { text: 'Rondo form', correct: false },
+        { text: 'Variation form', correct: false },
+      ]},
+
+    // ── GRADE 3: MUSIC TERMS ──────────────────────────────────────
+    { category: CAT.TERMS, grade: 3,
+      text: 'What does Sforzando (sfz or sf) mean?',
+      options: [
+        { text: 'A strong sudden accent', correct: true, exp: 'Sforzando (sfz or sf) means a sudden, strong accent on a single note or chord — forcing it to stand out.' },
+        { text: 'Gradually getting softer', correct: false },
+        { text: 'Dying away', correct: false },
+        { text: 'Very loud', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 3,
+      text: 'What does Dolce mean?',
+      options: [
+        { text: 'Sweetly, soft and sweet', correct: true, exp: 'Dolce means sweetly — play with a gentle, sweet, soft tone.' },
+        { text: 'With force', correct: false },
+        { text: 'Playfully', correct: false },
+        { text: 'With spirit', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 3,
+      text: 'What does Con brio mean?',
+      options: [
+        { text: 'With spirit', correct: true, exp: 'Con brio means "with spirit" or "with vigour" — play with energy and enthusiasm.' },
+        { text: 'With sadness', correct: false },
+        { text: 'With grace', correct: false },
+        { text: 'With movement', correct: false },
+      ]},
+    { category: CAT.TERMS, grade: 3,
+      text: 'What does Scherzando mean?',
+      options: [
+        { text: 'Playfully', correct: true, exp: 'Scherzando means playfully or jokingly — from the Italian word "scherzo" (joke). Play in a light-hearted, humorous way.' },
+        { text: 'Boldly', correct: false },
+        { text: 'Calmly', correct: false },
+        { text: 'Smoothly', correct: false },
+      ]},
+
+    // ── GRADE 3: SCALES & KEYS ───────────────────────────────────
+    { category: CAT.SCALES, grade: 3,
+      text: 'How many sharps are in the key signature of E major?',
+      options: [
+        { text: '4 sharps (F# C# G# D#)', correct: true, exp: 'E major has 4 sharps: F#, C#, G#, and D#. The scale is E F# G# A B C# D# E.' },
+        { text: '3 sharps', correct: false },
+        { text: '2 sharps', correct: false },
+        { text: '4 flats', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 3,
+      text: 'How many flats are in the key signature of E♭ major?',
+      options: [
+        { text: '3 flats (B♭ E♭ A♭)', correct: true, exp: 'E♭ major has 3 flats: B♭, E♭, and A♭. The scale is E♭ F G A♭ B♭ C D E♭.' },
+        { text: '2 flats', correct: false },
+        { text: '4 flats', correct: false },
+        { text: '3 sharps', correct: false },
+      ]},
+    { category: CAT.SCALES, grade: 3,
+      text: 'Which major scale has 2 flats in its key signature?',
+      options: [
+        { text: 'B♭ major (B♭ and E♭)', correct: true, exp: 'B♭ major has 2 flats: B♭ and E♭. The scale is B♭ C D E♭ F G A B♭.' },
+        { text: 'F major', correct: false },
+        { text: 'E♭ major', correct: false },
+        { text: 'A♭ major', correct: false },
+      ]},
+
+    // ── GRADE 3: CHORDS & CADENCES ────────────────────────────────
+    { category: CAT.CHORDS, grade: 3,
+      text: 'A Perfect cadence uses which two chords?',
+      options: [
+        { text: 'V → I (Dominant to Tonic)', correct: true, exp: 'The Perfect cadence (also called an Authentic cadence) moves from chord V (Dominant) to chord I (Tonic). It gives a strong sense of ending, like a full stop in music.' },
+        { text: 'IV → I (Subdominant to Tonic)', correct: false },
+        { text: 'I → V (Tonic to Dominant)', correct: false },
+        { text: 'II → V (Supertonic to Dominant)', correct: false },
+      ]},
+    { category: CAT.CHORDS, grade: 3,
+      text: 'A Plagal cadence uses which two chords?',
+      options: [
+        { text: 'IV → I (Subdominant to Tonic)', correct: true, exp: 'The Plagal cadence moves from chord IV (Subdominant) to chord I (Tonic). It is sometimes called the "Amen cadence" because it is often used at the end of hymns.' },
+        { text: 'V → I (Dominant to Tonic)', correct: false },
+        { text: 'I → IV (Tonic to Subdominant)', correct: false },
+        { text: 'II → I', correct: false },
+      ]},
+    { category: CAT.CHORDS, grade: 3,
+      text: 'In C major, chord I is C-E-G. What are the notes of chord IV (Subdominant)?',
+      options: [
+        { text: 'F – A – C (F major triad)', correct: true, exp: 'The Subdominant (IV) in C major is built on the 4th degree, F. The F major triad is F A C.' },
+        { text: 'G – B – D (G major triad)', correct: false },
+        { text: 'D – F – A (D minor triad)', correct: false },
+        { text: 'A – C – E (A minor triad)', correct: false },
+      ]},
+    { category: CAT.CHORDS, grade: 3,
+      text: 'In a chord in 1st inversion, which note is in the bass (lowest position)?',
+      options: [
+        { text: 'The 3rd of the chord', correct: true, exp: 'In 1st inversion, the 3rd of the chord is in the bass. For example, C major 1st inversion has E in the bass: E-G-C.' },
+        { text: 'The root of the chord', correct: false },
+        { text: 'The 5th of the chord', correct: false },
+        { text: 'The octave of the root', correct: false },
+      ]},
+
+    // ── GRADE 3: MUSICAL FORM ────────────────────────────────────
+    { category: CAT.FORM, grade: 3,
+      text: 'Rondo form can be shown as ABACABA. What is the recurring section called?',
+      options: [
+        { text: 'The refrain (A)', correct: true, exp: 'In Rondo form, the A section (refrain) keeps coming back between contrasting episodes (B, C etc.). The pattern is A-B-A-C-A-B-A.' },
+        { text: 'The episode (B)', correct: false },
+        { text: 'The coda', correct: false },
+        { text: 'The exposition', correct: false },
+      ]},
+    { category: CAT.FORM, grade: 3,
+      text: 'Which musical form has a refrain that alternates with contrasting episodes?',
+      options: [
+        { text: 'Rondo form', correct: true, exp: 'Rondo form features a main theme (refrain) that returns repeatedly, separated by contrasting episodes. A common pattern is ABACABA.' },
+        { text: 'Binary form', correct: false },
+        { text: 'Ternary form', correct: false },
+        { text: 'Variation form', correct: false },
+      ]},
+
+    // ── GRADE 3: RHYTHM ───────────────────────────────────────────
+    { category: CAT.RHYTHM, grade: 3,
+      text: 'In 9/8 time, how many beats are in each bar?',
+      options: [
+        { text: '3 beats (each divided into 3)', correct: true, exp: '9/8 is compound triple time — 3 main beats per bar, each divided into 3 eighth notes (quavers). It gives a flowing, lilting feel.' },
+        { text: '9 beats', correct: false },
+        { text: '3 beats (each divided into 2)', correct: false },
+        { text: '2 beats', correct: false },
+      ]},
+    { category: CAT.RHYTHM, grade: 3,
+      text: 'In 2/2 (cut time or alla breve), what note value gets one beat?',
+      options: [
+        { text: 'A minim (half note)', correct: true, exp: 'In 2/2 time (also called cut time or alla breve), the minim (half note) gets one beat, and there are 2 beats per bar. Music in 2/2 often moves at a brisk pace.' },
+        { text: 'A crotchet (quarter note)', correct: false },
+        { text: 'A semibreve (whole note)', correct: false },
+        { text: 'A quaver (eighth note)', correct: false },
+      ]},
+  ];
+
+  /* ================================================================
+     State
+  ================================================================ */
+  let testGrade = 2;
+  let questions = [];
+  let currentIdx = 0;
+  let correctCount = 0;
+  let categoryResults = {};
+  let timerInterval = null;
+  let secondsLeft = 0;
+
+  const QUESTION_COUNTS = { 1: 10, 2: 15, 3: 20 };
+  const TIMER_SECONDS   = { 1: 10*60, 2: 12*60, 3: 15*60 };
+
+  /* ================================================================
+     Grade select
+  ================================================================ */
+  function selectGrade(g) {
+    testGrade = g;
+    setGrade(g);
+    document.querySelectorAll('.grade-card').forEach(function(c) { c.classList.remove('selected'); });
+    document.querySelectorAll('.grade-card')[g-1].classList.add('selected');
+    document.getElementById('start-btn').style.display = 'inline-block';
+  }
+
+  function buildQuestions(grade) {
+    // Pool = all questions at or below this grade
+    const pool = ALL_QUESTIONS.filter(function(q) { return q.grade <= grade; });
+    // Shuffle
+    const shuffled = pool.slice().sort(function() { return Math.random() - 0.5; });
+    const count = QUESTION_COUNTS[grade];
+    // Try to spread across categories
+    const cats = Object.values(CAT);
+    const result = [];
+    cats.forEach(function(cat) {
+      const catQs = shuffled.filter(function(q) { return q.category === cat; });
+      if (catQs.length > 0) result.push(catQs[0]);
+    });
+    // Fill remaining slots with any remaining questions (shuffled, no duplicates)
+    const used = new Set(result.map(function(q) { return q.text; }));
+    shuffled.forEach(function(q) {
+      if (result.length < count && !used.has(q.text)) {
+        result.push(q);
+        used.add(q.text);
+      }
+    });
+    return result.sort(function() { return Math.random() - 0.5; }).slice(0, count);
+  }
+
+  function startTest() {
+    questions = buildQuestions(testGrade);
+    currentIdx = 0;
+    correctCount = 0;
+    categoryResults = {};
+    document.getElementById('grade-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    secondsLeft = TIMER_SECONDS[testGrade];
+    startTimer();
+    showQuestion();
+  }
+
+  /* ================================================================
+     Timer
+  ================================================================ */
+  function startTimer() {
+    clearInterval(timerInterval);
+    updateTimerDisplay();
+    timerInterval = setInterval(function() {
+      secondsLeft--;
+      updateTimerDisplay();
+      if (secondsLeft <= 0) {
+        clearInterval(timerInterval);
+        showResults();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const el = document.getElementById('quiz-timer');
+    el.textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+    el.classList.toggle('warning', secondsLeft <= 60);
+  }
+
+  /* ================================================================
+     Question display
+  ================================================================ */
+  function showQuestion() {
+    const q = questions[currentIdx];
+    const total = questions.length;
+
+    document.getElementById('q-counter').textContent = 'Question ' + (currentIdx+1) + ' of ' + total;
+    document.getElementById('progress-fill').style.width = (currentIdx / total * 100) + '%';
+    document.getElementById('q-category').textContent = q.category;
+    document.getElementById('q-text').textContent = q.text;
+    document.getElementById('q-staff').innerHTML = '';
+    if (q.staff) {
+      ABCJS.renderAbc('q-staff', q.staff, { scale: 2.2, staffwidth: 200, paddingtop: 10, paddingbottom: 5, paddingleft: 10, paddingright: 10 });
+    }
+    document.getElementById('q-explanation').style.display = 'none';
+    document.getElementById('q-explanation').textContent = '';
+    document.getElementById('next-btn').style.display = 'none';
+
+    // Build options
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
+    const opts = q.options.slice().sort(function() { return Math.random() - 0.5; });
+    opts.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt.text;
+      btn.onclick = function() { selectAnswer(opt, btn, q); };
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(opt, btn, q) {
+    // Disable all buttons
+    document.querySelectorAll('.opt-btn').forEach(function(b) { b.disabled = true; });
+    // Mark correct/wrong
+    document.querySelectorAll('.opt-btn').forEach(function(b) {
+      const text = b.textContent;
+      const matchOpt = q.options.find(function(o) { return o.text === text; });
+      if (matchOpt && matchOpt.correct) b.classList.add('correct');
+    });
+    if (!opt.correct) btn.classList.add('wrong');
+
+    // Track results
+    if (!categoryResults[q.category]) categoryResults[q.category] = { correct: 0, total: 0 };
+    categoryResults[q.category].total++;
+    if (opt.correct) {
+      correctCount++;
+      categoryResults[q.category].correct++;
+    }
+
+    // Show explanation
+    const correctOpt = q.options.find(function(o) { return o.correct; });
+    const expEl = document.getElementById('q-explanation');
+    if (correctOpt && correctOpt.exp) {
+      expEl.textContent = correctOpt.exp;
+      expEl.className = 'q-explanation' + (opt.correct ? '' : ' wrong-exp');
+      expEl.style.display = 'block';
+    }
+
+    // Show next button
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = 'inline-block';
+    nextBtn.textContent = (currentIdx + 1 < questions.length) ? 'Next Question →' : 'See Results 🎓';
+  }
+
+  function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= questions.length) {
+      clearInterval(timerInterval);
+      showResults();
+    } else {
+      showQuestion();
+    }
+  }
+
+  /* ================================================================
+     Results
+  ================================================================ */
+  function showResults() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('results-screen').style.display = 'block';
+
+    const total = questions.length;
+    const pct = Math.round(correctCount / total * 100);
+
+    document.getElementById('result-score').textContent = correctCount + ' / ' + total + ' correct';
+    document.getElementById('result-pct').textContent = pct + '%';
+
+    // AMEB grade thresholds
+    var badge, badgeClass;
+    if (pct >= 90)      { badge = 'High Distinction ⭐'; badgeClass = 'high-dist'; }
+    else if (pct >= 85) { badge = 'Distinction 🏆';     badgeClass = 'dist'; }
+    else if (pct >= 75) { badge = 'Merit 🥇';           badgeClass = 'merit'; }
+    else if (pct >= 65) { badge = 'Pass ✓';             badgeClass = 'pass'; }
+    else                { badge = 'Not yet — keep practising! 💪'; badgeClass = ''; }
+
+    const badgeEl = document.getElementById('result-badge');
+    badgeEl.textContent = badge;
+    badgeEl.className = 'result-grade-badge ' + badgeClass;
+
+    // AMEB scale
+    const bands = [
+      { label: 'Pass (65%)',  cls: 'pass',      min: 65 },
+      { label: 'Merit (75%)', cls: 'merit',     min: 75 },
+      { label: 'Dist (85%)',  cls: 'dist',      min: 85 },
+      { label: 'HD (90%)',    cls: 'high-dist', min: 90 },
+    ];
+    const scaleEl = document.getElementById('ameb-scale');
+    scaleEl.innerHTML = '';
+    bands.forEach(function(b) {
+      const el = document.createElement('div');
+      el.className = 'ameb-band ' + b.cls + (pct >= b.min ? ' earned' : '');
+      el.textContent = b.label;
+      el.style.opacity = pct >= b.min ? '1' : '0.35';
+      scaleEl.appendChild(el);
+    });
+
+    // Category breakdown
+    var breakdown = 'Results by topic:<br>';
+    Object.keys(categoryResults).sort().forEach(function(cat) {
+      const r = categoryResults[cat];
+      const catPct = Math.round(r.correct / r.total * 100);
+      const icon = catPct >= 75 ? '✅' : catPct >= 50 ? '⚠️' : '❌';
+      breakdown += icon + ' ' + cat + ': ' + r.correct + '/' + r.total + ' (' + catPct + '%)<br>';
+    });
+    document.getElementById('result-breakdown').innerHTML = breakdown;
+
+    // Save high score
+    const data = getModuleData('mock-test');
+    if (pct > (data.highScore || 0)) {
+      data.highScore = pct;
+      saveModuleData('mock-test', data);
+    }
+  }
+
+  function restartTest() {
+    document.getElementById('results-screen').style.display = 'none';
+    document.getElementById('grade-screen').style.display = 'block';
+    clearInterval(timerInterval);
+  }
+
+  /* ================================================================
+     Init — pre-select saved grade
+  ================================================================ */
+  initSampler(function() {
+    const saved = getGrade();
+    selectGrade(saved);
+  });
+  </script>
+</body>
+</html>
