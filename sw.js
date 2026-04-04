@@ -48,13 +48,8 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  /* HTML navigation — always network first so fresh HTML is served */
-  if (e.request.mode === 'navigate' || url.endsWith('.html') || /\/([\w-]+)$/.test(new URL(url).pathname)) {
-    e.respondWith(
-      fetch(e.request, { redirect: 'follow' }).catch(function() {
-        return caches.match('/index.html');
-      })
-    );
+  /* HTML navigation — don't intercept, let the browser handle natively */
+  if (e.request.mode === 'navigate') {
     return;
   }
 
