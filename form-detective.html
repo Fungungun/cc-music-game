@@ -102,6 +102,8 @@
 </div>
 
 <!-- Mode tabs -->
+<div class="mode-row" id="grade-selector" style="margin:8px 0;"></div>
+
 <div class="mode-tabs">
   <button class="mode-tab active" data-mode="all">All Questions</button>
   <button class="mode-tab" data-mode="form">Form (AB/ABA)</button>
@@ -132,7 +134,7 @@
 const QUESTIONS = [
   /* ── FORM questions ─────────────────────────────────────── */
   {
-    type: 'form',
+    type: 'form', grade: 2,
     label: 'Listen to this melody. What is its musical form?',
     answer: 'Binary (AB)',
     options: ['Binary (AB)', 'Ternary (ABA)'],
@@ -146,7 +148,7 @@ const QUESTIONS = [
     ]
   },
   {
-    type: 'form',
+    type: 'form', grade: 2,
     label: 'Listen to this melody. What is its musical form?',
     answer: 'Ternary (ABA)',
     options: ['Binary (AB)', 'Ternary (ABA)'],
@@ -197,7 +199,7 @@ const QUESTIONS = [
   },
   /* ── CADENCE questions ──────────────────────────────────── */
   {
-    type: 'cadence',
+    type: 'cadence', grade: 2,
     label: 'Listen to this ending. What type of cadence is it?',
     answer: 'Perfect Cadence (V→I)',
     options: ['Perfect Cadence (V→I)', 'Plagal Cadence (IV→I)'],
@@ -234,7 +236,7 @@ const QUESTIONS = [
   },
   /* ── TIME SIGNATURE questions ───────────────────────────── */
   {
-    type: 'timesig',
+    type: 'timesig', grade: 1,
     label: 'Listen to this melody. How many beats are in each bar?',
     answer: 'Simple Duple (2 beats)',
     options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
@@ -247,7 +249,7 @@ const QUESTIONS = [
     ]
   },
   {
-    type: 'timesig',
+    type: 'timesig', grade: 1,
     label: 'Listen to this melody. How many beats are in each bar?',
     answer: 'Simple Triple (3 beats)',
     options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
@@ -260,7 +262,7 @@ const QUESTIONS = [
     ]
   },
   {
-    type: 'timesig',
+    type: 'timesig', grade: 1,
     label: 'Listen to this melody. How many beats are in each bar?',
     answer: 'Simple Quadruple (4 beats)',
     options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
@@ -272,7 +274,7 @@ const QUESTIONS = [
     ]
   },
   {
-    type: 'timesig',
+    type: 'timesig', grade: 2,
     label: 'Listen to this melody. Does it feel like it has 2 big beats, each split into 3?',
     answer: 'Compound Duple (6/8)',
     options: ['Simple Duple (2 beats)','Simple Triple (3 beats)','Simple Quadruple (4 beats)','Compound Duple (6/8)'],
@@ -295,7 +297,8 @@ let answered = false;
 let wrongCount = 0;
 
 function buildQueue() {
-  let pool = currentMode === 'all' ? QUESTIONS.slice() : QUESTIONS.filter(q => q.type === currentMode);
+  let pool = (currentMode === 'all' ? QUESTIONS.slice() : QUESTIONS.filter(q => q.type === currentMode))
+    .filter(q => !q.grade || q.grade <= getGrade());
   // Shuffle
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -417,6 +420,7 @@ document.querySelectorAll('.mode-tab').forEach(btn => {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('form-detective');
+  buildGradeSelector('grade-selector', function() { buildQueue(); if (questionQueue.length) showQuestion(questionQueue[0]); });
   buildQueue();
   showQuestion(questionQueue[0]);
   initSampler(() => {});

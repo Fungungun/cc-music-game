@@ -97,6 +97,9 @@
       <div class="progress-label" id="progress-label">0 / 0</div>
     </div>
 
+    <!-- Grade selector -->
+    <div class="mode-row" id="grade-selector"></div>
+
     <!-- Mode toggle -->
     <div class="mode-row">
       <button class="mode-btn active" id="btn-diag" onclick="setMode('diagram')">Diagram → Name</button>
@@ -352,6 +355,7 @@
     /* ================================================================
        Init
     ================================================================ */
+    buildGradeSelector("grade-selector", function() { nextQuestion(); });
     initSampler(function() {
       nextQuestion();
     });
