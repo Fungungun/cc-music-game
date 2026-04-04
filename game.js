@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
   footer.style.cssText = 'text-align:center;font-size:11px;color:#bbb;padding:12px 0 20px;';
   footer.textContent = APP_VERSION;
   document.body.appendChild(footer);
+
+  // Register service worker for PWA offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  }
 });
 
 /* ============ Encouraging Messages ============ */

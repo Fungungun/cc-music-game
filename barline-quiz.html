@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📏 Barline Quiz — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #6A1B9A, #E1BEE7); }
+    .page-header h1 { color: #F3E5F5; }
+    .back-btn { border-color: #AB47BC; color: #F3E5F5; }
+
+    .mode-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+
+    /* Staff display */
+    .staff-wrap { text-align: center; overflow-x: auto; padding: 8px 0; }
+    #staff-display { display: inline-block; }
+
+    /* Time sig question card */
+    .q-card {
+      background: white; border-radius: 16px;
+      padding: 20px; margin: 12px 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      text-align: center;
+    }
+    .q-card h3 { margin: 0 0 10px; color: #6A1B9A; font-size: 1.05rem; }
+    .q-card p  { color: #555; margin: 0 0 6px; font-size: 0.95rem; line-height: 1.6; }
+
+    /* Big time sig display */
+    .timesig-display {
+      font-size: 3.5rem; font-weight: 900;
+      color: #6A1B9A; line-height: 1;
+      display: inline-flex; flex-direction: column;
+      align-items: center; margin: 8px 20px;
+    }
+
+    /* Note value grid */
+    .note-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+    .note-chip {
+      background: #F3E5F5; border-radius: 12px;
+      padding: 8px 16px; font-size: 1rem; font-weight: 700;
+      color: #6A1B9A; min-width: 80px; text-align: center;
+    }
+
+    .answer-btn { min-width: 120px; background: white; border: 2px solid #ddd; }
+    .answer-btn:hover { background: #E1BEE7; border-color: #AB47BC; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="flex:1;">
+      <h1>📏 Barline &amp; Time Signature Quiz</h1>
+      <div class="subtitle">Master metre and barlines!</div>
+    </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+  </header>
+
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span>How to Play</span><span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p><strong>Mode 1 — Identify Time Signature:</strong> A rhythm is shown on the staff. Count the beats and choose the correct time signature.</p>
+      <p><strong>Mode 2 — Count the Beats:</strong> A time signature is given. How many beats are in the bar, and what type of beat?</p>
+      <p><strong>Mode 3 — Beats per Bar:</strong> Given a time signature, choose how many beats fit in one bar.</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <div class="score-display">
+      <div class="score-item"><span>Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span>Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Grade + mode selectors -->
+    <div class="mode-row" id="grade-selector"></div>
+    <div class="mode-row">
+      <button class="mode-btn active" id="m-identify" onclick="setMode('identify')">Identify time sig</button>
+      <button class="mode-btn" id="m-beats"    onclick="setMode('beats')">Beats per bar</button>
+      <button class="mode-btn" id="m-note"     onclick="setMode('note')">Beat note value</button>
+    </div>
+
+    <!-- Staff display -->
+    <div class="staff-wrap"><div id="staff-display"></div></div>
+
+    <!-- Question card -->
+    <div class="q-card" id="q-card">
+      <h3 id="q-title"></h3>
+      <p  id="q-text"></p>
+      <div id="q-extra"></div>
+    </div>
+
+    <div class="feedback empty" id="feedback"></div>
+    <div class="answer-grid" id="answer-grid"></div>
+
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn btn-secondary" onclick="nextQuestion()">Skip →</button>
+    </div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+
+    /* ── Intro ── */
+    function toggleIntro() {
+      var b = document.getElementById('intro-body'), a = document.getElementById('intro-arrow');
+      var open = b.style.display !== 'none';
+      b.style.display = open ? 'none' : 'block';
+      a.textContent = open ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
+    /* ── Time signature data ── */
+    var TIME_SIGS = [
+      // grade, top, bottom, beats, beatNote, description, type
+      { sig:'2/4', top:2, bot:4, beats:2, beatNote:'crotchet (quarter note)', desc:'2 crotchet beats per bar — march feel', type:'simple duple',    grade:1 },
+      { sig:'3/4', top:3, bot:4, beats:3, beatNote:'crotchet (quarter note)', desc:'3 crotchet beats per bar — waltz feel', type:'simple triple',   grade:1 },
+      { sig:'4/4', top:4, bot:4, beats:4, beatNote:'crotchet (quarter note)', desc:'4 crotchet beats per bar — most common', type:'simple quadruple', grade:1 },
+      { sig:'2/2', top:2, bot:2, beats:2, beatNote:'minim (half note)',       desc:'2 minim beats per bar — alla breve', type:'simple duple',        grade:2 },
+      { sig:'6/8', top:6, bot:8, beats:2, beatNote:'dotted crotchet',        desc:'2 compound beats, 6 quaver pulses per bar', type:'compound duple', grade:2 },
+      { sig:'9/8', top:9, bot:8, beats:3, beatNote:'dotted crotchet',        desc:'3 compound beats, 9 quaver pulses per bar', type:'compound triple', grade:3 },
+      { sig:'12/8',top:12,bot:8,beats:4, beatNote:'dotted crotchet',         desc:'4 compound beats, 12 quaver pulses per bar', type:'compound quadruple', grade:3 },
+    ];
+
+    /* ── ABC patterns for each time signature ── */
+    // Each entry: ABC note string that fills 1 bar correctly
+    var TS_ABC_BARS = {
+      '2/4':  'C D |',                    // 2 quarter notes
+      '3/4':  'C D E |',                  // 3 quarter notes
+      '4/4':  'C D E F |',               // 4 quarter notes
+      '2/2':  'C2 D2 |',                  // 2 half notes
+      '6/8':  'C D E F G A |',           // 6 eighth notes
+      '9/8':  'C D E F G A B c d |',     // 9 eighth notes
+      '12/8': 'C D E F G A B c d e f g |' // 12 eighth notes
+    };
+
+    function getPool() {
+      return TIME_SIGS.filter(function(ts){ return ts.grade <= getGrade(); });
+    }
+
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function shuffle(arr)    { return arr.slice().sort(function(){ return Math.random()-0.5; }); }
+
+    /* ── Render ABC staff ── */
+    function renderTimeSigStaff(ts, bars) {
+      bars = bars || 2;
+      var bar = TS_ABC_BARS[ts.sig] || 'C D E F |';
+      var body = '';
+      for (var i = 0; i < bars; i++) body += bar + ' ';
+      var abc = 'X:1\nT:\nM:' + ts.sig + '\nL:1/8\nK:C clef=perc\n' + body + '|]';
+      ABCJS.renderAbc('staff-display', abc, {
+        scale: 1.8, staffwidth: Math.min(window.innerWidth - 60, 480),
+        paddingtop: 10, paddingbottom: 10, paddingleft: 10, paddingright: 10
+      });
+    }
+
+    /* ── Quiz mode ── */
+    var quizMode = 'identify';
+    var currentTS = null;
+    var answered = false;
+    var score = new SessionScore('barline-quiz');
+
+    function setMode(m) {
+      quizMode = m;
+      ['identify','beats','note'].forEach(function(id){
+        document.getElementById('m-' + id).classList.toggle('active', id === m);
+      });
+      nextQuestion();
+    }
+
+    function buildQuestion() {
+      var pool = getPool();
+      currentTS = pickRandom(pool);
+      answered = false;
+
+      var title, text, options, answer;
+
+      if (quizMode === 'identify') {
+        renderTimeSigStaff(currentTS, 2);
+        title = 'What is the time signature?';
+        text  = 'Count the beats in each bar shown on the staff above.';
+        answer = currentTS.sig;
+        var others = shuffle(pool.filter(function(t){ return t.sig !== currentTS.sig; })).slice(0,3).map(function(t){ return t.sig; });
+        options = shuffle([answer].concat(others));
+
+      } else if (quizMode === 'beats') {
+        renderTimeSigStaff(currentTS, 1);
+        title = 'How many beats per bar?';
+        text  = 'Time signature: ' + currentTS.sig + '  —  ' + currentTS.desc;
+        answer = String(currentTS.beats);
+        options = shuffle(['1','2','3','4','6'].filter(function(n){ return n !== answer; }).slice(0,3).concat([answer]));
+
+      } else { // note value
+        renderTimeSigStaff(currentTS, 1);
+        title = 'What is the beat note value?';
+        text  = 'Time signature: ' + currentTS.sig;
+        answer = currentTS.beatNote;
+        var noteOpts = [
+          'crotchet (quarter note)', 'minim (half note)',
+          'dotted crotchet', 'quaver (eighth note)', 'semibreve (whole note)'
+        ];
+        var others2 = shuffle(noteOpts.filter(function(n){ return n !== answer; })).slice(0,3);
+        options = shuffle([answer].concat(others2));
+      }
+
+      return { title: title, text: text, options: options, answer: answer };
+    }
+
+    function showQuestion(q) {
+      document.getElementById('q-title').textContent = q.title;
+      document.getElementById('q-text').textContent  = q.text;
+
+      // Extra info box for compound time sigs
+      var extra = document.getElementById('q-extra');
+      if (currentTS.top >= 6 && quizMode === 'identify') {
+        extra.innerHTML = '<div class="note-grid"><div class="note-chip">Top: ' + currentTS.top +
+          '</div><div class="note-chip">Bottom: ' + currentTS.bot + '</div></div>';
+      } else { extra.innerHTML = ''; }
+
+      setFeedback('', 'empty');
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      q.options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = opt;
+        btn.onclick = function(){ checkAnswer(opt, btn, q.answer); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(opt, btn, answer) {
+      if (answered) return;
+      answered = true;
+
+      if (opt === answer) {
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect() + ' ' + currentTS.type + ' time!', 'correct');
+        triggerStarburst(btn);
+        score.onCorrect();
+        setTimeout(nextQuestion, 1800);
+      } else {
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        document.querySelectorAll('.answer-btn').forEach(function(b){
+          if (b.textContent === answer) b.classList.add('correct-ans');
+        });
+        setFeedback(randomWrong() + ' Correct: ' + answer + ' (' + currentTS.desc + ')', 'wrong');
+        score.onWrong();
+        setTimeout(nextQuestion, 3000);
+      }
+    }
+
+    function setFeedback(msg, type) {
+      var el = document.getElementById('feedback');
+      el.textContent = msg; el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function nextQuestion() {
+      var q = buildQuestion();
+      showQuestion(q);
+    }
+
+    /* ── Init ── */
+    initSampler(function() {
+      buildGradeSelector('grade-selector', function(){ nextQuestion(); });
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>

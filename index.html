@@ -221,10 +221,11 @@
       { id:'terms-flashcards',titleKey:'mod-terms-flashcards',descKey:'desc-terms-flashcards',emoji:'📚', accent:'sky',      href:'terms-flashcards.html' },
       { id:'form-detective',  titleKey:'mod-form-detective',  descKey:'desc-form-detective',  emoji:'🔍', accent:'purple',   href:'form-detective.html' },
       { id:'guitar-chords',   titleKey:'mod-guitar-chords',   descKey:'desc-guitar-chords',   emoji:'🎸', accent:'brown',    href:'guitar-chords.html' },
+      { id:'barline-quiz',    titleKey:'mod-barline-quiz',    descKey:'desc-barline-quiz',    emoji:'📏', accent:'purple',   href:'barline-quiz.html' },
       { id:'mock-test',       titleKey:'mod-mock-test',       descKey:'desc-mock-test',       emoji:'📝', accent:'grape',    href:'mock-test.html' }
     ];
 
-    const SCORED = ['note-namer','aural-training','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective','guitar-chords'];
+    const SCORED = ['note-namer','aural-training','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective','guitar-chords','barline-quiz'];
 
     /* ─── Build cards ─── */
     function buildCards() {
@@ -326,7 +327,8 @@
         { id:'rhythm-tapper',   label:'Rhythm Tapper',    href:'rhythm-tapper.html',   max:15 },
         { id:'terms-flashcards',label:'Terms Flashcards', href:'terms-flashcards.html',max:20 },
         { id:'form-detective',  label:'Form Detective',   href:'form-detective.html',  max:15 },
-        { id:'guitar-chords',   label:'Guitar Chords',    href:'guitar-chords.html',   max:15 }
+        { id:'guitar-chords',   label:'Guitar Chords',    href:'guitar-chords.html',   max:15 },
+        { id:'barline-quiz',    label:'Barline & Time Sig', href:'barline-quiz.html',  max:20 }
       ];
 
       var played = scored.filter(function(m) {

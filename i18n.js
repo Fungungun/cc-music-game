@@ -20,6 +20,7 @@ window.TRANSLATIONS = {
     // Module names
     'mod-aural-training':  '🎧 Aural Training',
     'mod-daily-challenge': '📅 Daily Challenge',
+    'mod-barline-quiz':    '📏 Barline & Time Sig',
     'mod-note-namer': '🎵 Note Namer',
     'mod-scale-builder': '🎼 Scale Builder',
     'mod-interval-quiz': '🎶 Interval Quiz',
@@ -34,6 +35,7 @@ window.TRANSLATIONS = {
     // Module descriptions
     'desc-aural-training':  'Identify intervals by ear — no staff!',
     'desc-daily-challenge': '5 questions every day — build your streak',
+    'desc-barline-quiz':    'Master time signatures, beats & barlines',
     'desc-note-namer': 'Identify notes on the staff',
     'desc-scale-builder': 'Build major & minor scales',
     'desc-interval-quiz': 'Name musical intervals',
@@ -144,6 +146,7 @@ window.TRANSLATIONS = {
     // Module names
     'mod-aural-training':  '🎧 听觉训练',
     'mod-daily-challenge': '📅 每日挑战',
+    'mod-barline-quiz':    '📏 小节线与拍号',
     'mod-note-namer': '🎵 音符认读',
     'mod-scale-builder': '🎼 音阶构建',
     'mod-interval-quiz': '🎶 音程测验',
@@ -158,6 +161,7 @@ window.TRANSLATIONS = {
     // Module descriptions
     'desc-aural-training':  '通过耳朵辨别音程——不看五线谱！',
     'desc-daily-challenge': '每天5道题——坚持练习',
+    'desc-barline-quiz':    '掌握拍号、节拍与小节线',
     'desc-note-namer': '认读五线谱上的音符',
     'desc-scale-builder': '构建大调和小调音阶',
     'desc-interval-quiz': '命名音程',
