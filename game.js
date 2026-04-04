@@ -3,6 +3,15 @@
    All at global/window scope — no ES modules
    ============================================= */
 
+const APP_VERSION = "v1.2 · 2026-04-04";
+
+document.addEventListener('DOMContentLoaded', function() {
+  var footer = document.createElement('div');
+  footer.style.cssText = 'text-align:center;font-size:11px;color:#bbb;padding:12px 0 20px;';
+  footer.textContent = APP_VERSION;
+  document.body.appendChild(footer);
+});
+
 /* ============ Encouraging Messages ============ */
 const CORRECT_MESSAGES = [
   "Amazing work, CC! 🌟",
