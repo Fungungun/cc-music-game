@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v2.4 · 2026-04-04";
+const APP_VERSION = "v2.5 · 2026-04-04";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -14,6 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // Register service worker for PWA offline support
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
+
+    // Self-heal: if an old broken SW is causing navigation errors,
+    // unregister all SWs and reload once to get a clean state.
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(reg) {
+        if (reg.active && reg.active.scriptURL && !reg.active.scriptURL.includes('/sw.js')) {
+          reg.unregister();
+          location.reload();
+        }
+      });
+    }).catch(function(){});
   }
 });
 
