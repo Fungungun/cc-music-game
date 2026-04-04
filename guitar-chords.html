@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎸 Guitar Chords — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #5D4037, #FFD4A3); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    /* Mode tabs */
+    .mode-row { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+
+    /* Diagram display */
+    .chord-display {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; padding: 10px 0;
+    }
+    .chord-diagram-large svg { /* upscaled via viewBox */ }
+    .chord-question-label {
+      font-size: 1rem; color: #666; text-align: center;
+    }
+
+    /* For "name mode": show chord name, show diagram in answer */
+    .diagram-answer-grid {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      justify-content: center; margin: 10px 20px;
+    }
+    .diagram-answer-btn {
+      background: white; border: 3px solid #ddd; border-radius: 16px;
+      padding: 10px 12px; cursor: pointer; text-align: center;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .diagram-answer-btn:hover { border-color: #5D4037; background: #FFD4A3; }
+    .diagram-answer-btn.correct-ans { border-color: #4CAF50; background: #b8f0c8; }
+    .diagram-answer-btn.wrong-ans   { border-color: #f44336; background: #fdd; }
+    .diagram-answer-btn .diag-label { font-size: 0.9rem; font-weight: 800; margin-top: 4px; color: #333; }
+
+    /* For "diagram mode": show diagram, answer by name button */
+    .name-answer-grid {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center; margin: 10px 20px;
+    }
+    .name-answer-btn {
+      min-width: 100px; padding: 14px 20px; border-radius: 16px;
+      border: 2px solid #ddd; background: white; font-size: 1.1rem;
+      font-weight: 800; cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .name-answer-btn:hover { border-color: #5D4037; background: #FFD4A3; }
+    .name-answer-btn.correct-ans { border-color: #4CAF50; background: #b8f0c8; }
+    .name-answer-btn.wrong-ans   { border-color: #f44336; background: #fdd; }
+
+    .chord-info { text-align: center; font-size: 0.85rem; color: #888; margin: 4px 0 8px; }
+
+    .play-row { display: flex; gap: 10px; justify-content: center; margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="flex:1;">
+      <h1>🎸 Guitar Chords</h1>
+      <div class="subtitle">Name that chord!</div>
+    </div>
+  </header>
+
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span>How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p><strong>Diagram → Name:</strong> A chord diagram appears — tap the correct chord name.<br>
+         <strong>Name → Diagram:</strong> A chord name appears — tap the correct diagram.<br>
+         Press ▶ Play to hear the chord on piano!</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <div class="score-display">
+      <div class="score-item"><span>Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span>Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-row">
+      <button class="mode-btn active" id="btn-diag" onclick="setMode('diagram')">Diagram → Name</button>
+      <button class="mode-btn" id="btn-name" onclick="setMode('name')">Name → Diagram</button>
+    </div>
+
+    <!-- Main display area -->
+    <div class="chord-display" id="chord-display"></div>
+    <div class="chord-info" id="chord-info"></div>
+
+    <div class="play-row">
+      <button class="btn btn-coral" id="btn-play" onclick="playCurrentChord()">▶ Play Chord</button>
+      <button class="btn btn-secondary" onclick="nextQuestion()">Skip →</button>
+    </div>
+
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Answer area (changes based on mode) -->
+    <div id="answer-area"></div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      const body = document.getElementById('intro-body');
+      const arrow = document.getElementById('intro-arrow');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
+    /* ================================================================
+       Chord Data
+       frets: [string6, string5, string4, string3, string2, string1]
+              (low E → high e)
+       -1 = muted, 0 = open, 1+ = fret number
+       notes: the actual piano notes to play (approximation in a playable octave)
+    ================================================================ */
+    const CHORDS = [
+      { name:'Em', full:'E Minor',   quality:'minor', frets:[ 0, 2, 2, 0, 0, 0], notes:['E3','G3','B3','E4'] },
+      { name:'Am', full:'A Minor',   quality:'minor', frets:[-1, 0, 2, 2, 1, 0], notes:['A3','E4','A4'] },
+      { name:'Dm', full:'D Minor',   quality:'minor', frets:[-1,-1, 0, 2, 3, 1], notes:['D4','A4','D5'] },
+      { name:'E',  full:'E Major',   quality:'major', frets:[ 0, 2, 2, 1, 0, 0], notes:['E3','G#3','B3','E4'] },
+      { name:'A',  full:'A Major',   quality:'major', frets:[-1, 0, 2, 2, 2, 0], notes:['A3','E4','A4','C#5'] },
+      { name:'D',  full:'D Major',   quality:'major', frets:[-1,-1, 0, 2, 3, 2], notes:['D4','A4','D5','F#5'] },
+      { name:'G',  full:'G Major',   quality:'major', frets:[ 3, 2, 0, 0, 0, 3], notes:['G3','B3','D4','G4'] },
+      { name:'C',  full:'C Major',   quality:'major', frets:[-1, 3, 2, 0, 1, 0], notes:['C4','E4','G4','C5'] },
+    ];
+
+    /* ================================================================
+       SVG chord diagram renderer
+    ================================================================ */
+    function drawChord(frets, scale) {
+      scale = scale || 1;
+      var bW = 80 * scale, bH = 96 * scale;
+      var strX0 = 12 * scale, strXn = 68 * scale;
+      var fretY0 = 20 * scale, fretH = 14 * scale, numFrets = 4;
+      var strGap = (strXn - strX0) / 5;
+
+      var svg = '<svg width="' + bW + '" height="' + bH + '" viewBox="0 0 ' + bW + ' ' + bH + '" xmlns="http://www.w3.org/2000/svg">';
+      // Nut
+      svg += '<rect x="' + strX0 + '" y="' + fretY0 + '" width="' + (strXn - strX0) + '" height="' + (3 * scale) + '" fill="#333"/>';
+      // Frets
+      for (var f = 1; f <= numFrets; f++) {
+        var fy = fretY0 + f * fretH;
+        svg += '<line x1="' + strX0 + '" y1="' + fy + '" x2="' + strXn + '" y2="' + fy + '" stroke="#bbb" stroke-width="' + scale + '"/>';
+      }
+      // Strings
+      for (var s = 0; s < 6; s++) {
+        var sx = strX0 + s * strGap;
+        svg += '<line x1="' + sx + '" y1="' + fretY0 + '" x2="' + sx + '" y2="' + (fretY0 + numFrets * fretH) + '" stroke="#777" stroke-width="' + (1.5 * scale) + '"/>';
+      }
+      // Markers
+      for (var s = 0; s < 6; s++) {
+        var sx = strX0 + s * strGap;
+        var fret = frets[s];
+        if (fret === -1) {
+          svg += '<text x="' + sx + '" y="' + (fretY0 - 5 * scale) + '" text-anchor="middle" font-size="' + (10 * scale) + '" fill="#c00" font-weight="bold">✕</text>';
+        } else if (fret === 0) {
+          svg += '<circle cx="' + sx + '" cy="' + (fretY0 - 7 * scale) + '" r="' + (4 * scale) + '" fill="none" stroke="#333" stroke-width="' + (1.5 * scale) + '"/>';
+        } else {
+          var fy = fretY0 + (fret - 0.5) * fretH;
+          svg += '<circle cx="' + sx + '" cy="' + fy + '" r="' + (6 * scale) + '" fill="#5D4037"/>';
+        }
+      }
+      svg += '</svg>';
+      return svg;
+    }
+
+    /* ================================================================
+       State
+    ================================================================ */
+    let gameMode = 'diagram'; // 'diagram' | 'name'
+    let currentChord = null;
+    let wrongAttempts = 0;
+    let answeredThisRound = false;
+    const score = new SessionScore('guitar-chords');
+
+    function setMode(mode) {
+      gameMode = mode;
+      document.getElementById('btn-diag').classList.toggle('active', mode === 'diagram');
+      document.getElementById('btn-name').classList.toggle('active', mode === 'name');
+      nextQuestion();
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function pickDistractors(correct, count) {
+      return CHORDS.filter(function(c) { return c.name !== correct.name; })
+        .sort(function() { return Math.random() - 0.5; }).slice(0, count);
+    }
+
+    /* ================================================================
+       Diagram → Name mode: show diagram, answer with name buttons
+    ================================================================ */
+    function showDiagramMode() {
+      const display = document.getElementById('chord-display');
+      display.innerHTML =
+        '<div class="chord-diagram-large">' + drawChord(currentChord.frets, 1.8) + '</div>' +
+        '<div class="chord-question-label">What chord is this?</div>';
+      document.getElementById('chord-info').textContent = '';
+
+      const distractors = pickDistractors(currentChord, 3);
+      const all = [currentChord].concat(distractors).sort(function() { return Math.random() - 0.5; });
+      const area = document.getElementById('answer-area');
+      area.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'name-answer-grid';
+      all.forEach(function(ch) {
+        const btn = document.createElement('button');
+        btn.className = 'name-answer-btn';
+        btn.textContent = ch.name;
+        btn.onclick = function() { checkAnswer(ch.name === currentChord.name, btn, ch.name); };
+        grid.appendChild(btn);
+      });
+      area.appendChild(grid);
+    }
+
+    /* ================================================================
+       Name → Diagram mode: show name, answer with diagram buttons
+    ================================================================ */
+    function showNameMode() {
+      const display = document.getElementById('chord-display');
+      display.innerHTML =
+        '<div style="font-size:3rem;font-weight:900;color:#5D4037;">' + currentChord.name + '</div>' +
+        '<div class="chord-question-label">' + currentChord.full + ' — find the diagram</div>';
+      document.getElementById('chord-info').textContent = '';
+
+      const distractors = pickDistractors(currentChord, 3);
+      const all = [currentChord].concat(distractors).sort(function() { return Math.random() - 0.5; });
+      const area = document.getElementById('answer-area');
+      area.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'diagram-answer-grid';
+      all.forEach(function(ch) {
+        const btn = document.createElement('button');
+        btn.className = 'diagram-answer-btn';
+        btn.innerHTML = drawChord(ch.frets, 1) + '<div class="diag-label">' + (ch.name === currentChord.name ? '?' : '') + '</div>';
+        btn.onclick = function() { checkAnswer(ch.name === currentChord.name, btn, ch.name); };
+        grid.appendChild(btn);
+      });
+      area.appendChild(grid);
+    }
+
+    /* ================================================================
+       Answer checking
+    ================================================================ */
+    function checkAnswer(isCorrect, btn, chosenName) {
+      if (answeredThisRound) return;
+
+      if (isCorrect) {
+        answeredThisRound = true;
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect(), 'correct');
+        triggerStarburst(btn);
+        score.onCorrect();
+        playCurrentChord();
+        // In name mode, label diagrams now
+        if (gameMode === 'name') {
+          document.querySelectorAll('.diagram-answer-btn').forEach(function(b) {
+            b.querySelector('.diag-label').textContent = '';
+          });
+          btn.querySelector('.diag-label').textContent = currentChord.name;
+        }
+        setTimeout(function() { nextQuestion(); }, 1800);
+      } else {
+        wrongAttempts++;
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        setFeedback(randomWrong(), 'wrong');
+        score.onWrong();
+
+        if (wrongAttempts >= 2) {
+          answeredThisRound = true;
+          // Reveal correct
+          const allBtns = document.querySelectorAll('.name-answer-btn, .diagram-answer-btn');
+          allBtns.forEach(function(b) {
+            const label = gameMode === 'diagram' ? b.textContent : b.querySelector('.diag-label').textContent;
+            if (gameMode === 'diagram' && b.textContent === currentChord.name) b.classList.add('correct-ans');
+          });
+          setFeedback('The answer was ' + currentChord.full + '! (' + currentChord.name + ')', 'wrong');
+          document.getElementById('chord-info').textContent =
+            'Notes: ' + currentChord.notes.join(' – ') + ' | Quality: ' + currentChord.quality;
+          setTimeout(function() { nextQuestion(); }, 2500);
+        }
+      }
+    }
+
+    function setFeedback(msg, type) {
+      const el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    /* ================================================================
+       Play chord
+    ================================================================ */
+    function playCurrentChord() {
+      if (!currentChord) return;
+      // Strum: play notes slightly staggered then sustain together
+      playMelodic(currentChord.notes, '4n', 180);
+      setTimeout(function() {
+        playChord(currentChord.notes, '2n');
+      }, currentChord.notes.length * (60 / 180 * 1000));
+    }
+
+    /* ================================================================
+       Next question
+    ================================================================ */
+    function nextQuestion() {
+      currentChord = pickRandom(CHORDS);
+      wrongAttempts = 0;
+      answeredThisRound = false;
+      setFeedback('', 'empty');
+      if (gameMode === 'diagram') showDiagramMode();
+      else showNameMode();
+    }
+
+    /* ================================================================
+       Init
+    ================================================================ */
+    initSampler(function() {
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>

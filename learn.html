@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📖 Learn — CC's Music Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #2E8B6E, #C7F2E3); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    /* Topic nav */
+    .topic-nav {
+      display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px;
+      background: white; border-bottom: 2px solid #eee; position: sticky; top: 0; z-index: 10;
+      scrollbar-width: none;
+    }
+    .topic-nav::-webkit-scrollbar { display: none; }
+    .topic-btn {
+      flex-shrink: 0; padding: 8px 16px; border-radius: 20px;
+      border: 2px solid #ddd; background: white; font-family: inherit;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .topic-btn.active, .topic-btn:hover { background: #C7F2E3; border-color: #2E8B6E; }
+
+    /* Sections */
+    .learn-section { padding: 24px 20px 8px; max-width: 680px; margin: 0 auto; }
+    .section-title {
+      font-size: 1.4rem; font-weight: 900; color: #1a5c47;
+      padding-bottom: 8px; border-bottom: 3px solid #C7F2E3; margin-bottom: 16px;
+    }
+    .subsection { margin-bottom: 20px; }
+    .subsection h3 { font-size: 1.05rem; font-weight: 800; color: #333; margin-bottom: 6px; }
+    p { font-size: 0.95rem; color: #444; line-height: 1.6; margin-bottom: 8px; }
+
+    /* Mnemonic tip box */
+    .tip {
+      background: #FFF8E7; border-left: 4px solid #FFB74D; border-radius: 0 12px 12px 0;
+      padding: 12px 16px; margin: 10px 0; font-size: 0.92rem;
+    }
+    .tip-label { font-weight: 900; color: #E07B20; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tip strong { color: #E07B20; }
+
+    /* Grade badge */
+    .grade-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 800;
+      padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle;
+    }
+    .g1 { background: #FFE0E6; color: #c0392b; }
+    .g2 { background: #E0F0FF; color: #1565c0; }
+    .g3 { background: #E8F5E9; color: #2e7d32; }
+
+    /* Staff display */
+    .staff-box { background: white; border-radius: 12px; border: 1px solid #eee; padding: 8px 0; text-align: center; margin: 10px 0; }
+
+    /* Note value table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 10px 0; }
+    th { background: #C7F2E3; color: #1a5c47; font-weight: 800; padding: 8px 10px; text-align: left; }
+    td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f9f9f9; }
+
+    /* Interval song examples */
+    .interval-song { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.88rem; }
+    .interval-song:last-child { border-bottom: none; }
+    .int-name { font-weight: 800; min-width: 100px; color: #3d1e8a; }
+    .int-song { color: #555; }
+
+    /* Guitar diagram */
+    .guitar-section { background: #FFF8F0; border-radius: 16px; padding: 16px; margin: 12px 0; }
+    .chord-grid { display: flex; flex-wrap: wrap; gap: 16px; justify-content: flex-start; margin-top: 12px; }
+    .chord-item { text-align: center; }
+    .chord-name { font-weight: 800; font-size: 0.95rem; margin-top: 6px; color: #333; }
+    .chord-label { font-size: 0.75rem; color: #888; }
+
+    /* Scale pattern */
+    .scale-steps {
+      display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0;
+      font-size: 0.82rem; font-family: monospace;
+    }
+    .step {
+      padding: 4px 8px; border-radius: 6px; font-weight: 700;
+    }
+    .step.T  { background: #C7F2E3; color: #1a5c47; } /* tone/whole step */
+    .step.S  { background: #FFD4A3; color: #7a3e00; } /* semitone/half step */
+    .step.TS { background: #FFAAAA; color: #7a0000; } /* tone+semitone (aug 2nd) */
+
+    /* Key sig table */
+    .key-table { font-size: 0.85rem; }
+    .sharps { color: #1565c0; font-weight: 700; }
+    .flats  { color: #6a1b9a; font-weight: 700; }
+
+    .divider { border: none; border-top: 2px solid #eee; margin: 8px 0 20px; }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="flex:1;">
+      <h1>📖 Theory Guide</h1>
+      <div class="subtitle">Learn before you play!</div>
+    </div>
+  </header>
+
+  <!-- Topic navigation -->
+  <nav class="topic-nav" id="topic-nav">
+    <button class="topic-btn active" onclick="scrollTo('staff')">🎵 Staff & Notes</button>
+    <button class="topic-btn" onclick="scrollTo('values')">🎼 Note Values</button>
+    <button class="topic-btn" onclick="scrollTo('time')">⏱ Time Sigs</button>
+    <button class="topic-btn" onclick="scrollTo('keys')">🔑 Keys & Scales</button>
+    <button class="topic-btn" onclick="scrollTo('intervals')">📐 Intervals</button>
+    <button class="topic-btn" onclick="scrollTo('chords')">🎹 Chords</button>
+    <button class="topic-btn" onclick="scrollTo('terms')">📚 Terms</button>
+    <button class="topic-btn" onclick="scrollTo('guitar')">🎸 Guitar</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════ STAFF & NOTES -->
+  <section class="learn-section" id="staff">
+    <div class="section-title">🎵 The Staff & Note Names</div>
+
+    <div class="subsection">
+      <h3>What is a staff?</h3>
+      <p>Music is written on a <strong>staff</strong> — 5 lines and 4 spaces. Notes sit on the lines or in the spaces. The higher the note on the staff, the higher it sounds.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Treble Clef (𝄞) — right hand / higher notes</h3>
+      <div class="staff-box"><div id="staff-treble"></div></div>
+      <p>The treble clef curls around the <strong>G</strong> line (second from bottom) — that's why it's also called the G clef.</p>
+
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick — Lines (bottom → top)</div>
+        <strong>E</strong>very <strong>G</strong>ood <strong>B</strong>oy <strong>D</strong>eserves <strong>F</strong>ruit<br>
+        → E · G · B · D · F
+      </div>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick — Spaces (bottom → top)</div>
+        The spaces spell a word: <strong>F · A · C · E</strong> = <strong>FACE</strong> 😄
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Bass Clef (𝄢) — left hand / lower notes</h3>
+      <div class="staff-box"><div id="staff-bass"></div></div>
+      <p>The bass clef's two dots surround the <strong>F</strong> line (fourth from bottom) — also called the F clef.</p>
+
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick — Lines (bottom → top)</div>
+        <strong>G</strong>ood <strong>B</strong>oys <strong>D</strong>eserve <strong>F</strong>ine <strong>A</strong>pples<br>
+        → G · B · D · F · A
+      </div>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick — Spaces (bottom → top)</div>
+        <strong>A</strong>ll <strong>C</strong>ows <strong>E</strong>at <strong>G</strong>rass → A · C · E · G
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Middle C</h3>
+      <p>Middle C sits on a short ledger line <em>below</em> the treble clef or <em>above</em> the bass clef. It's the C in the middle of the piano — a great landmark note!</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        Count up from the bottom of the treble clef: the first ledger line <em>below</em> the staff is Middle C (C4). Count down from the top of the bass clef: the first ledger line <em>above</em> is also Middle C.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Accidentals</h3>
+      <table>
+        <tr><th>Symbol</th><th>Name</th><th>Effect</th></tr>
+        <tr><td style="font-size:1.4rem">♯</td><td>Sharp</td><td>Raises the note by one semitone</td></tr>
+        <tr><td style="font-size:1.4rem">♭</td><td>Flat</td><td>Lowers the note by one semitone</td></tr>
+        <tr><td style="font-size:1.4rem">♮</td><td>Natural</td><td>Cancels a sharp or flat</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ NOTE VALUES -->
+  <section class="learn-section" id="values">
+    <div class="section-title">🎼 Note Values &amp; Rests</div>
+
+    <div class="subsection">
+      <h3>Note values (in 4/4 time)</h3>
+      <table>
+        <tr><th>UK Name</th><th>US Name</th><th>Beats</th><th>Rest looks like</th></tr>
+        <tr><td>Semibreve</td><td>Whole note</td><td>4</td><td>𝄻 (hanging block)</td></tr>
+        <tr><td>Minim</td><td>Half note</td><td>2</td><td>𝄼 (sitting block)</td></tr>
+        <tr><td>Crotchet</td><td>Quarter note</td><td>1</td><td>𝄽 (zigzag)</td></tr>
+        <tr><td>Quaver</td><td>Eighth note</td><td>½</td><td>𝄾 (small zigzag)</td></tr>
+        <tr><td>Semiquaver</td><td>16th note</td><td>¼</td><td>𝄿 (double zigzag)</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — halving</div>
+        Each shorter note is <strong>half</strong> the value of the one above: Semibreve → Minim → Crotchet → Quaver → Semiquaver. Double a note to go the other way!
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Dotted notes</h3>
+      <p>A dot after a note adds <strong>half</strong> of that note's value to it.</p>
+      <table>
+        <tr><th>Note</th><th>= Note + …</th><th>Total beats</th></tr>
+        <tr><td>Dotted minim ♩.</td><td>Minim + crotchet</td><td>3 beats</td></tr>
+        <tr><td>Dotted crotchet ♩.</td><td>Crotchet + quaver</td><td>1½ beats</td></tr>
+        <tr><td>Dotted quaver ♩.</td><td>Quaver + semiquaver</td><td>¾ beat</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        <strong>Dot = add half.</strong> If the note is worth 2, the dot adds 1. If it's worth 1, the dot adds ½.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Rests — silence</h3>
+      <p>Every note value has a matching <strong>rest</strong> (silence). The semibreve rest hangs from the 4th line; the minim rest sits on the 3rd line.</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — semibreve vs minim rest</div>
+        The <strong>semibreve rest</strong> hangs DOWN like a heavy brick (it's heavier = 4 beats).<br>
+        The <strong>minim rest</strong> sits UP like a hat (lighter = 2 beats).<br>
+        <em>"The heavy one hangs, the light one sits."</em>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ TIME SIGNATURES -->
+  <section class="learn-section" id="time">
+    <div class="section-title">⏱ Time Signatures</div>
+
+    <div class="subsection">
+      <p>The time signature appears at the start of a piece. It tells you:</p>
+      <p>🔝 <strong>Top number</strong> = how many beats per bar<br>
+         🔽 <strong>Bottom number</strong> = what note gets one beat (4 = crotchet, 8 = quaver, 2 = minim)</p>
+
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        The bottom number is like a fraction: <strong>4 means "quarter"</strong> (crotchet), <strong>8 means "eighth"</strong> (quaver), <strong>2 means "half"</strong> (minim).
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Simple time <span class="grade-badge g1">Grade 1</span></h3>
+      <table>
+        <tr><th>Sig</th><th>Beats</th><th>Beat note</th><th>Feel</th></tr>
+        <tr><td><strong>2/4</strong></td><td>2</td><td>Crotchet</td><td>March — ONE two ONE two</td></tr>
+        <tr><td><strong>3/4</strong></td><td>3</td><td>Crotchet</td><td>Waltz — ONE two three</td></tr>
+        <tr><td><strong>4/4 (C)</strong></td><td>4</td><td>Crotchet</td><td>Most pop songs — ONE two three four</td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Compound time <span class="grade-badge g2">Grade 2</span></h3>
+      <table>
+        <tr><th>Sig</th><th>Beats</th><th>Beat note</th><th>Feel</th></tr>
+        <tr><td><strong>6/8</strong></td><td>2</td><td>Dotted crotchet</td><td>Swung/lilting — ONE-and-a TWO-and-a</td></tr>
+        <tr><td><strong>9/8</strong></td><td>3</td><td>Dotted crotchet</td><td>3 compound beats — lilting waltz</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — simple vs compound</div>
+        <strong>Simple time:</strong> each beat divides into 2. <strong>Compound time:</strong> each beat divides into 3 (dotted note as the beat). In 6/8, you feel 2 big beats, not 6 small ones!
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Cut time <span class="grade-badge g3">Grade 3</span></h3>
+      <table>
+        <tr><th>Sig</th><th>Beats</th><th>Beat note</th><th>Also called</th></tr>
+        <tr><td><strong>2/2 (𝄵)</strong></td><td>2</td><td>Minim</td><td>Alla breve / Cut time — brisk marches</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ KEYS & SCALES -->
+  <section class="learn-section" id="keys">
+    <div class="section-title">🔑 Key Signatures &amp; Scales</div>
+
+    <div class="subsection">
+      <h3>Order of sharps &amp; flats</h3>
+      <div class="tip">
+        <div class="tip-label">🧠 Order of Sharps — FCGDAEB</div>
+        <strong>F</strong>ather <strong>C</strong>harles <strong>G</strong>oes <strong>D</strong>own <strong>A</strong>nd <strong>E</strong>nds <strong>B</strong>attle<br>
+        → F# · C# · G# · D# · A# · E# · B#
+      </div>
+      <div class="tip">
+        <div class="tip-label">🧠 Order of Flats — BEADGCF (reverse of sharps!)</div>
+        <strong>B</strong>attle <strong>E</strong>nds <strong>A</strong>nd <strong>D</strong>own <strong>G</strong>oes <strong>C</strong>harles' <strong>F</strong>ather<br>
+        → Bb · Eb · Ab · Db · Gb · Cb · Fb
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Major key signatures</h3>
+      <table class="key-table">
+        <tr><th>Key</th><th>Sharps / Flats</th><th>Grade</th></tr>
+        <tr><td><strong>C major</strong></td><td>None</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td><strong>G major</strong></td><td class="sharps">1 sharp: F#</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td><strong>F major</strong></td><td class="flats">1 flat: Bb</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td><strong>D major</strong></td><td class="sharps">2 sharps: F# C#</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td><strong>A major</strong></td><td class="sharps">3 sharps: F# C# G#</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td><strong>E major</strong></td><td class="sharps">4 sharps: F# C# G# D#</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td><strong>Bb major</strong></td><td class="flats">2 flats: Bb Eb</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td><strong>Eb major</strong></td><td class="flats">3 flats: Bb Eb Ab</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td><strong>Ab major</strong></td><td class="flats">4 flats: Bb Eb Ab Db</td><td><span class="grade-badge g3">G3</span></td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — sharps keys</div>
+        The key name is <strong>one semitone above</strong> the last sharp. E.g. the last sharp in D major is C# — one semitone above C# is D. ✓
+      </div>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — flats keys</div>
+        The key name is the <strong>second-to-last flat</strong>. E.g. Bb major has 2 flats (Bb Eb) — the second-to-last is Bb. ✓ (Exception: F major = 1 flat, just memorise it!)
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Scale patterns</h3>
+      <p>Every major scale follows the same pattern of Tones (T = whole step) and Semitones (S = half step):</p>
+      <div class="scale-steps">
+        <span class="step T">T</span><span class="step T">T</span><span class="step S">S</span>
+        <span class="step T">T</span><span class="step T">T</span><span class="step T">T</span><span class="step S">S</span>
+      </div>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        <strong>Two tones, semitone, three tones, semitone.</strong> The semitones are always between steps 3–4 and 7–8.
+      </div>
+
+      <h3 style="margin-top:16px;">Harmonic minor scale <span class="grade-badge g2">Grade 2</span></h3>
+      <div class="scale-steps">
+        <span class="step T">T</span><span class="step S">S</span><span class="step T">T</span>
+        <span class="step T">T</span><span class="step S">S</span><span class="step TS">T+S</span><span class="step S">S</span>
+      </div>
+      <p>The harmonic minor raises the <strong>7th degree</strong> by a semitone, creating an augmented 2nd (3 semitones) between degrees 6 and 7. This gives it an exotic, dramatic sound!</p>
+
+      <div class="subsection">
+        <h3>Harmonic minor scales <span class="grade-badge g2">Grade 2</span></h3>
+        <table class="key-table">
+          <tr><th>Key</th><th>Notes</th><th>Key sig + raised 7th</th></tr>
+          <tr><td><strong>A harmonic minor</strong></td><td>A B C D E F <strong>G#</strong> A</td><td>No sharps/flats + G#</td></tr>
+          <tr><td><strong>E harmonic minor</strong></td><td>E F# G A B C <strong>D#</strong> E</td><td>1 sharp (F#) + D#</td></tr>
+          <tr><td><strong>D harmonic minor</strong></td><td>D E F G A Bb <strong>C#</strong> D</td><td>1 flat (Bb) + C#</td></tr>
+          <tr><td><strong>G harmonic minor</strong><span class="grade-badge g3">G3</span></td><td>G A Bb C D Eb <strong>F#</strong> G</td><td>2 flats + F#</td></tr>
+          <tr><td><strong>C harmonic minor</strong><span class="grade-badge g3">G3</span></td><td>C D Eb F G Ab <strong>B</strong> C</td><td>3 flats + B♮</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ INTERVALS -->
+  <section class="learn-section" id="intervals">
+    <div class="section-title">📐 Intervals</div>
+
+    <div class="subsection">
+      <h3>How to count an interval</h3>
+      <p>Count every letter name from the bottom note to the top note, <strong>including both notes</strong>.</p>
+      <p>Example: C → G = C(1) D(2) E(3) F(4) <strong>G(5)</strong> = a <strong>5th</strong>.</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        Always count the bottom note as "1". Never start at 0!
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Interval quality <span class="grade-badge g2">Grade 2+</span></h3>
+      <table>
+        <tr><th>Quality</th><th>Applies to</th><th>Semitones (e.g.)</th></tr>
+        <tr><td><strong>Perfect</strong></td><td>Unison, 4th, 5th, Octave</td><td>P4 = 5, P5 = 7</td></tr>
+        <tr><td><strong>Major</strong></td><td>2nd, 3rd, 6th, 7th</td><td>M3 = 4, M6 = 9</td></tr>
+        <tr><td><strong>Minor</strong></td><td>2nd, 3rd, 6th, 7th</td><td>m3 = 3, m7 = 10</td></tr>
+        <tr><td><strong>Diminished</strong></td><td>Perfect intervals − 1 semitone</td><td>d5 = 6</td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Recognise intervals by song</h3>
+      <p>Every interval has a famous song that starts with it. Train your ears!</p>
+      <div class="interval-song"><span class="int-name">Minor 2nd</span><span class="int-song">Jaws theme 🦈 (duh-DUN)</span></div>
+      <div class="interval-song"><span class="int-name">Major 2nd</span><span class="int-song">Happy Birthday (Hap-py)</span></div>
+      <div class="interval-song"><span class="int-name">Minor 3rd</span><span class="int-song">Smoke on the Water · Greensleeves</span></div>
+      <div class="interval-song"><span class="int-name">Major 3rd</span><span class="int-song">When the Saints Go Marching In · Oh! Susanna</span></div>
+      <div class="interval-song"><span class="int-name">Perfect 4th</span><span class="int-song">Here Comes the Bride · Amazing Grace · O Christmas Tree</span></div>
+      <div class="interval-song"><span class="int-name">Diminished 5th</span><span class="int-song">The Simpsons theme · Maria (West Side Story)</span></div>
+      <div class="interval-song"><span class="int-name">Perfect 5th</span><span class="int-song">Star Wars theme 🚀 · Twinkle Twinkle (second note)</span></div>
+      <div class="interval-song"><span class="int-name">Minor 6th</span><span class="int-song">The Entertainer · Love Story (Francis Lai)</span></div>
+      <div class="interval-song"><span class="int-name">Major 6th</span><span class="int-song">My Bonnie Lies Over the Ocean · NBC chime</span></div>
+      <div class="interval-song"><span class="int-name">Minor 7th</span><span class="int-song">Somewhere (West Side Story) · Star Trek theme</span></div>
+      <div class="interval-song"><span class="int-name">Major 7th</span><span class="int-song">Take On Me · Somewhere Over the Rainbow (2nd interval)</span></div>
+      <div class="interval-song"><span class="int-name">Octave</span><span class="int-song">Somewhere Over the Rainbow 🌈 (first two notes)</span></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ CHORDS -->
+  <section class="learn-section" id="chords">
+    <div class="section-title">🎹 Chords &amp; Cadences</div>
+
+    <div class="subsection">
+      <h3>Building a triad</h3>
+      <p>A <strong>triad</strong> is a 3-note chord built by stacking <strong>3rds</strong>: root, 3rd, 5th.</p>
+      <table>
+        <tr><th>Type</th><th>3rd above root</th><th>5th above root</th><th>Sound</th></tr>
+        <tr><td><strong>Major</strong></td><td>Major 3rd (4 semitones)</td><td>Perfect 5th (7 semitones)</td><td>Happy, bright</td></tr>
+        <tr><td><strong>Minor</strong></td><td>Minor 3rd (3 semitones)</td><td>Perfect 5th (7 semitones)</td><td>Sad, dark</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        Major chord = <strong>big 3rd + small 3rd</strong> stacked (4+3 semitones).<br>
+        Minor chord = <strong>small 3rd + big 3rd</strong> stacked (3+4 semitones). Just swap the order!
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Inversions <span class="grade-badge g3">Grade 3</span></h3>
+      <table>
+        <tr><th>Position</th><th>Lowest note</th><th>Example (C major)</th></tr>
+        <tr><td>Root position</td><td>Root (1st)</td><td>C – E – G</td></tr>
+        <tr><td>1st inversion</td><td>3rd</td><td>E – G – C</td></tr>
+        <tr><td>2nd inversion</td><td>5th</td><td>G – C – E</td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Primary triads <span class="grade-badge g3">Grade 3</span></h3>
+      <p>The three most important chords in a key are built on the <strong>1st, 4th and 5th</strong> degrees:</p>
+      <table>
+        <tr><th>Roman numeral</th><th>Name</th><th>In C major</th></tr>
+        <tr><td><strong>I</strong></td><td>Tonic</td><td>C – E – G</td></tr>
+        <tr><td><strong>IV</strong></td><td>Subdominant</td><td>F – A – C</td></tr>
+        <tr><td><strong>V</strong></td><td>Dominant</td><td>G – B – D</td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Cadences <span class="grade-badge g3">Grade 3</span></h3>
+      <table>
+        <tr><th>Cadence</th><th>Chords</th><th>Sound / Feel</th></tr>
+        <tr><td><strong>Perfect</strong></td><td>V → I</td><td>Strong ending — like a full stop ✓</td></tr>
+        <tr><td><strong>Plagal</strong></td><td>IV → I</td><td>Soft ending — "Amen" in hymns 🙏</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick</div>
+        <strong>Perfect = V→I</strong> (think "Five to One — done!").<br>
+        <strong>Plagal = IV→I</strong> (think "Four to One — Amen").
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ TERMS -->
+  <section class="learn-section" id="terms">
+    <div class="section-title">📚 Music Terms (Italian)</div>
+
+    <div class="subsection">
+      <h3>Tempo (speed)</h3>
+      <table>
+        <tr><th>Term</th><th>Meaning</th><th>Grade</th></tr>
+        <tr><td>Adagio</td><td>Slowly</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Andante</td><td>At a walking pace</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Moderato</td><td>At a moderate speed</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Allegro</td><td>Fast and lively</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Presto</td><td>Very fast</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Lento / Largo</td><td>Slowly / Very slow and broad</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>Allegretto</td><td>Moderately fast (a little slower than Allegro)</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>Vivace</td><td>Lively and fast</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>Prestissimo</td><td>Extremely fast</td><td><span class="grade-badge g3">G3</span></td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Dynamics (volume)</h3>
+      <table>
+        <tr><th>Symbol / Term</th><th>Meaning</th><th>Grade</th></tr>
+        <tr><td>p (piano)</td><td>Soft</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>f (forte)</td><td>Loud</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>cresc.</td><td>Getting louder</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>dim. / decresc.</td><td>Getting softer</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>pp / ff</td><td>Very soft / Very loud</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>mp / mf</td><td>Moderately soft / Moderately loud</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>sfz (sforzando)</td><td>Sudden strong accent</td><td><span class="grade-badge g3">G3</span></td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — dynamics order (softest → loudest)</div>
+        <strong>pp · p · mp · mf · f · ff</strong><br>
+        Pianissimo · Piano · Mezzo-piano · Mezzo-forte · Forte · Fortissimo
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Expression &amp; style</h3>
+      <table>
+        <tr><th>Term</th><th>Meaning</th><th>Grade</th></tr>
+        <tr><td>Legato</td><td>Smoothly connected</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Staccato</td><td>Short and detached</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td>Cantabile</td><td>In a singing style</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>Sostenuto</td><td>Sustained</td><td><span class="grade-badge g2">G2</span></td></tr>
+        <tr><td>Dolce</td><td>Sweetly</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td>Con brio</td><td>With spirit</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td>Scherzando</td><td>Playfully</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td>Tranquillo</td><td>Calmly</td><td><span class="grade-badge g3">G3</span></td></tr>
+      </table>
+      <p style="margin-top:8px;">→ <a href="terms-flashcards.html" style="color:#2E8B6E;font-weight:700;">Practice all terms with flashcards 📚</a></p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ GUITAR -->
+  <section class="learn-section" id="guitar">
+    <div class="section-title">🎸 Guitar Basics</div>
+
+    <div class="subsection">
+      <h3>The 6 strings</h3>
+      <p>A standard guitar has 6 strings. From the <strong>thickest (lowest pitch)</strong> to the <strong>thinnest (highest pitch)</strong>:</p>
+      <table>
+        <tr><th>String #</th><th>Note</th><th>Thickness</th></tr>
+        <tr><td>6 (thickest)</td><td><strong>E</strong></td><td>Low E — thickest, deepest</td></tr>
+        <tr><td>5</td><td><strong>A</strong></td><td></td></tr>
+        <tr><td>4</td><td><strong>D</strong></td><td></td></tr>
+        <tr><td>3</td><td><strong>G</strong></td><td></td></tr>
+        <tr><td>2</td><td><strong>B</strong></td><td></td></tr>
+        <tr><td>1 (thinnest)</td><td><strong>e</strong></td><td>High e — thinnest, highest</td></tr>
+      </table>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick — E A D G B e</div>
+        <strong>E</strong>ddie <strong>A</strong>te <strong>D</strong>ynamite, <strong>G</strong>oodbye <strong>E</strong>ddie! 💥<br>
+        (or: <strong>E</strong>very <strong>A</strong>mazing <strong>D</strong>og <strong>G</strong>rowls <strong>B</strong>ig <strong>e</strong>ars)
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Reading chord diagrams</h3>
+      <p>Chord diagrams show the guitar neck from the front:</p>
+      <ul style="font-size:0.9rem;color:#444;padding-left:20px;line-height:2;">
+        <li>Vertical lines = strings (left = low E, right = high e)</li>
+        <li>Horizontal lines = frets</li>
+        <li>● dots = where to press your finger</li>
+        <li><strong>O</strong> above a string = play it open (unfretted)</li>
+        <li><strong>✕</strong> above a string = don't play this string</li>
+        <li>A number above the dots = which finger to use (1=index, 2=middle, 3=ring, 4=pinky)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Common open chords</h3>
+      <p>These are the essential beginner chords — all playable without barre (pressing across all strings):</p>
+      <div class="chord-grid" id="chord-diagrams"></div>
+      <p style="margin-top:12px;">→ <a href="guitar-chords.html" style="color:#2E8B6E;font-weight:700;">Practice guitar chords with the quiz 🎸</a></p>
+    </div>
+
+    <div class="subsection">
+      <h3>How chords relate to piano theory</h3>
+      <p>The chord names are the same! A G major chord on guitar has the same notes (G, B, D) as on piano — just played differently. All the music theory you learn for piano applies to guitar too.</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Trick — major vs minor guitar chords</div>
+        On guitar, chords with a lowercase "m" are minor (e.g. Am, Em, Dm). No "m" = major (G, C, D, A, E). It's exactly the same distinction as on piano!
+      </div>
+    </div>
+  </section>
+
+  <div style="height:40px;"></div>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Smooth scroll to section ---- */
+    function scrollTo(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.topic-btn').forEach(function(b) { b.classList.remove('active'); });
+      event.target.classList.add('active');
+    }
+
+    /* ---- Render staff examples ---- */
+    ABCJS.renderAbc('staff-treble',
+      'X:1\nT:\nM:4/4\nL:1/4\nK:C\nE G B d f|]',
+      { scale: 2.0, staffwidth: 260, paddingtop: 10, paddingbottom: 5, paddingleft: 20, paddingright: 20 });
+
+    ABCJS.renderAbc('staff-bass',
+      'X:1\nT:\nM:4/4\nL:1/4\nK:C clef=bass\nG, B, D F A|]',
+      { scale: 2.0, staffwidth: 260, paddingtop: 10, paddingbottom: 5, paddingleft: 20, paddingright: 20 });
+
+    /* ---- Guitar chord diagrams ---- */
+    // frets: array of 6 (strings 6→1, low E to high e)
+    // -1 = muted (X), 0 = open (O), 1-4 = fret number
+    const OPEN_CHORDS = [
+      { name:'Em', notes:'E G B',  frets:[ 0, 2, 2, 0, 0, 0] },
+      { name:'Am', notes:'A C E',  frets:[-1, 0, 2, 2, 1, 0] },
+      { name:'Dm', notes:'D F A',  frets:[-1,-1, 0, 2, 3, 1] },
+      { name:'E',  notes:'E G# B', frets:[ 0, 2, 2, 1, 0, 0] },
+      { name:'A',  notes:'A C# E', frets:[-1, 0, 2, 2, 2, 0] },
+      { name:'D',  notes:'D F# A', frets:[-1,-1, 0, 2, 3, 2] },
+      { name:'G',  notes:'G B D',  frets:[ 3, 2, 0, 0, 0, 3] },
+      { name:'C',  notes:'C E G',  frets:[-1, 3, 2, 0, 1, 0] },
+    ];
+
+    function drawChordDiagram(frets) {
+      var W = 80, H = 96, strX0 = 12, strXn = 68;
+      var fretY0 = 20, fretH = 14, numFrets = 4;
+      var strGap = (strXn - strX0) / 5;
+
+      var svg = '<svg width="' + W + '" height="' + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+      // Nut (thick top line if starting at fret 1)
+      svg += '<rect x="' + strX0 + '" y="' + fretY0 + '" width="' + (strXn - strX0) + '" height="3" fill="#333"/>';
+
+      // Fret lines
+      for (var f = 1; f <= numFrets; f++) {
+        var fy = fretY0 + f * fretH;
+        svg += '<line x1="' + strX0 + '" y1="' + fy + '" x2="' + strXn + '" y2="' + fy + '" stroke="#999" stroke-width="1"/>';
+      }
+
+      // String lines
+      for (var s = 0; s < 6; s++) {
+        var sx = strX0 + s * strGap;
+        svg += '<line x1="' + sx + '" y1="' + fretY0 + '" x2="' + sx + '" y2="' + (fretY0 + numFrets * fretH) + '" stroke="#555" stroke-width="1.5"/>';
+      }
+
+      // Finger dots and X/O markers
+      for (var s = 0; s < 6; s++) {
+        var sx = strX0 + s * strGap;
+        var fret = frets[s];
+        if (fret === -1) {
+          // Muted
+          svg += '<text x="' + sx + '" y="' + (fretY0 - 6) + '" text-anchor="middle" font-size="10" fill="#c00" font-weight="bold">✕</text>';
+        } else if (fret === 0) {
+          // Open
+          svg += '<circle cx="' + sx + '" cy="' + (fretY0 - 7) + '" r="4" fill="none" stroke="#333" stroke-width="1.5"/>';
+        } else {
+          // Finger dot
+          var fy = fretY0 + (fret - 0.5) * fretH;
+          svg += '<circle cx="' + sx + '" cy="' + fy + '" r="6" fill="#2E8B6E"/>';
+        }
+      }
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    var grid = document.getElementById('chord-diagrams');
+    OPEN_CHORDS.forEach(function(chord) {
+      var item = document.createElement('div');
+      item.className = 'chord-item';
+      item.innerHTML = drawChordDiagram(chord.frets) +
+        '<div class="chord-name">' + chord.name + '</div>' +
+        '<div class="chord-label">' + chord.notes + '</div>';
+      grid.appendChild(item);
+    });
+  </script>
+</body>
+</html>

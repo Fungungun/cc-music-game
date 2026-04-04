@@ -17,6 +17,10 @@
     .module-card[data-accent="sky"]    { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
     .module-card[data-accent="purple"] { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
     .module-card[data-accent="grape"]  { background: linear-gradient(135deg, #E8D0FF, #D4AAFF); }
+    .module-card[data-accent="mint2"]  { background: linear-gradient(135deg, #B2DFDB, #80CBC4); }
+    .module-card[data-accent="brown"]  { background: linear-gradient(135deg, #FFD4A3, #FFAB76); }
+    /* Special card styling for non-game pages */
+    .module-card.card-learn { border: 3px solid #2E8B6E; }
   </style>
 </head>
 <body>
@@ -43,6 +47,15 @@
   <script src="game.js"></script>
   <script>
     const MODULES = [
+      {
+        id: 'learn',
+        titleKey: 'mod-learn',
+        descKey: 'desc-learn',
+        emoji: '📖',
+        accent: 'mint2',
+        href: 'learn.html',
+        noScore: true,
+      },
       {
         id: 'note-namer',
         titleKey: 'mod-note-namer',
@@ -100,6 +113,14 @@
         href: 'form-detective.html'
       },
       {
+        id: 'guitar-chords',
+        titleKey: 'mod-guitar-chords',
+        descKey: 'desc-guitar-chords',
+        emoji: '🎸',
+        accent: 'brown',
+        href: 'guitar-chords.html'
+      },
+      {
         id: 'mock-test',
         titleKey: 'mod-mock-test',
         descKey: 'desc-mock-test',
@@ -114,7 +135,7 @@
       let totalScore = 0;
 
       // Only count modules that have score data (exclude mock-test which uses different storage)
-      const scoredModules = ['note-namer','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective'];
+      const scoredModules = ['note-namer','scale-builder','interval-quiz','chord-game','guitar-chords','rhythm-tapper','terms-flashcards','form-detective'];
 
       MODULES.forEach(function(mod) {
         const data = getModuleData(mod.id);
@@ -135,7 +156,7 @@
           '<span class="card-icon">' + mod.emoji + '</span>' +
           '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
           '<div class="card-desc" data-i18n="' + mod.descKey + '">' + desc + '</div>' +
-          '<div class="card-score">Best: ' + score + ' ✨</div>';
+          (mod.noScore ? '' : '<div class="card-score">Best: ' + score + ' ✨</div>');
         grid.appendChild(card);
       });
 

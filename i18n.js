@@ -26,6 +26,8 @@ window.TRANSLATIONS = {
     'mod-terms-flashcards': '📚 Terms Flashcards',
     'mod-form-detective': '🔍 Form Detective',
     'mod-mock-test': '📝 AMEB Mock Test',
+    'mod-learn': '📖 Theory Guide',
+    'mod-guitar-chords': '🎸 Guitar Chords',
 
     // Module descriptions
     'desc-note-namer': 'Identify notes on the staff',
@@ -36,6 +38,8 @@ window.TRANSLATIONS = {
     'desc-terms-flashcards': 'Italian & French music terms',
     'desc-form-detective': 'Identify musical forms',
     'desc-mock-test': 'Practice AMEB Grade 1-2 exam questions',
+    'desc-learn': 'Theory reference with tricks & mnemonics',
+    'desc-guitar-chords': 'Learn & quiz open guitar chords',
 
     // How to play intros
     'how-note-namer': 'A note will appear on the music staff. Look carefully at where the note sits on the lines and spaces, then tap the correct letter name (C D E F G A B)!',
@@ -142,6 +146,8 @@ window.TRANSLATIONS = {
     'mod-terms-flashcards': '📚 术语闪卡',
     'mod-form-detective': '🔍 曲式侦探',
     'mod-mock-test': '📝 AMEB模拟测验',
+    'mod-learn': '📖 乐理指南',
+    'mod-guitar-chords': '🎸 吉他和弦',
 
     // Module descriptions
     'desc-note-namer': '认读五线谱上的音符',
@@ -152,6 +158,8 @@ window.TRANSLATIONS = {
     'desc-terms-flashcards': '意大利语和法语音乐术语',
     'desc-form-detective': '识别曲式结构',
     'desc-mock-test': '练习AMEB一、二级考试题目',
+    'desc-learn': '乐理参考手册，含记忆技巧',
+    'desc-guitar-chords': '学习并测验吉他开放和弦',
 
     // How to play intros
     'how-note-namer': '五线谱上会出现一个音符。仔细看音符在线条和间隔上的位置，然后点击正确的音符名称（C D E F G A B）！',
