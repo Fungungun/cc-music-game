@@ -40,6 +40,9 @@ self.addEventListener('activate', function(e) {
 self.addEventListener('fetch', function(e) {
   var url = e.request.url;
 
+  /* Ignore non-http(s) requests (e.g. chrome-extension://) */
+  if (!url.startsWith('http')) return;
+
   /* CDN / audio samples — network first, cache fallback */
   if (url.includes('cdn') || url.includes('tonejs.github.io') || url.includes('cdnjs')) {
     e.respondWith(
