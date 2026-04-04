@@ -159,6 +159,22 @@
       return getGrade() === 1 ? ROOT_NOTES_G1 : ROOT_NOTES_G2;
     }
 
+    /* ---- Song hints per interval ---- */
+    var INTERVAL_SONGS = {
+      'P1':'same note twice',
+      'M2':'"Happy Birthday" (1st→2nd note)',
+      'm3':'"Smoke on the Water" riff',
+      'M3':'"When the Saints Go Marching In"',
+      'P4':'"Here Comes the Bride"',
+      'd5':'"The Simpsons" theme',
+      'P5':'"Star Wars" theme',
+      'm6':'"The Entertainer"',
+      'M6':'"My Bonnie Lies Over the Ocean"',
+      'm7':'"Somewhere" (West Side Story)',
+      'M7':'almost an octave — very tense!',
+      'P8':'"Somewhere Over the Rainbow" (1st→2nd note)'
+    };
+
     /* ---- State ---- */
     let currentRoot = 'C4';
     let currentInterval = null;
@@ -261,11 +277,12 @@
       if (isCorrectAnswer(interval)) {
         answeredThisRound = true;
         btn.classList.add('correct-ans');
-        setFeedback(randomCorrect(), 'correct');
+        var hint = INTERVAL_SONGS[currentInterval.short] ? ' 🎵 ' + INTERVAL_SONGS[currentInterval.short] : '';
+        setFeedback(randomCorrect() + hint, 'correct');
         triggerStarburst(btn);
         score.onCorrect();
         playCurrentInterval();
-        setTimeout(function() { nextQuestion(); }, 1800);
+        setTimeout(function() { nextQuestion(); }, 2000);
       } else {
         wrongAttempts++;
         btn.classList.add('wrong-ans');
@@ -278,8 +295,9 @@
           document.querySelectorAll('.answer-btn').forEach(function(b) {
             if (b.dataset.short === currentInterval.short) b.classList.add('correct-ans');
           });
-          setFeedback('The answer was ' + currentInterval.name + '! Semitones: ' + currentInterval.semitones, 'wrong');
-          setTimeout(function() { nextQuestion(); }, 2500);
+          var hint = INTERVAL_SONGS[currentInterval.short] ? ' 🎵 Think: ' + INTERVAL_SONGS[currentInterval.short] : '';
+          setFeedback('The answer was ' + currentInterval.name + ' (' + currentInterval.semitones + ' semitones)!' + hint, 'wrong');
+          setTimeout(function() { nextQuestion(); }, 3000);
         }
       }
     }
