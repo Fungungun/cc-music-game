@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: linear-gradient(135deg, #FFF8FB 0%, #F5F0FF 50%, #F0FFF8 100%); }
+    .page-header { background: linear-gradient(90deg, #FF8FAB, #FFB74D); }
+    .page-header h1 { color: white; }
+    .privacy-body {
+      max-width: 680px; margin: 24px auto; padding: 0 20px 40px;
+      font-size: 0.95rem; color: #444; line-height: 1.7;
+    }
+    .privacy-body h2 { color: #333; margin-top: 28px; font-size: 1.1rem; }
+    .privacy-body p  { margin: 0 0 14px; }
+    .privacy-body ul { margin: 0 0 14px; padding-left: 22px; }
+    .privacy-body li { margin-bottom: 6px; }
+    .highlight-box {
+      background: rgba(255,255,255,0.8); border-radius: 14px;
+      padding: 16px 20px; margin: 20px 0;
+      border-left: 4px solid #FF8FAB;
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <h1 style="color:white;">Privacy Notice</h1>
+  </header>
+
+  <div class="privacy-body">
+
+    <div class="highlight-box">
+      <strong>Short version:</strong> Music Maestro stores all your data locally on your own device using browser localStorage. We do not collect, transmit, or store any personal data on our servers.
+    </div>
+
+    <h2>What data is stored</h2>
+    <p>Music Maestro saves the following data in your browser's <strong>localStorage</strong> — this stays entirely on your device and is never sent anywhere:</p>
+    <ul>
+      <li>Your chosen display name</li>
+      <li>Game progress and high scores for each module</li>
+      <li>Flashcard spaced-repetition progress</li>
+      <li>Selected language (English or Chinese)</li>
+      <li>Selected grade level (1, 2, or 3)</li>
+      <li>Trial start date</li>
+      <li>Daily challenge completion records</li>
+      <li>Email address, if you voluntarily enter it in the "notify me" upgrade form</li>
+    </ul>
+
+    <h2>What we do NOT do</h2>
+    <ul>
+      <li>We do not use cookies</li>
+      <li>We do not use analytics or tracking scripts</li>
+      <li>We do not create user accounts</li>
+      <li>We do not share data with third parties</li>
+      <li>We do not serve advertisements</li>
+    </ul>
+
+    <h2>Third-party resources</h2>
+    <p>Music Maestro loads the following scripts from external CDNs when you are online:</p>
+    <ul>
+      <li><strong>Tone.js</strong> (cdnjs.cloudflare.com) — for piano audio</li>
+      <li><strong>Tonal.js</strong> (cdn.jsdelivr.net) — for music theory calculations</li>
+      <li><strong>abcjs</strong> (cdn.jsdelivr.net) — for sheet music rendering</li>
+      <li><strong>Salamander Grand Piano samples</strong> (tonejs.github.io) — audio files</li>
+    </ul>
+    <p>These are standard open-source libraries. Their respective CDN providers may log request metadata (IP address, timestamp) as part of normal CDN operation.</p>
+
+    <h2>Children's privacy</h2>
+    <p>Music Maestro is designed for use by children under parental guidance. We do not knowingly collect any personal information from children. All data remains on the device.</p>
+
+    <h2>Deleting your data</h2>
+    <p>To delete all saved data, clear your browser's localStorage for this site via your browser settings, or use the "Reset Progress" button within each module.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about privacy? Contact us through the app's feedback page or raise an issue on GitHub.</p>
+
+    <p style="color:#aaa;font-size:0.82rem;margin-top:28px;">Last updated: April 2026</p>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -134,41 +134,50 @@
       }
     });
 
-    /* ---- Note Data ---- */
+    /* ---- Note Data (grade-filtered) ---- */
+    // grade = minimum grade to include this note
     const TREBLE_NOTES = [
-      {abc:'c',    tone:'C4', name:'C'},
-      {abc:'d',    tone:'D4', name:'D'},
-      {abc:'e',    tone:'E4', name:'E'},
-      {abc:'f',    tone:'F4', name:'F'},
-      {abc:'g',    tone:'G4', name:'G'},
-      {abc:'a',    tone:'A4', name:'A'},
-      {abc:'b',    tone:'B4', name:'B'},
-      {abc:"c'",   tone:'C5', name:'C'},
-      {abc:"d'",   tone:'D5', name:'D'},
-      {abc:"e'",   tone:'E5', name:'E'},
-      {abc:"f'",   tone:'F5', name:'F'},
-      {abc:"g'",   tone:'G5', name:'G'},
+      // Grade 1: lines and spaces of the treble staff (E4–F5)
+      {abc:'E',  tone:'E4', name:'E', grade:1},
+      {abc:'F',  tone:'F4', name:'F', grade:1},
+      {abc:'G',  tone:'G4', name:'G', grade:1},
+      {abc:'A',  tone:'A4', name:'A', grade:1},
+      {abc:'B',  tone:'B4', name:'B', grade:1},
+      {abc:'c',  tone:'C5', name:'C', grade:1},
+      {abc:'d',  tone:'D5', name:'D', grade:1},
+      {abc:'e',  tone:'E5', name:'E', grade:1},
+      {abc:'f',  tone:'F5', name:'F', grade:1},
+      // Grade 2: extend range + ledger lines
+      {abc:"C,", tone:'C4', name:'C', grade:2},  // middle C ledger line below
+      {abc:"D,", tone:'D4', name:'D', grade:2},
+      {abc:"g",  tone:'G5', name:'G', grade:2},
+      {abc:"a",  tone:'A5', name:'A', grade:2},
+      {abc:"b",  tone:'B5', name:'B', grade:2},
+      // Grade 3: top ledger lines
+      {abc:"c'", tone:'C6', name:'C', grade:3},
+      {abc:"d'", tone:'D6', name:'D', grade:3},
     ];
     const BASS_NOTES = [
-      {abc:'C,',  tone:'C2', name:'C'},
-      {abc:'D,',  tone:'D2', name:'D'},
-      {abc:'E,',  tone:'E2', name:'E'},
-      {abc:'F,',  tone:'F2', name:'F'},
-      {abc:'G,',  tone:'G2', name:'G'},
-      {abc:'A,',  tone:'A2', name:'A'},
-      {abc:'B,',  tone:'B2', name:'B'},
-      {abc:'C',   tone:'C3', name:'C'},
-      {abc:'D',   tone:'D3', name:'D'},
-      {abc:'E',   tone:'E3', name:'E'},
-      {abc:'F',   tone:'F3', name:'F'},
-      {abc:'G',   tone:'G3', name:'G'},
-      {abc:'A',   tone:'A3', name:'A'},
-      {abc:'B',   tone:'B3', name:'B'},
-      {abc:'c',   tone:'C4', name:'C'},
-      {abc:'d',   tone:'D4', name:'D'},
-      {abc:'e',   tone:'E4', name:'E'},
-      {abc:'f',   tone:'F4', name:'F'},
-      {abc:'g',   tone:'G4', name:'G'},
+      // Grade 1: lines and spaces of bass staff (G2–A3)
+      {abc:'G,', tone:'G2', name:'G', grade:1},
+      {abc:'A,', tone:'A2', name:'A', grade:1},
+      {abc:'B,', tone:'B2', name:'B', grade:1},
+      {abc:'C',  tone:'C3', name:'C', grade:1},
+      {abc:'D',  tone:'D3', name:'D', grade:1},
+      {abc:'E',  tone:'E3', name:'E', grade:1},
+      {abc:'F',  tone:'F3', name:'F', grade:1},
+      {abc:'G',  tone:'G3', name:'G', grade:1},
+      {abc:'A',  tone:'A3', name:'A', grade:1},
+      // Grade 2: extend range
+      {abc:'F,', tone:'F2', name:'F', grade:2},
+      {abc:'E,', tone:'E2', name:'E', grade:2},
+      {abc:'B',  tone:'B3', name:'B', grade:2},
+      {abc:'c',  tone:'C4', name:'C', grade:2},
+      {abc:'d',  tone:'D4', name:'D', grade:2},
+      // Grade 3: ledger lines
+      {abc:'D,', tone:'D2', name:'D', grade:3},
+      {abc:'C,', tone:'C2', name:'C', grade:3},
+      {abc:'e',  tone:'E4', name:'E', grade:3},
     ];
 
     /* ---- State ---- */
@@ -187,7 +196,8 @@
     }
 
     function pickNote() {
-      const pool = currentClef === 'treble' ? TREBLE_NOTES : BASS_NOTES;
+      const allNotes = currentClef === 'treble' ? TREBLE_NOTES : BASS_NOTES;
+      const pool = allNotes.filter(function(n){ return n.grade <= getGrade(); });
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
@@ -264,7 +274,7 @@
 
     /* ---- Start ---- */
     initSampler(function() {
-      buildGradeSelector('grade-selector', function() {});
+      buildGradeSelector('grade-selector', function() { nextNote(); });
       nextNote();
     });
   </script>

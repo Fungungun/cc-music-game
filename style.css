@@ -488,7 +488,8 @@ body {
   font-family: var(--font);
 }
 .mode-btn.active { background: #FF8FAB; color: white; border-color: #FF8FAB; }
-.mode-btn:hover:not(.active) { background: #f0f0f0; }
+.mode-btn:hover:not(.active):not(.locked) { background: #f0f0f0; }
+.mode-btn.locked { opacity: 0.55; cursor: pointer; border-style: dashed; }
 
 .stars-display { font-size: 1.8rem; text-align: center; margin: 12px 0; }
 .result-box {
