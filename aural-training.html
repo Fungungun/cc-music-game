@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎧 Aural Training — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #00838F, #B2EBF2); }
+    .page-header h1 { color: #003840; }
+    .back-btn { border-color: #00838F; color: #003840; }
+
+    .listen-area {
+      text-align: center;
+      padding: 24px 16px 10px;
+    }
+    .play-big-btn {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00838F, #00BCD4);
+      border: none; cursor: pointer;
+      font-size: 2.8rem; color: white;
+      box-shadow: 0 6px 24px rgba(0,131,143,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .play-big-btn:hover { transform: scale(1.07); box-shadow: 0 10px 32px rgba(0,131,143,0.45); }
+    .play-big-btn:active { transform: scale(0.96); }
+    .play-big-btn.playing { background: linear-gradient(135deg, #FF8FAB, #FFB74D); animation: pulse 0.6s ease-in-out infinite alternate; }
+    @keyframes pulse { from { box-shadow: 0 6px 20px rgba(255,143,171,0.4); } to { box-shadow: 0 10px 36px rgba(255,143,171,0.7); } }
+
+    .listen-hint { font-size: 0.9rem; color: #777; margin-top: 10px; }
+
+    .mode-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; }
+    .answer-grid { margin: 14px 0; }
+    .answer-btn {
+      min-width: 160px; background: white;
+      border: 2px solid #ddd; font-size: 1rem;
+    }
+    .answer-btn:hover { background: #B2EBF2; border-color: #00838F; }
+
+    .note-reveal {
+      text-align: center; font-size: 1rem;
+      color: #00838F; font-weight: 600;
+      min-height: 28px; margin: 6px 0;
+    }
+    .attempts-dots { text-align: center; margin: 6px 0; font-size: 1.3rem; letter-spacing: 4px; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" data-i18n="back">←</a>
+    <div style="flex:1;">
+      <h1>🎧 Aural Training</h1>
+      <div class="subtitle">Identify intervals by ear!</div>
+    </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+  </header>
+
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span>How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p>Press the big <strong>▶ Play</strong> button to hear two notes. Listen carefully — are they close together or far apart? Then choose the correct interval name. No staff is shown — it's all about your ears!</p>
+      <p>You can press Play again any time to hear the notes again. After 2 wrong answers, the note names will be revealed.</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <div class="score-display">
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Grade selector -->
+    <div class="mode-row" id="grade-selector"></div>
+
+    <!-- Play/hear mode toggle -->
+    <div class="mode-row">
+      <button class="mode-btn active" id="btn-harmonic" onclick="setPlayMode('harmonic')">Together ♩♩</button>
+      <button class="mode-btn"        id="btn-melodic"  onclick="setPlayMode('melodic')">One by one ♩→♩</button>
+    </div>
+
+    <!-- Big play button -->
+    <div class="listen-area">
+      <button class="play-big-btn" id="play-btn" onclick="playCurrentInterval()">▶</button>
+      <div class="listen-hint" id="listen-hint">Press ▶ to hear the interval</div>
+    </div>
+
+    <!-- Attempts indicator -->
+    <div class="attempts-dots" id="attempts-dots"></div>
+
+    <!-- Note name reveal (after 2 wrong) -->
+    <div class="note-reveal" id="note-reveal"></div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Answer buttons -->
+    <div class="answer-grid" id="answer-grid"></div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Intro ---- */
+    function toggleIntro() {
+      var body = document.getElementById('intro-body');
+      var arrow = document.getElementById('intro-arrow');
+      var open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      arrow.textContent = open ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
+    /* ---- Intervals (same as interval-quiz) ---- */
+    var INTERVALS = [
+      { name:'Unison (1st)',   number:'1st', short:'P1', semitones:0,  grade:1 },
+      { name:'Major 2nd',      number:'2nd', short:'M2', semitones:2,  grade:1 },
+      { name:'Minor 3rd',      number:'3rd', short:'m3', semitones:3,  grade:2 },
+      { name:'Major 3rd',      number:'3rd', short:'M3', semitones:4,  grade:1 },
+      { name:'Perfect 4th',    number:'4th', short:'P4', semitones:5,  grade:1 },
+      { name:'Diminished 5th', number:'5th', short:'d5', semitones:6,  grade:2 },
+      { name:'Perfect 5th',    number:'5th', short:'P5', semitones:7,  grade:1 },
+      { name:'Minor 6th',      number:'6th', short:'m6', semitones:8,  grade:2 },
+      { name:'Major 6th',      number:'6th', short:'M6', semitones:9,  grade:2 },
+      { name:'Minor 7th',      number:'7th', short:'m7', semitones:10, grade:2 },
+      { name:'Major 7th',      number:'7th', short:'M7', semitones:11, grade:2 },
+      { name:'Octave (8th)',   number:'8th', short:'P8', semitones:12, grade:1 },
+    ];
+
+    /* Famous song hints to help identify each interval */
+    var INTERVAL_SONGS = {
+      'P1': 'same note twice',
+      'M2': '"Happy Birthday" (1st→2nd note)',
+      'm3': '"Smoke on the Water" riff',
+      'M3': '"When the Saints Go Marching In"',
+      'P4': '"Here Comes the Bride"',
+      'd5': '"The Simpsons" theme',
+      'P5': '"Star Wars" theme',
+      'm6': '"The Entertainer"',
+      'M6': '"My Bonnie Lies Over the Ocean"',
+      'm7': '"Somewhere" (West Side Story)',
+      'M7': 'almost an octave — very tense!',
+      'P8': '"Somewhere Over the Rainbow" (1st→2nd note)'
+    };
+
+    var ROOT_NOTES_G1 = ['C4','E4','G4','F4'];
+    var ROOT_NOTES_G2 = ['C4','D4','E4','F4','G4','A4','B4'];
+
+    function getRootNotes() {
+      return getGrade() === 1 ? ROOT_NOTES_G1 : ROOT_NOTES_G2;
+    }
+    function getPool() {
+      return INTERVALS.filter(function(i){ return i.grade <= getGrade(); });
+    }
+    function intervalLabel(iv) {
+      return getGrade() === 1 ? iv.number : iv.name;
+    }
+
+    /* ---- State ---- */
+    var currentRoot = 'C4';
+    var currentUpper = 'G4';
+    var currentInterval = null;
+    var wrongAttempts = 0;
+    var answered = false;
+    var playMode = 'harmonic';
+    var hasPlayed = false;
+
+    var score = new SessionScore('aural-training');
+
+    function setPlayMode(m) {
+      playMode = m;
+      document.getElementById('btn-harmonic').classList.toggle('active', m === 'harmonic');
+      document.getElementById('btn-melodic').classList.toggle('active', m === 'melodic');
+    }
+
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function toTonalInterval(short) { return short.slice(1) + short[0]; }
+
+    function generateQuestion() {
+      currentRoot = pickRandom(getRootNotes());
+      currentInterval = pickRandom(getPool());
+      try {
+        var upper = Tonal.Note.transpose(currentRoot, toTonalInterval(currentInterval.short));
+        if (!upper || Tonal.Note.get(upper).empty) {
+          upper = Tonal.Note.fromMidi(Tonal.Note.midi(currentRoot) + currentInterval.semitones);
+        }
+        currentUpper = upper;
+      } catch(e) {
+        currentUpper = Tonal.Note.fromMidi(Tonal.Note.midi(currentRoot) + currentInterval.semitones);
+      }
+      wrongAttempts = 0;
+      answered = false;
+      hasPlayed = false;
+    }
+
+    function pickDistractors(correct, count) {
+      var pool = getPool();
+      var key = getGrade() === 1 ? 'number' : 'short';
+      var others = pool.filter(function(i){ return i[key] !== correct[key]; });
+      if (getGrade() === 1) {
+        var seen = {};
+        others = others.filter(function(i){ if (seen[i.number]) return false; seen[i.number]=true; return true; });
+      }
+      return others.sort(function(){ return Math.random()-0.5; }).slice(0, count);
+    }
+
+    function buildAnswerButtons() {
+      var distractors = pickDistractors(currentInterval, 3);
+      var all = [currentInterval].concat(distractors).sort(function(){ return Math.random()-0.5; });
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      all.forEach(function(iv) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = intervalLabel(iv);
+        btn.dataset.short = iv.short;
+        btn.onclick = function(){ checkAnswer(iv, btn); };
+        /* Disable until played once */
+        if (!hasPlayed) { btn.disabled = true; btn.style.opacity = '0.5'; }
+        grid.appendChild(btn);
+      });
+    }
+
+    function enableAnswerButtons() {
+      document.querySelectorAll('.answer-btn').forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
+    }
+
+    function updateAttemptDots() {
+      var dots = '';
+      for (var i = 0; i < 3; i++) {
+        dots += i < wrongAttempts ? '❌' : '⬜';
+      }
+      document.getElementById('attempts-dots').textContent = dots;
+    }
+
+    function isCorrect(iv) {
+      return getGrade() === 1 ? iv.number === currentInterval.number : iv.short === currentInterval.short;
+    }
+
+    function checkAnswer(iv, btn) {
+      if (answered) return;
+
+      if (isCorrect(iv)) {
+        answered = true;
+        btn.classList.add('correct-ans');
+        var hint = INTERVAL_SONGS[currentInterval.short] || '';
+        setFeedback(randomCorrect() + (hint ? ' 🎵 Think: ' + hint : ''), 'correct');
+        triggerStarburst(btn);
+        score.onCorrect();
+        setTimeout(function(){ nextQuestion(); }, 2200);
+      } else {
+        wrongAttempts++;
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        score.onWrong();
+        updateAttemptDots();
+
+        if (wrongAttempts >= 2) {
+          answered = true;
+          document.querySelectorAll('.answer-btn').forEach(function(b){
+            if (b.dataset.short === currentInterval.short) b.classList.add('correct-ans');
+          });
+          document.getElementById('note-reveal').textContent =
+            '🎵 Notes: ' + currentRoot + ' → ' + currentUpper +
+            ' (' + currentInterval.name + ', ' + currentInterval.semitones + ' semitones)';
+          var hint = INTERVAL_SONGS[currentInterval.short] || '';
+          setFeedback(randomWrong() + (hint ? ' Hint: ' + hint : ''), 'wrong');
+          setTimeout(function(){ nextQuestion(); }, 3000);
+        } else {
+          setFeedback(randomWrong() + ' Listen again!', 'wrong');
+          playCurrentInterval();
+        }
+      }
+    }
+
+    function setFeedback(msg, type) {
+      var el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function playCurrentInterval() {
+      var btn = document.getElementById('play-btn');
+      btn.classList.add('playing');
+      btn.textContent = '♪';
+
+      if (playMode === 'harmonic') {
+        playChord([currentRoot, currentUpper], '2n');
+        setTimeout(function(){ btn.classList.remove('playing'); btn.textContent = '▶'; }, 1200);
+      } else {
+        playMelodic([currentRoot, currentUpper], '4n', 80);
+        setTimeout(function(){ btn.classList.remove('playing'); btn.textContent = '▶'; }, 2000);
+      }
+
+      if (!hasPlayed) {
+        hasPlayed = true;
+        enableAnswerButtons();
+        document.getElementById('listen-hint').textContent = 'Heard it? Choose the interval below!';
+      }
+    }
+
+    function nextQuestion() {
+      generateQuestion();
+      buildAnswerButtons();
+      setFeedback('', 'empty');
+      updateAttemptDots();
+      document.getElementById('note-reveal').textContent = '';
+      document.getElementById('listen-hint').textContent = 'Press ▶ to hear the interval';
+      document.getElementById('play-btn').classList.remove('playing');
+      document.getElementById('play-btn').textContent = '▶';
+    }
+
+    /* ---- Start ---- */
+    initSampler(function() {
+      buildGradeSelector('grade-selector', function() { nextQuestion(); });
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>

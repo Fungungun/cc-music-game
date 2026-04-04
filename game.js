@@ -1,9 +1,9 @@
 /* =============================================
-   CC's Music Game — Shared Utilities (game.js)
+   Music Maestro — Shared Utilities (game.js)
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v1.5 · 2026-04-04";
+const APP_VERSION = "v2.0 · 2026-04-04";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -14,35 +14,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* ============ Encouraging Messages ============ */
 const CORRECT_MESSAGES = [
-  "Amazing work, CC! 🌟",
-  "You're a music star, CC! 🎵",
-  "Brilliant, CC! Keep going! ✨",
-  "That's right, CC! You're so clever! 🎹",
-  "Woohoo CC! Your piano teacher would be proud! 🏆",
-  "Correct! CC is on fire today! 🔥",
-  "Yes yes yes! You got it CC! 🎉",
-  "CC you're amazing at this! 💫",
-  "Perfect, CC! You're going to ace your AMEB exam! 🎓",
-  "Superstar CC strikes again! ⭐"
+  "Amazing work, {name}! 🌟",
+  "You're a music star, {name}! 🎵",
+  "Brilliant, {name}! Keep going! ✨",
+  "That's right, {name}! You're so clever! 🎹",
+  "Woohoo {name}! Your music teacher would be proud! 🏆",
+  "Correct! {name} is on fire today! 🔥",
+  "Yes yes yes! You got it, {name}! 🎉",
+  "{name} you're amazing at this! 💫",
+  "Perfect, {name}! You're going to ace that exam! 🎓",
+  "Superstar {name} strikes again! ⭐"
 ];
 
 const WRONG_MESSAGES = [
-  "Almost CC! Give it another try 💪",
-  "Not quite, CC — you've got this! 🌈",
-  "Oops! Try again CC, I believe in you! 🎵",
-  "Nearly there CC! Have another go 😊",
-  "Don't give up CC, you're learning! 🌟"
+  "Almost, {name}! Give it another try 💪",
+  "Not quite, {name} — you've got this! 🌈",
+  "Oops! Try again, {name}, I believe in you! 🎵",
+  "Nearly there, {name}! Have another go 😊",
+  "Don't give up, {name}, you're learning! 🌟"
 ];
 
 let _correctIdx = 0;
 let _wrongIdx = 0;
+
+/* Replace {name} with the stored player name, or strip it gracefully */
+function formatMsg(msg) {
+  var name = getPlayerName();
+  if (name) return msg.replace(/\{name\}/g, name);
+  // Remove ", {name}" or "{name} " patterns so messages still read naturally
+  return msg.replace(/,\s*\{name\}/g, '').replace(/\{name\}\s*/g, '');
+}
 
 function randomCorrect() {
   const msgs = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[getCurrentLang()] && TRANSLATIONS[getCurrentLang()].correct)
     ? TRANSLATIONS[getCurrentLang()].correct : CORRECT_MESSAGES;
   const msg = msgs[_correctIdx % msgs.length];
   _correctIdx++;
-  return msg;
+  return formatMsg(msg);
 }
 
 function randomWrong() {
@@ -50,7 +58,7 @@ function randomWrong() {
     ? TRANSLATIONS[getCurrentLang()].wrong : WRONG_MESSAGES;
   const msg = msgs[_wrongIdx % msgs.length];
   _wrongIdx++;
-  return msg;
+  return formatMsg(msg);
 }
 
 /* ============ Sampler ============ */
@@ -160,9 +168,112 @@ async function playNotePairs(pairs) {
   });
 }
 
+/* ============ Exam Board ============ */
+var EXAM_BOARDS = {
+  ameb:  { label: 'AMEB',  name: 'AMEB Theory of Music',          region: 'Australia/NZ' },
+  abrsm: { label: 'ABRSM', name: 'ABRSM Music Theory',            region: 'UK / International', soon: true },
+  rcm:   { label: 'RCM',   name: 'Royal Conservatory of Music',   region: 'Canada/US',          soon: true },
+  trinity:{ label: 'Trinity', name: 'Trinity College London',     region: 'UK / International', soon: true }
+};
+
+function getExamBoard() {
+  return localStorage.getItem('mm-exam-board') || 'ameb';
+}
+function setExamBoard(b) {
+  localStorage.setItem('mm-exam-board', b);
+}
+function getExamBoardLabel() {
+  var b = EXAM_BOARDS[getExamBoard()];
+  return b ? b.label : 'AMEB';
+}
+
+/* ============ Player Name ============ */
+function getPlayerName() {
+  return localStorage.getItem('player-name') || '';
+}
+function setPlayerName(n) {
+  localStorage.setItem('player-name', n.trim().slice(0, 20));
+}
+
+/* ============ Trial / Access ============ */
+var TRIAL_DAYS = 30;
+
+function startTrialIfNeeded() {
+  if (!localStorage.getItem('mm-trial-start')) {
+    localStorage.setItem('mm-trial-start', String(Date.now()));
+  }
+}
+
+function getTrialDaysLeft() {
+  startTrialIfNeeded();
+  var start = parseInt(localStorage.getItem('mm-trial-start'));
+  var elapsed = (Date.now() - start) / (1000 * 60 * 60 * 24);
+  return Math.max(0, Math.ceil(TRIAL_DAYS - elapsed));
+}
+
+function isTrialActive() {
+  return getTrialDaysLeft() > 0;
+}
+
+function isUnlocked() {
+  return localStorage.getItem('mm-unlocked') === 'true';
+}
+
+function hasFullAccess() {
+  return isUnlocked() || isTrialActive();
+}
+
+function showUpgradeModal() {
+  var existing = document.getElementById('upgrade-modal');
+  if (existing) { existing.style.display = 'flex'; return; }
+
+  var daysLeft = getTrialDaysLeft();
+  var msg = daysLeft > 0
+    ? 'You have <strong>' + daysLeft + ' days</strong> left in your free trial.'
+    : 'Your 30-day free trial has ended.';
+
+  var modal = document.createElement('div');
+  modal.id = 'upgrade-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML =
+    '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.25);">' +
+      '<div style="font-size:3rem;margin-bottom:10px;">🔒</div>' +
+      '<h2 style="margin:0 0 8px;color:#333;font-size:1.4rem;">Grade 2 &amp; 3 Content</h2>' +
+      '<p style="color:#666;margin-bottom:6px;">' + msg + '</p>' +
+      '<p style="color:#888;font-size:0.9rem;margin-bottom:20px;">Full access unlock is coming soon!<br>Enter your email to be notified.</p>' +
+      '<input type="email" id="upgrade-email" placeholder="your@email.com" style="width:100%;box-sizing:border-box;border:2px solid #FFB7C5;border-radius:12px;padding:11px 14px;font-size:1rem;margin-bottom:12px;outline:none;" />' +
+      '<button onclick="saveUpgradeEmail()" style="background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px 24px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:10px;font-weight:600;">Notify me 🎵</button>' +
+      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:0.9rem;">Continue with Grade 1</button>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+}
+
+function saveUpgradeEmail() {
+  var input = document.getElementById('upgrade-email');
+  var email = input ? input.value.trim() : '';
+  if (!email || !email.includes('@')) {
+    if (input) input.style.borderColor = '#FF6B6B';
+    return;
+  }
+  var list = JSON.parse(localStorage.getItem('mm-notify-list') || '[]');
+  if (list.indexOf(email) === -1) list.push(email);
+  localStorage.setItem('mm-notify-list', JSON.stringify(list));
+  var modal = document.getElementById('upgrade-modal');
+  if (modal) modal.querySelector('div').innerHTML =
+    '<div style="font-size:3rem;margin-bottom:10px;">🎉</div>' +
+    '<h2 style="margin:0 0 10px;color:#333;">You\'re on the list!</h2>' +
+    '<p style="color:#666;margin-bottom:20px;">We\'ll notify you as soon as full access is available.</p>' +
+    '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px 24px;font-size:1rem;cursor:pointer;font-weight:600;">Continue with Grade 1 🎵</button>';
+}
+
 /* ============ Grade System ============ */
 function getGrade() {
-  return parseInt(localStorage.getItem('cc-grade') || '2');
+  var g = parseInt(localStorage.getItem('cc-grade') || '1');
+  if (g > 1 && !hasFullAccess()) { setGrade(1); return 1; }
+  return g;
 }
 function setGrade(g) {
   localStorage.setItem('cc-grade', String(g));
@@ -171,10 +282,12 @@ function buildGradeSelector(containerId, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
   [1, 2, 3].forEach(function(g) {
+    var locked = g > 1 && !hasFullAccess();
     var btn = document.createElement('button');
-    btn.className = 'mode-btn' + (g === getGrade() ? ' active' : '');
-    btn.textContent = 'Grade ' + g;
+    btn.className = 'mode-btn' + (g === getGrade() ? ' active' : '') + (locked ? ' locked' : '');
+    btn.textContent = (locked ? '🔒 ' : '') + 'Grade ' + g;
     btn.onclick = function() {
+      if (locked) { showUpgradeModal(); return; }
       setGrade(g);
       container.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');

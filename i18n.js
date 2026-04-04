@@ -1,5 +1,5 @@
 /* =============================================
-   CC's Music Game — i18n (Bilingual Support)
+   Music Maestro — i18n (Bilingual Support)
    English + Simplified Chinese
    ============================================= */
 
@@ -13,11 +13,13 @@ window.TRANSLATIONS = {
     'skip': 'Skip →',
 
     // Index
-    'app-title': "🎹 CC's Music Game",
-    'app-tagline': "Hi CC! Let's learn music theory! 🌟",
+    'app-title': "🎹 Music Maestro",
+    'app-tagline': "Welcome! Let's learn music theory! 🌟",
     'overall-progress': 'Overall Progress',
 
     // Module names
+    'mod-aural-training':  '🎧 Aural Training',
+    'mod-daily-challenge': '📅 Daily Challenge',
     'mod-note-namer': '🎵 Note Namer',
     'mod-scale-builder': '🎼 Scale Builder',
     'mod-interval-quiz': '🎶 Interval Quiz',
@@ -25,11 +27,13 @@ window.TRANSLATIONS = {
     'mod-rhythm-tapper': '🥁 Rhythm Tapper',
     'mod-terms-flashcards': '📚 Terms Flashcards',
     'mod-form-detective': '🔍 Form Detective',
-    'mod-mock-test': '📝 AMEB Mock Test',
+    'mod-mock-test': '📝 Theory Exam Practice',
     'mod-learn': '📖 Theory Guide',
     'mod-guitar-chords': '🎸 Guitar Chords',
 
     // Module descriptions
+    'desc-aural-training':  'Identify intervals by ear — no staff!',
+    'desc-daily-challenge': '5 questions every day — build your streak',
     'desc-note-namer': 'Identify notes on the staff',
     'desc-scale-builder': 'Build major & minor scales',
     'desc-interval-quiz': 'Name musical intervals',
@@ -37,7 +41,7 @@ window.TRANSLATIONS = {
     'desc-rhythm-tapper': 'Tap along to rhythms',
     'desc-terms-flashcards': 'Italian & French music terms',
     'desc-form-detective': 'Identify musical forms',
-    'desc-mock-test': 'Practice AMEB Grade 1-2 exam questions',
+    'desc-mock-test': 'Practice Grade 1-3 theory exam questions',
     'desc-learn': 'Theory reference with tricks & mnemonics',
     'desc-guitar-chords': 'Learn & quiz open guitar chords',
 
@@ -49,7 +53,7 @@ window.TRANSLATIONS = {
     'how-rhythm-tapper': 'A rhythm pattern will be shown. Press Start, listen to the count-in, then tap the TAP button (or spacebar) in time with the rhythm. The closer your timing, the more stars you earn!',
     'how-terms-flashcards': "A music term appears on the front of the card. Try to remember the meaning, then tap the card to flip it and see the answer. Press ✓ Got it! if you knew it, or ✗ Not sure if you didn't.",
     'how-form-detective': 'Listen to a short piece of music and answer questions about its form (Binary AB or Ternary ABA), the type of cadence at the end, or the time signature.',
-    'how-mock-test': 'Answer AMEB Grade 1-2 style theory questions. Each test has 10 questions covering notes, scales, intervals, chords, terms and rhythm. Try to get 8 or more correct!',
+    'how-mock-test': 'Answer Grade 1-3 style theory questions covering notes, scales, intervals, chords, terms and rhythm — aligned with major international exam boards (ABRSM, AMEB, RCM). Try to get 8 or more correct!',
 
     // Common buttons
     'how-to-play': 'How to Play',
@@ -93,34 +97,34 @@ window.TRANSLATIONS = {
     'tap-skip': '(tap here to skip)',
 
     // Mock test
-    'test-title': '📝 AMEB Mock Test',
+    'test-title': '📝 Theory Exam Practice',
     'test-grade': 'Grade',
     'test-question': 'Question',
     'test-of': 'of',
     'test-score': 'Your score:',
-    'test-pass': '🎉 Excellent! AMEB exam ready!',
+    'test-pass': '🎉 Excellent! Exam ready!',
     'test-good': '👍 Well done! Keep practising!',
     'test-try': '💪 Keep going! Try again!',
 
     // Correct messages
     correct: [
-      "Amazing work, CC! 🌟",
-      "You're a music star, CC! 🎵",
-      "Brilliant, CC! Keep going! ✨",
-      "That's right, CC! You're so clever! 🎹",
-      "Woohoo CC! Your piano teacher would be proud! 🏆",
-      "Correct! CC is on fire today! 🔥",
-      "Yes yes yes! You got it CC! 🎉",
-      "CC you're amazing at this! 💫",
-      "Perfect, CC! You're going to ace your AMEB exam! 🎓",
-      "Superstar CC strikes again! ⭐"
+      "Amazing work, {name}! 🌟",
+      "You're a music star, {name}! 🎵",
+      "Brilliant, {name}! Keep going! ✨",
+      "That's right, {name}! You're so clever! 🎹",
+      "Woohoo {name}! Your music teacher would be proud! 🏆",
+      "Correct! {name} is on fire today! 🔥",
+      "Yes yes yes! You got it, {name}! 🎉",
+      "{name} you're amazing at this! 💫",
+      "Perfect, {name}! You're going to ace that exam! 🎓",
+      "Superstar {name} strikes again! ⭐"
     ],
     wrong: [
-      "Almost CC! Give it another try 💪",
-      "Not quite, CC — you've got this! 🌈",
-      "Oops! Try again CC, I believe in you! 🎵",
-      "Nearly there CC! Have another go 😊",
-      "Don't give up CC, you're learning! 🌟"
+      "Almost, {name}! Give it another try 💪",
+      "Not quite, {name} — you've got this! 🌈",
+      "Oops! Try again, {name}, I believe in you! 🎵",
+      "Nearly there, {name}! Have another go 😊",
+      "Don't give up, {name}, you're learning! 🌟"
     ]
   },
 
@@ -133,11 +137,13 @@ window.TRANSLATIONS = {
     'skip': '跳过 →',
 
     // Index
-    'app-title': '🎹 CC的音乐游戏',
-    'app-tagline': '你好CC！让我们一起学习音乐理论！🌟',
+    'app-title': '🎹 音乐大师',
+    'app-tagline': '欢迎！让我们一起学习音乐理论！🌟',
     'overall-progress': '总体进度',
 
     // Module names
+    'mod-aural-training':  '🎧 听觉训练',
+    'mod-daily-challenge': '📅 每日挑战',
     'mod-note-namer': '🎵 音符认读',
     'mod-scale-builder': '🎼 音阶构建',
     'mod-interval-quiz': '🎶 音程测验',
@@ -145,11 +151,13 @@ window.TRANSLATIONS = {
     'mod-rhythm-tapper': '🥁 节奏拍打',
     'mod-terms-flashcards': '📚 术语闪卡',
     'mod-form-detective': '🔍 曲式侦探',
-    'mod-mock-test': '📝 AMEB模拟测验',
+    'mod-mock-test': '📝 乐理考试练习',
     'mod-learn': '📖 乐理指南',
     'mod-guitar-chords': '🎸 吉他和弦',
 
     // Module descriptions
+    'desc-aural-training':  '通过耳朵辨别音程——不看五线谱！',
+    'desc-daily-challenge': '每天5道题——坚持练习',
     'desc-note-namer': '认读五线谱上的音符',
     'desc-scale-builder': '构建大调和小调音阶',
     'desc-interval-quiz': '命名音程',
@@ -157,7 +165,7 @@ window.TRANSLATIONS = {
     'desc-rhythm-tapper': '跟随节奏拍打',
     'desc-terms-flashcards': '意大利语和法语音乐术语',
     'desc-form-detective': '识别曲式结构',
-    'desc-mock-test': '练习AMEB一、二级考试题目',
+    'desc-mock-test': '练习一至三级乐理考试题目',
     'desc-learn': '乐理参考手册，含记忆技巧',
     'desc-guitar-chords': '学习并测验吉他开放和弦',
 
@@ -169,7 +177,7 @@ window.TRANSLATIONS = {
     'how-rhythm-tapper': '会显示一个节奏型。按"开始"，听预备拍，然后跟着节奏点击TAP按钮（或空格键）。节奏越准确，获得的星星越多！',
     'how-terms-flashcards': '卡片正面显示一个音乐术语。试着想出它的含义，然后点击卡片翻转看答案。如果你知道答案，按"✓ 我会了！"；如果不知道，按"✗ 不确定"。',
     'how-form-detective': '聆听一段短曲，回答关于曲式（二段式AB或三段式ABA）、结尾终止式类型或拍子记号的问题。',
-    'how-mock-test': '回答AMEB一、二级风格的乐理题。每次测验有10道题，涵盖音符、音阶、音程、和弦、术语和节奏。争取答对8道以上！',
+    'how-mock-test': '回答一至三级风格的乐理题，涵盖音符、音阶、音程、和弦、术语和节奏（与ABRSM、AMEB、RCM等国际考试接轨）。争取答对8道以上！',
 
     // Common buttons
     'how-to-play': '游戏说明',
@@ -213,34 +221,34 @@ window.TRANSLATIONS = {
     'tap-skip': '（点击此处跳过）',
 
     // Mock test
-    'test-title': '📝 AMEB模拟测验',
+    'test-title': '📝 乐理考试练习',
     'test-grade': '级别',
     'test-question': '第',
     'test-of': '题，共',
     'test-score': '你的得分：',
-    'test-pass': '🎉 非常棒！AMEB考试准备好了！',
+    'test-pass': '🎉 非常棒！考试准备好了！',
     'test-good': '👍 做得好！继续练习！',
     'test-try': '💪 继续加油！再试一次！',
 
     // Correct messages
     correct: [
-      "太棒了，CC！🌟",
-      "你是音乐明星，CC！🎵",
-      "太好了，CC！继续加油！✨",
-      "答对了，CC！你真聪明！🎹",
-      "哇哦CC！你的钢琴老师会为你骄傲的！🏆",
-      "正确！CC今天状态超好！🔥",
-      "对对对！你答对了CC！🎉",
-      "CC你太厉害了！💫",
-      "完美，CC！你一定能通过AMEB考试！🎓",
-      "超级明星CC再次出击！⭐"
+      "太棒了，{name}！🌟",
+      "你是音乐明星，{name}！🎵",
+      "太好了，{name}！继续加油！✨",
+      "答对了，{name}！你真聪明！🎹",
+      "哇哦{name}！你的音乐老师会为你骄傲的！🏆",
+      "正确！{name}今天状态超好！🔥",
+      "对对对！你答对了，{name}！🎉",
+      "{name}你太厉害了！💫",
+      "完美，{name}！你一定能通过考试！🎓",
+      "超级明星{name}再次出击！⭐"
     ],
     wrong: [
-      "差一点CC！再试一次💪",
-      "不太对，CC——你可以的！🌈",
-      "哎呀！再试试CC，我相信你！🎵",
-      "快到了CC！再来一次😊",
-      "不要放弃CC，你在进步！🌟"
+      "差一点，{name}！再试一次💪",
+      "不太对，{name}——你可以的！🌈",
+      "哎呀！再试试，{name}，我相信你！🎵",
+      "快到了，{name}！再来一次😊",
+      "不要放弃，{name}，你在进步！🌟"
     ]
   }
 };

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📅 Daily Challenge — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #E65100, #FFE0B2); }
+    .page-header h1 { color: #3E1000; }
+    .back-btn { border-color: #E65100; color: #3E1000; }
+
+    /* Streak calendar */
+    .streak-section {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 0 0 16px;
+      text-align: center;
+    }
+    .streak-title { font-size: 0.85rem; color: #888; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.05em; }
+    .streak-count { font-size: 2.2rem; font-weight: 900; color: #E65100; line-height: 1; }
+    .streak-label { font-size: 0.85rem; color: #999; margin-top: 2px; }
+    .calendar-row { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .cal-day {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700; font-family: monospace;
+    }
+    .cal-day.done    { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
+    .cal-day.today   { background: linear-gradient(135deg, #FF8FAB, #FFB74D); color: white; }
+    .cal-day.missed  { background: #f5f5f5; color: #ccc; }
+    .cal-day.future  { background: #fafafa; color: #ddd; border: 1px dashed #eee; }
+
+    /* Completed state */
+    .completed-box {
+      background: linear-gradient(135deg, #FFF3B0, #FFE87A);
+      border-radius: 20px;
+      padding: 28px 20px;
+      text-align: center;
+      margin: 10px 0 20px;
+    }
+    .completed-box h2 { margin: 0 0 8px; font-size: 1.5rem; }
+    .completed-box p  { color: #6D4C00; margin: 0 0 14px; }
+
+    /* Question area */
+    .question-counter { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600; }
+    .q-card {
+      background: white; border-radius: 16px;
+      padding: 22px 20px; margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .q-type-tag {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #aaa; margin-bottom: 8px;
+    }
+    .q-text { font-size: 1.05rem; font-weight: 600; color: #333; margin-bottom: 14px; line-height: 1.5; }
+    .answer-grid .answer-btn { min-width: 140px; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="flex:1;">
+      <h1>📅 Daily Challenge</h1>
+      <div class="subtitle" id="date-subtitle"></div>
+    </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Streak + calendar -->
+    <div class="streak-section">
+      <div class="streak-title">🔥 DAILY STREAK</div>
+      <div class="streak-count" id="streak-count">0</div>
+      <div class="streak-label">days in a row</div>
+      <div class="calendar-row" id="calendar-row"></div>
+    </div>
+
+    <!-- Score bar (shown during challenge) -->
+    <div class="score-display" id="score-area" style="display:none;">
+      <div class="score-item"><span>Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span>Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+    <div class="progress-section" id="progress-area" style="display:none;">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 5</div>
+    </div>
+
+    <!-- Completed state -->
+    <div class="completed-box" id="completed-box" style="display:none;">
+      <div style="font-size:2.5rem;">🎉</div>
+      <h2 id="completed-headline">Challenge complete!</h2>
+      <p id="completed-sub"></p>
+      <div style="font-size:1.8rem;" id="completed-stars"></div>
+    </div>
+
+    <!-- Start screen -->
+    <div id="start-screen" style="text-align:center;padding:20px 0;">
+      <p style="color:#666;margin-bottom:20px;">5 mixed questions · one chance per day</p>
+      <button class="btn" style="background:linear-gradient(90deg,#E65100,#FFB74D);color:white;font-size:1.1rem;padding:16px 36px;" onclick="startChallenge()">Start today's challenge 🚀</button>
+    </div>
+
+    <!-- Question area -->
+    <div id="question-area" style="display:none;">
+      <div class="question-counter" id="question-counter">Question 1 of 5</div>
+      <div class="q-card">
+        <div class="q-type-tag" id="q-type-tag"></div>
+        <div class="q-text" id="q-text"></div>
+        <div id="q-staff"></div>
+        <div id="q-play-row" style="text-align:center;margin-bottom:10px;display:none;">
+          <button class="btn btn-secondary" onclick="playCurrentQ()">▶ Play</button>
+        </div>
+      </div>
+      <div class="feedback empty" id="feedback"></div>
+      <div class="answer-grid" id="answer-grid"></div>
+    </div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="game.js"></script>
+  <script>
+
+    /* ── Date helpers ── */
+    function todayKey() {
+      var d = new Date();
+      return 'mm-daily-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function dateKey(offset) {
+      var d = new Date();
+      d.setDate(d.getDate() + offset);
+      return 'mm-daily-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function getTodayData() {
+      try { return JSON.parse(localStorage.getItem(todayKey())) || {}; } catch(e) { return {}; }
+    }
+    function saveTodayData(data) {
+      localStorage.setItem(todayKey(), JSON.stringify(data));
+    }
+
+    function calcStreak() {
+      var streak = 0;
+      for (var i = 0; i >= -365; i--) {
+        var key = dateKey(i);
+        var data; try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
+        if (data.completed) streak++;
+        else if (i < 0) break;
+      }
+      return streak;
+    }
+
+    function buildCalendar() {
+      var row = document.getElementById('calendar-row');
+      row.innerHTML = '';
+      for (var i = -6; i <= 0; i++) {
+        var key = dateKey(i);
+        var data; try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
+        var d = new Date(); d.setDate(d.getDate() + i);
+        var label = d.toLocaleDateString('en', {weekday:'short'}).slice(0,1);
+        var el = document.createElement('div');
+        el.className = 'cal-day ' + (i === 0 ? (data.completed ? 'done' : 'today') : (data.completed ? 'done' : 'missed'));
+        el.textContent = data.completed ? '✓' : label;
+        el.title = d.toLocaleDateString('en', {month:'short',day:'numeric'}) + (data.completed ? ' ✓' : '');
+        row.appendChild(el);
+      }
+      document.getElementById('streak-count').textContent = calcStreak();
+    }
+
+    /* ── Question bank (5 types: note, interval, scale, term, chord) ── */
+    var NOTE_NAMES = ['C','D','E','F','G','A','B'];
+    var INTERVALS = [
+      { name:'Major 2nd', semitones:2, grade:1 }, { name:'Major 3rd', semitones:4, grade:1 },
+      { name:'Perfect 4th', semitones:5, grade:1 }, { name:'Perfect 5th', semitones:7, grade:1 },
+      { name:'Octave', semitones:12, grade:1 },
+      { name:'Minor 3rd', semitones:3, grade:2 }, { name:'Minor 6th', semitones:8, grade:2 },
+      { name:'Major 6th', semitones:9, grade:2 }
+    ];
+    var TERMS = [
+      { term:'Allegro',   meaning:'Fast' },       { term:'Andante',  meaning:'Walking pace' },
+      { term:'Piano',     meaning:'Soft' },        { term:'Forte',    meaning:'Loud' },
+      { term:'Legato',    meaning:'Smoothly' },    { term:'Staccato', meaning:'Detached' },
+      { term:'Crescendo', meaning:'Getting louder'}, { term:'Da Capo', meaning:'From the beginning' },
+      { term:'Fine',      meaning:'The end' },     { term:'Moderato', meaning:'At a moderate pace' },
+      { term:'Presto',    meaning:'Very fast' },   { term:'Adagio',   meaning:'Slowly' }
+    ];
+    var SCALES = [
+      { name:'C major',   notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
+      { name:'G major',   notes:['G4','A4','B4','C5','D5','E5','F#5','G5'] },
+      { name:'F major',   notes:['F4','G4','A4','Bb4','C5','D5','E5','F5'] }
+    ];
+
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function shuffle(arr) { return arr.slice().sort(function(){ return Math.random()-0.5; }); }
+
+    function makeNoteQ() {
+      var n = pickRandom(NOTE_NAMES);
+      var wrong = shuffle(NOTE_NAMES.filter(function(x){ return x !== n; })).slice(0,3);
+      var opts = shuffle([n].concat(wrong));
+      return { type:'Note Reading', text:'What note is this? C D E F G A B', answer:n, options:opts,
+               play: function(){ playNote(n+'4','2n'); } };
+    }
+
+    function makeIntervalQ() {
+      var pool = INTERVALS.filter(function(i){ return i.grade <= getGrade(); });
+      var iv = pickRandom(pool);
+      var root = pickRandom(['C4','E4','G4','F4']);
+      var upper = Tonal.Note.fromMidi(Tonal.Note.midi(root) + iv.semitones);
+      var wrong = shuffle(pool.filter(function(i){ return i.name !== iv.name; })).slice(0,3).map(function(i){ return i.name; });
+      var opts = shuffle([iv.name].concat(wrong));
+      return { type:'Interval', text:'Listen — what interval do you hear?', answer:iv.name, options:opts,
+               playNotes:[root, upper], play: function(){ playChord([root, upper],'2n'); setTimeout(function(){ playMelodic([root,upper],'4n',80); },1200); } };
+    }
+
+    function makeTermQ() {
+      var term = pickRandom(TERMS);
+      var wrong = shuffle(TERMS.filter(function(t){ return t.term !== term.term; })).slice(0,3).map(function(t){ return t.meaning; });
+      var opts = shuffle([term.meaning].concat(wrong));
+      return { type:'Music Term', text:'What does "' + term.term + '" mean?', answer:term.meaning, options:opts };
+    }
+
+    function makeScaleQ() {
+      var scale = pickRandom(SCALES);
+      var allNames = SCALES.map(function(s){ return s.name; });
+      var wrong = shuffle(allNames.filter(function(n){ return n !== scale.name; })).slice(0,3);
+      var opts = shuffle([scale.name].concat(wrong));
+      return { type:'Scale', text:'Listen — which scale is this?', answer:scale.name, options:opts,
+               play: function(){ playScale(scale.notes, 100); } };
+    }
+
+    function makeTimeSigQ() {
+      var sigs = [
+        { sig:'2/4', desc:'2 beats per bar (march)' },
+        { sig:'3/4', desc:'3 beats per bar (waltz)' },
+        { sig:'4/4', desc:'4 beats per bar (common time)' }
+      ];
+      var ts = pickRandom(sigs);
+      var wrong = shuffle(sigs.filter(function(s){ return s.sig !== ts.sig; })).map(function(s){ return s.sig; });
+      var opts = shuffle([ts.sig].concat(wrong));
+      return { type:'Time Signature', text:'Which time signature has ' + ts.desc + '?', answer:ts.sig, options:opts };
+    }
+
+    var questionBuilders = [makeNoteQ, makeIntervalQ, makeTermQ, makeScaleQ, makeTimeSigQ];
+
+    function buildDailySet() {
+      var qs = [];
+      var builders = shuffle(questionBuilders);
+      for (var i = 0; i < 5; i++) {
+        qs.push(builders[i % builders.length]());
+      }
+      return qs;
+    }
+
+    /* ── Challenge state ── */
+    var questions = [];
+    var currentQIdx = 0;
+    var correctCount = 0;
+    var answered = false;
+    var score;
+
+    function startChallenge() {
+      var today = getTodayData();
+      if (today.completed) { showCompleted(today); return; }
+
+      questions = buildDailySet();
+      currentQIdx = 0;
+      correctCount = 0;
+      answered = false;
+      score = new SessionScore('daily-challenge');
+
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('question-area').style.display = 'block';
+      document.getElementById('score-area').style.display = 'flex';
+      document.getElementById('progress-area').style.display = 'block';
+
+      showQuestion();
+    }
+
+    function showQuestion() {
+      var q = questions[currentQIdx];
+      document.getElementById('question-counter').textContent = 'Question ' + (currentQIdx+1) + ' of 5';
+      document.getElementById('q-type-tag').textContent = q.type;
+      document.getElementById('q-text').textContent = q.text;
+      document.getElementById('feedback').className = 'feedback empty';
+      document.getElementById('feedback').textContent = '';
+      answered = false;
+
+      var playRow = document.getElementById('q-play-row');
+      playRow.style.display = q.play ? 'block' : 'none';
+
+      updateProgressBar(currentQIdx, 5);
+
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      q.options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = opt;
+        btn.onclick = function(){ checkDailyAnswer(opt, btn, q); };
+        grid.appendChild(btn);
+      });
+
+      // Auto-play audio questions
+      if (q.play) setTimeout(function(){ q.play(); }, 400);
+    }
+
+    function playCurrentQ() {
+      var q = questions[currentQIdx];
+      if (q && q.play) q.play();
+    }
+
+    function checkDailyAnswer(opt, btn, q) {
+      if (answered) return;
+      answered = true;
+
+      if (opt === q.answer) {
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect(), 'correct');
+        triggerStarburst(btn);
+        correctCount++;
+        score.onCorrect();
+      } else {
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        document.querySelectorAll('.answer-btn').forEach(function(b){
+          if (b.textContent === q.answer) b.classList.add('correct-ans');
+        });
+        setFeedback(randomWrong() + ' Correct: ' + q.answer, 'wrong');
+        score.onWrong();
+      }
+
+      setTimeout(function() {
+        currentQIdx++;
+        if (currentQIdx < 5) {
+          showQuestion();
+        } else {
+          finishChallenge();
+        }
+      }, 1600);
+    }
+
+    function setFeedback(msg, type) {
+      var el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    function finishChallenge() {
+      var data = { completed: true, score: correctCount, date: new Date().toISOString() };
+      saveTodayData(data);
+      buildCalendar();
+      showCompleted(data);
+    }
+
+    function showCompleted(data) {
+      document.getElementById('question-area').style.display = 'none';
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('score-area').style.display = 'none';
+      document.getElementById('progress-area').style.display = 'none';
+
+      var s = data.score || 0;
+      var stars = s >= 5 ? '⭐⭐⭐' : s >= 3 ? '⭐⭐' : '⭐';
+      var msg = s === 5 ? 'Perfect score! You\'re a music maestro! 🎓' :
+                s >= 3 ? 'Great work! Keep practising! 🎵' : 'Good effort — come back tomorrow! 💪';
+
+      document.getElementById('completed-headline').textContent = 'Challenge complete! ' + s + '/5';
+      document.getElementById('completed-sub').textContent = msg;
+      document.getElementById('completed-stars').textContent = stars;
+      document.getElementById('completed-box').style.display = 'block';
+    }
+
+    /* ── Init ── */
+    initSampler(function() {
+      var today = new Date();
+      document.getElementById('date-subtitle').textContent =
+        today.toLocaleDateString('en', { weekday:'long', month:'long', day:'numeric' });
+
+      buildCalendar();
+
+      var todayData = getTodayData();
+      if (todayData.completed) {
+        document.getElementById('start-screen').style.display = 'none';
+        showCompleted(todayData);
+      }
+    });
+  </script>
+</body>
+</html>

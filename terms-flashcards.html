@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📚 Terms Flashcards — CC's Music Game</title>
+  <title>📚 Terms Flashcards — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
@@ -98,6 +99,10 @@
       <div class="flashcard-face flashcard-front">
         <div class="card-term" id="card-term">—</div>
         <div class="card-grade" id="card-grade">Grade 1</div>
+        <button id="audio-demo-btn" onclick="event.stopPropagation(); playTermAudio()"
+          style="display:none;margin-top:12px;background:linear-gradient(90deg,#5B9BD5,#B2EBF2);color:white;border:none;border-radius:20px;padding:8px 20px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
+          ▶ Hear example
+        </button>
         <div class="flip-hint">👆 Tap to reveal meaning</div>
       </div>
       <div class="flashcard-face flashcard-back">
@@ -281,6 +286,10 @@ function showCard(idx) {
   document.getElementById('mastered-count').textContent =
     '⭐ ' + getMastered() + ' mastered out of ' + filteredTerms.length;
 
+  // Show audio button only if this term has a demo
+  var audioBtn = document.getElementById('audio-demo-btn');
+  if (audioBtn) audioBtn.style.display = TERM_AUDIO[term.id] ? 'inline-block' : 'none';
+
   // Reset flip
   isFlipped = false;
   document.getElementById('flashcard').classList.remove('flipped');
@@ -305,7 +314,7 @@ function markCard(correct) {
   } else {
     score.onWrong();
     showFeedback(randomWrong(), 'wrong');
-    // Move term to end of queue so CC sees it again soon
+    // Move term to end of queue so the student sees it again soon
     queue.splice(currentIdx, 1);
     queue.push(term);
     // don't advance index (next card will be what was after)
@@ -366,6 +375,54 @@ document.addEventListener('keydown', e => {
   if (e.key === 'n' || e.key === 'N') { if (isFlipped) markCard(false); }
 });
 
+/* ===== TERM AUDIO DEMOS ===== */
+var SCALE_5 = ['C4','D4','E4','F4','G4'];
+var TERM_AUDIO = {
+  // Tempo — same scale at different speeds
+  'grave':      function(){ playMelodic(SCALE_5,'4n',36); },
+  'largo':      function(){ playMelodic(SCALE_5,'4n',40); },
+  'lento':      function(){ playMelodic(SCALE_5,'4n',44); },
+  'adagio':     function(){ playMelodic(SCALE_5,'4n',52); },
+  'andante':    function(){ playMelodic(SCALE_5,'4n',76); },
+  'moderato':   function(){ playMelodic(SCALE_5,'4n',108); },
+  'allegretto': function(){ playMelodic(SCALE_5,'4n',126); },
+  'allegro':    function(){ playMelodic(SCALE_5,'4n',152); },
+  'vivace':     function(){ playMelodic(SCALE_5,'4n',168); },
+  'vivo':       function(){ playMelodic(SCALE_5,'4n',168); },
+  'presto':     function(){ playMelodic(SCALE_5,'4n',192); },
+  // Articulation — same notes, different duration
+  'legato':     function(){ playMelodic(['C4','E4','G4','E4','C4'],'2n',80); },
+  'staccato':   function(){ playMelodic(['C4','E4','G4','E4','C4'],'16n',100); },
+  'tenuto':     function(){ playMelodic(['C4','E4','G4'],'2n',72); },
+  // Structure
+  'dc':         function(){
+    playMelodic(['C4','D4','E4','F4','G4'],'4n',100);
+    setTimeout(function(){ playMelodic(['C4','D4','E4','F4','G4'],'4n',100); }, 2500);
+  },
+  'fine':       function(){
+    playChord(['G3','B3','D4'],'2n');
+    setTimeout(function(){ playChord(['C3','E3','G3'],'2n'); }, 1200);
+  },
+  'seg':        function(){
+    playMelodic(['C4','E4','G4'],'4n',100);
+    setTimeout(function(){ playMelodic(['A4','C5','E5'],'4n',100); }, 1500);
+  },
+  // Dynamics — play chord to show the concept
+  'forte':      function(){ playChord(['C3','E3','G3','C4','E4','G4'],'1n'); },
+  'piano':      function(){ playChord(['C4','E4','G4'],'1n'); },
+  'mf':         function(){ playChord(['C3','E3','G3','C4'],'1n'); },
+  'mp':         function(){ playChord(['C4','E4','G4'],'2n'); },
+  'ff':         function(){ playChord(['C2','G2','C3','E3','G3','C4','E4','G4'],'1n'); },
+  'pp':         function(){ playChord(['C5','E5'],'1n'); }
+};
+
+function playTermAudio() {
+  var term = queue[currentIdx];
+  if (!term) return;
+  var fn = TERM_AUDIO[term.id];
+  if (fn) fn();
+}
+
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('terms-flashcards');
@@ -373,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
   showCard(0);
 
   initSampler(() => {
-    // No audio needed for flashcards, but sampler init hides loading overlay
+    // Audio ready — demo buttons will work now
   });
 });
 </script>

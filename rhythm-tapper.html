@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🥁 Rhythm Tapper — CC's Music Game</title>
+  <title>🥁 Rhythm Tapper — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
@@ -422,11 +423,13 @@ function showResult(p) {
   const { stars, pct } = gradeAccuracy(p, tapTimes);
 
   const starStr = ['', '⭐', '⭐⭐', '⭐⭐⭐'][stars] || '⭐';
+  var pn = getPlayerName();
+  var pn2 = pn ? ', ' + pn : '';
   const msgs = [
     '',
-    'Good try CC! Keep practising! 💪',
-    'Well done CC! You\'re getting it! 🎵',
-    'Perfect timing CC! You\'re a rhythm star! 🌟'
+    'Good try' + pn2 + '! Keep practising! 💪',
+    'Well done' + pn2 + '! You\'re getting it! 🎵',
+    'Perfect timing' + pn2 + '! You\'re a rhythm star! 🌟'
   ];
 
   document.getElementById('result-stars').textContent = starStr;

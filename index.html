@@ -3,174 +3,403 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🎹 CC's Music Game</title>
+  <title>🎹 Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
     body { background: linear-gradient(135deg, #FFF8FB 0%, #F5F0FF 50%, #F0FFF8 100%); }
     .page-header { background: linear-gradient(90deg, #FF8FAB, #FFB74D); color: white; }
     .page-header h1 { color: white; }
-    .module-card[data-accent="pink"]   { background: linear-gradient(135deg, #FFB7C5, #FFD0DA); }
-    .module-card[data-accent="mint"]   { background: linear-gradient(135deg, #C7F2E3, #A8EED4); }
-    .module-card[data-accent="lavender"] { background: linear-gradient(135deg, #E0D4F7, #CEC0F5); }
-    .module-card[data-accent="yellow"] { background: linear-gradient(135deg, #FFF3B0, #FFE87A); }
-    .module-card[data-accent="coral"]  { background: linear-gradient(135deg, #FFD4A3, #FFBF7A); }
-    .module-card[data-accent="sky"]    { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
-    .module-card[data-accent="purple"] { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
-    .module-card[data-accent="grape"]  { background: linear-gradient(135deg, #E8D0FF, #D4AAFF); }
-    .module-card[data-accent="mint2"]  { background: linear-gradient(135deg, #B2DFDB, #80CBC4); }
-    .module-card[data-accent="brown"]  { background: linear-gradient(135deg, #FFD4A3, #FFAB76); }
-    /* Special card styling for non-game pages */
+    .module-card[data-accent="pink"]    { background: linear-gradient(135deg, #FFB7C5, #FFD0DA); }
+    .module-card[data-accent="mint"]    { background: linear-gradient(135deg, #C7F2E3, #A8EED4); }
+    .module-card[data-accent="lavender"]{ background: linear-gradient(135deg, #E0D4F7, #CEC0F5); }
+    .module-card[data-accent="yellow"]  { background: linear-gradient(135deg, #FFF3B0, #FFE87A); }
+    .module-card[data-accent="coral"]   { background: linear-gradient(135deg, #FFD4A3, #FFBF7A); }
+    .module-card[data-accent="sky"]     { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
+    .module-card[data-accent="purple"]  { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
+    .module-card[data-accent="grape"]   { background: linear-gradient(135deg, #E8D0FF, #D4AAFF); }
+    .module-card[data-accent="mint2"]   { background: linear-gradient(135deg, #B2DFDB, #80CBC4); }
+    .module-card[data-accent="brown"]   { background: linear-gradient(135deg, #FFD4A3, #FFAB76); }
+    .module-card[data-accent="teal"]    { background: linear-gradient(135deg, #B2EBF2, #80DEEA); }
+    .module-card[data-accent="orange"]  { background: linear-gradient(135deg, #FFE0B2, #FFCC80); }
     .module-card.card-learn { border: 3px solid #2E8B6E; }
+
+    /* ── Top info bar ── */
+    .info-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.75);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .info-bar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* Player name */
+    .welcome-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.9rem; color: #555;
+    }
+    .welcome-pill strong { color: #333; }
+    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#aaa; padding:0 2px; }
+    .icon-btn:hover { color: #FF8FAB; }
+
+    /* Name form */
+    .name-form { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .name-form input {
+      border: 2px solid #FFB7C5; border-radius: 10px;
+      padding: 5px 10px; font-size: 0.9rem; outline: none; width: 130px;
+    }
+    .name-form input:focus { border-color: #FF8FAB; }
+
+    /* Trial pill */
+    .trial-pill {
+      font-size: 0.8rem; font-weight: 600; padding: 5px 12px;
+      border-radius: 20px; white-space: nowrap;
+    }
+    .trial-pill.good { background: #e8f8e8; color: #2e7d32; }
+    .trial-pill.warn { background: #fff8e1; color: #e65100; }
+    .trial-pill.over { background: #ffeaea; color: #c62828; cursor: pointer; }
+
+    /* Exam board selector */
+    .exam-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 16px; background: rgba(255,255,255,0.5);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      flex-wrap: wrap; font-size: 0.85rem; color: #666;
+    }
+    .exam-btn {
+      padding: 4px 12px; border-radius: 16px; border: 2px solid #ddd;
+      background: white; cursor: pointer; font-size: 0.82rem; font-weight: 600;
+      color: #666; transition: all 0.15s;
+    }
+    .exam-btn.active { border-color: #FF8FAB; background: #FF8FAB; color: white; }
+    .exam-btn:disabled { opacity: 0.45; cursor: default; }
+    .soon-tag {
+      font-size: 0.65rem; background: #eee; color: #999;
+      border-radius: 8px; padding: 1px 5px; margin-left: 3px;
+      vertical-align: middle;
+    }
+
+    /* Weak area banner */
+    .weak-banner {
+      margin: 10px 16px 0;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 14px;
+      border-left: 4px solid #FFB74D;
+      font-size: 0.9rem; color: #555;
+      display: none;
+    }
+    .weak-banner strong { color: #E65100; }
+    .weak-banner a { color: #E65100; font-weight: 600; text-decoration: none; }
+    .weak-banner a:hover { text-decoration: underline; }
+
+    /* Badges */
+    .badges-section {
+      margin: 14px 16px 0;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+    }
+    .badges-title { font-size: 0.85rem; color: #888; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.03em; }
+    .badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 0.82rem; font-weight: 600;
+      background: #f0f0f0; color: #999;
+    }
+    .badge-chip.earned { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
+    .badge-chip.earned .badge-icon { filter: none; }
+    .badge-icon { font-size: 1.1rem; }
+
+    /* Onboarding modal */
+    .onboard-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .onboard-box {
+      background: white; border-radius: 24px; padding: 32px 28px;
+      max-width: 420px; width: 100%; text-align: center;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+    }
+    .onboard-box h2 { margin: 0 0 10px; font-size: 1.5rem; color: #333; }
+    .onboard-box p  { color: #666; margin: 0 0 14px; line-height: 1.6; }
+    .onboard-features { text-align: left; margin: 16px 0; }
+    .onboard-features li { padding: 4px 0; color: #555; font-size: 0.95rem; }
+
+    .btn-sm { padding: 6px 14px; font-size: 0.9rem; min-width: unset; border-radius: 12px; }
+    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#aaa; padding:0 2px; }
   </style>
 </head>
 <body>
+
+  <!-- Onboarding modal (first visit only) -->
+  <div class="onboard-overlay" id="onboard-overlay" style="display:none;">
+    <div class="onboard-box">
+      <div style="font-size:3rem;margin-bottom:8px;">🎹</div>
+      <h2>Welcome to Music Maestro!</h2>
+      <p>Interactive music theory practice for Grade 1–3 students, aligned with major international exam boards.</p>
+      <ul class="onboard-features">
+        <li>🎵 10 practice modules — notes, scales, chords & more</li>
+        <li>🎧 Hear real piano audio as you learn</li>
+        <li>📝 Exam-style mock tests (AMEB, ABRSM, RCM)</li>
+        <li>🌍 English &amp; Chinese interface</li>
+        <li>📱 Works on tablet, phone &amp; desktop</li>
+      </ul>
+      <p style="font-size:0.85rem;color:#999;">Grade 1 is always free. Grade 2–3 included in your 30-day trial.</p>
+      <button class="btn btn-pink" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Let's start! 🚀</button>
+    </div>
+  </div>
+
   <header class="page-header">
-    <h1 data-i18n="app-title">🎹 CC's Music Game</h1>
+    <h1 data-i18n="app-title">🎹 Music Maestro</h1>
     <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
 
+  <!-- Info bar: name + trial -->
+  <div class="info-bar">
+    <div id="player-greeting" class="welcome-pill" style="display:none;">
+      <span>👋 Welcome back, <strong id="greeting-name"></strong>!</span>
+      <button class="icon-btn" onclick="showNameForm()" title="Change name">✎</button>
+    </div>
+    <div id="player-name-form" class="name-form">
+      <span>👋 Your name?</span>
+      <input type="text" id="name-input" placeholder="Enter name" maxlength="20"
+             onkeydown="if(event.key==='Enter')saveName()" />
+      <button class="btn btn-pink btn-sm" onclick="saveName()">Save</button>
+      <button class="icon-btn" onclick="skipNameForm()" title="Skip">✕</button>
+    </div>
+    <div class="info-bar-right">
+      <span class="trial-pill" id="trial-pill"></span>
+    </div>
+  </div>
+
+  <!-- Exam board selector -->
+  <div class="exam-bar">
+    <span>Exam board:</span>
+    <button class="exam-btn active" id="eb-ameb"    onclick="chooseBoard('ameb')">AMEB</button>
+    <button class="exam-btn" id="eb-abrsm" disabled>ABRSM <span class="soon-tag">soon</span></button>
+    <button class="exam-btn" id="eb-rcm"   disabled>RCM <span class="soon-tag">soon</span></button>
+    <button class="exam-btn" id="eb-trinity" disabled>Trinity <span class="soon-tag">soon</span></button>
+  </div>
+
+  <!-- Weak area recommendation -->
+  <div class="weak-banner" id="weak-banner"></div>
+
   <main class="main-content">
     <div class="hero">
-      <p class="tagline" data-i18n="app-tagline">Hi CC! Let's learn music theory! 🌟</p>
+      <p class="tagline" data-i18n="app-tagline">Welcome! Let's learn music theory! 🌟</p>
     </div>
 
-    <div class="cards-grid" id="cards-grid">
-      <!-- Cards injected by JS -->
+    <div class="cards-grid" id="cards-grid"></div>
+
+    <!-- Badges -->
+    <div class="badges-section" id="badges-section" style="display:none;">
+      <div class="badges-title">🏅 ACHIEVEMENTS</div>
+      <div class="badges-row" id="badges-row"></div>
     </div>
 
-    <div class="total-stars" id="total-stars">
-      <!-- Total stars injected by JS -->
-    </div>
+    <div class="total-stars" id="total-stars"></div>
   </main>
 
   <script src="i18n.js"></script>
   <script src="game.js"></script>
   <script>
+    /* ─── Module definitions ─── */
     const MODULES = [
-      {
-        id: 'learn',
-        titleKey: 'mod-learn',
-        descKey: 'desc-learn',
-        emoji: '📖',
-        accent: 'mint2',
-        href: 'learn.html',
-        noScore: true,
-      },
-      {
-        id: 'note-namer',
-        titleKey: 'mod-note-namer',
-        descKey: 'desc-note-namer',
-        emoji: '🎵',
-        accent: 'pink',
-        href: 'note-namer.html'
-      },
-      {
-        id: 'scale-builder',
-        titleKey: 'mod-scale-builder',
-        descKey: 'desc-scale-builder',
-        emoji: '🎼',
-        accent: 'mint',
-        href: 'scale-builder.html'
-      },
-      {
-        id: 'interval-quiz',
-        titleKey: 'mod-interval-quiz',
-        descKey: 'desc-interval-quiz',
-        emoji: '🎶',
-        accent: 'lavender',
-        href: 'interval-quiz.html'
-      },
-      {
-        id: 'chord-game',
-        titleKey: 'mod-chord-game',
-        descKey: 'desc-chord-game',
-        emoji: '🎸',
-        accent: 'yellow',
-        href: 'chord-game.html'
-      },
-      {
-        id: 'rhythm-tapper',
-        titleKey: 'mod-rhythm-tapper',
-        descKey: 'desc-rhythm-tapper',
-        emoji: '🥁',
-        accent: 'coral',
-        href: 'rhythm-tapper.html'
-      },
-      {
-        id: 'terms-flashcards',
-        titleKey: 'mod-terms-flashcards',
-        descKey: 'desc-terms-flashcards',
-        emoji: '📚',
-        accent: 'sky',
-        href: 'terms-flashcards.html'
-      },
-      {
-        id: 'form-detective',
-        titleKey: 'mod-form-detective',
-        descKey: 'desc-form-detective',
-        emoji: '🔍',
-        accent: 'purple',
-        href: 'form-detective.html'
-      },
-      {
-        id: 'guitar-chords',
-        titleKey: 'mod-guitar-chords',
-        descKey: 'desc-guitar-chords',
-        emoji: '🎸',
-        accent: 'brown',
-        href: 'guitar-chords.html'
-      },
-      {
-        id: 'mock-test',
-        titleKey: 'mod-mock-test',
-        descKey: 'desc-mock-test',
-        emoji: '📝',
-        accent: 'grape',
-        href: 'mock-test.html'
-      }
+      { id:'learn',           titleKey:'mod-learn',           descKey:'desc-learn',           emoji:'📖', accent:'mint2',    href:'learn.html',           noScore:true },
+      { id:'daily-challenge', titleKey:'mod-daily-challenge', descKey:'desc-daily-challenge', emoji:'📅', accent:'orange',   href:'daily-challenge.html', noScore:true },
+      { id:'note-namer',      titleKey:'mod-note-namer',      descKey:'desc-note-namer',      emoji:'🎵', accent:'pink',     href:'note-namer.html' },
+      { id:'aural-training',  titleKey:'mod-aural-training',  descKey:'desc-aural-training',  emoji:'🎧', accent:'teal',     href:'aural-training.html' },
+      { id:'scale-builder',   titleKey:'mod-scale-builder',   descKey:'desc-scale-builder',   emoji:'🎼', accent:'mint',     href:'scale-builder.html' },
+      { id:'interval-quiz',   titleKey:'mod-interval-quiz',   descKey:'desc-interval-quiz',   emoji:'🎶', accent:'lavender', href:'interval-quiz.html' },
+      { id:'chord-game',      titleKey:'mod-chord-game',      descKey:'desc-chord-game',      emoji:'🎸', accent:'yellow',   href:'chord-game.html' },
+      { id:'rhythm-tapper',   titleKey:'mod-rhythm-tapper',   descKey:'desc-rhythm-tapper',   emoji:'🥁', accent:'coral',    href:'rhythm-tapper.html' },
+      { id:'terms-flashcards',titleKey:'mod-terms-flashcards',descKey:'desc-terms-flashcards',emoji:'📚', accent:'sky',      href:'terms-flashcards.html' },
+      { id:'form-detective',  titleKey:'mod-form-detective',  descKey:'desc-form-detective',  emoji:'🔍', accent:'purple',   href:'form-detective.html' },
+      { id:'guitar-chords',   titleKey:'mod-guitar-chords',   descKey:'desc-guitar-chords',   emoji:'🎸', accent:'brown',    href:'guitar-chords.html' },
+      { id:'mock-test',       titleKey:'mod-mock-test',       descKey:'desc-mock-test',       emoji:'📝', accent:'grape',    href:'mock-test.html' }
     ];
 
+    const SCORED = ['note-namer','aural-training','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective','guitar-chords'];
+
+    /* ─── Build cards ─── */
     function buildCards() {
-      const grid = document.getElementById('cards-grid');
-      let totalScore = 0;
-
-      // Only count modules that have score data (exclude mock-test which uses different storage)
-      const scoredModules = ['note-namer','scale-builder','interval-quiz','chord-game','guitar-chords','rhythm-tapper','terms-flashcards','form-detective'];
-
+      var grid = document.getElementById('cards-grid');
+      var totalScore = 0;
       MODULES.forEach(function(mod) {
-        const data = getModuleData(mod.id);
-        const score = data.highScore || 0;
-        if (scoredModules.indexOf(mod.id) !== -1) {
-          totalScore += score;
-        }
+        var data = getModuleData(mod.id);
+        var score = data.highScore || 0;
+        if (SCORED.indexOf(mod.id) !== -1) totalScore += score;
 
-        const card = document.createElement('a');
+        var card = document.createElement('a');
         card.className = 'module-card';
         card.href = mod.href;
         card.dataset.accent = mod.accent;
-
-        const title = t(mod.titleKey);
-        const desc = t(mod.descKey);
-
+        var title = t(mod.titleKey);
+        var desc  = t(mod.descKey);
         card.innerHTML =
           '<span class="card-icon">' + mod.emoji + '</span>' +
           '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
-          '<div class="card-desc" data-i18n="' + mod.descKey + '">' + desc + '</div>' +
+          '<div class="card-desc"  data-i18n="' + mod.descKey  + '">' + desc  + '</div>' +
           (mod.noScore ? '' : '<div class="card-score">Best: ' + score + ' ✨</div>');
         grid.appendChild(card);
       });
 
-      // Total stars display
-      const starsEl = document.getElementById('total-stars');
-      const stars = Math.min(totalScore, 50);
-      let starStr = '';
-      for (let i = 0; i < Math.min(stars, 20); i++) starStr += '⭐';
+      var starsEl = document.getElementById('total-stars');
+      var starStr = '';
+      for (var i = 0; i < Math.min(totalScore, 20); i++) starStr += '⭐';
       starsEl.innerHTML =
-        '<div style="margin-bottom:6px;font-size:1rem;color:#666;" data-i18n="overall-progress">' + t('overall-progress') + ': ' + totalScore + '</div>' +
-        '<div style="font-size:1.4rem;line-height:1.8;">' + (starStr || '🎵 Start playing to earn stars!') + '</div>';
+        '<div style="margin-bottom:6px;font-size:1rem;color:#666;" data-i18n="overall-progress">' +
+          t('overall-progress') + ': ' + totalScore + '</div>' +
+        '<div style="font-size:1.4rem;line-height:1.8;">' +
+          (starStr || '🎵 Start playing to earn stars!') + '</div>';
     }
 
+    /* ─── Player name ─── */
+    function initWelcome() {
+      var name = getPlayerName();
+      if (name) {
+        document.getElementById('greeting-name').textContent = name;
+        document.getElementById('player-greeting').style.display = 'flex';
+        document.getElementById('player-name-form').style.display = 'none';
+      }
+    }
+    function saveName() {
+      var val = document.getElementById('name-input').value.trim().slice(0, 20);
+      if (!val) return;
+      setPlayerName(val);
+      initWelcome();
+    }
+    function skipNameForm() {
+      document.getElementById('player-name-form').style.display = 'none';
+    }
+    function showNameForm() {
+      document.getElementById('player-greeting').style.display = 'none';
+      document.getElementById('player-name-form').style.display = 'flex';
+      document.getElementById('name-input').value = getPlayerName();
+    }
+
+    /* ─── Trial pill ─── */
+    function initTrialPill() {
+      var el = document.getElementById('trial-pill');
+      if (!el) return;
+      var days = getTrialDaysLeft();
+      if (isUnlocked()) {
+        el.textContent = '✓ Full access'; el.className = 'trial-pill good';
+      } else if (days > 7) {
+        el.textContent = '🎵 Trial: ' + days + 'd left'; el.className = 'trial-pill good';
+      } else if (days > 0) {
+        el.textContent = '⚠️ Trial: ' + days + 'd left'; el.className = 'trial-pill warn';
+      } else {
+        el.textContent = '🔒 Trial ended'; el.className = 'trial-pill over';
+        el.onclick = showUpgradeModal;
+      }
+    }
+
+    /* ─── Exam board ─── */
+    function chooseBoard(b) {
+      setExamBoard(b);
+      document.querySelectorAll('.exam-btn').forEach(function(btn) { btn.classList.remove('active'); });
+      var btn = document.getElementById('eb-' + b);
+      if (btn) btn.classList.add('active');
+    }
+    function initExamBoard() {
+      var b = getExamBoard();
+      document.querySelectorAll('.exam-btn').forEach(function(btn) { btn.classList.remove('active'); });
+      var btn = document.getElementById('eb-' + b);
+      if (btn) btn.classList.add('active');
+    }
+
+    /* ─── Weak area tracker ─── */
+    function initWeakArea() {
+      var banner = document.getElementById('weak-banner');
+      var scored = [
+        { id:'note-namer',      label:'Note Namer',       href:'note-namer.html',      max:20 },
+        { id:'aural-training',  label:'Aural Training',   href:'aural-training.html',  max:20 },
+        { id:'scale-builder',   label:'Scale Builder',    href:'scale-builder.html',   max:15 },
+        { id:'interval-quiz',   label:'Interval Quiz',    href:'interval-quiz.html',   max:20 },
+        { id:'chord-game',      label:'Chord Game',       href:'chord-game.html',      max:20 },
+        { id:'rhythm-tapper',   label:'Rhythm Tapper',    href:'rhythm-tapper.html',   max:15 },
+        { id:'terms-flashcards',label:'Terms Flashcards', href:'terms-flashcards.html',max:20 },
+        { id:'form-detective',  label:'Form Detective',   href:'form-detective.html',  max:15 },
+        { id:'guitar-chords',   label:'Guitar Chords',    href:'guitar-chords.html',   max:15 }
+      ];
+
+      var played = scored.filter(function(m) {
+        var d = getModuleData(m.id);
+        return (d.highScore || 0) > 0;
+      });
+
+      if (played.length < 2) return; // not enough data yet
+
+      var worst = played.reduce(function(acc, m) {
+        var d = getModuleData(m.id);
+        var pct = (d.highScore || 0) / m.max;
+        return pct < acc.pct ? { m: m, pct: pct } : acc;
+      }, { m: played[0], pct: 1 });
+
+      var score = getModuleData(worst.m.id).highScore || 0;
+      var pct = Math.round(worst.m.pct * 100);
+      banner.innerHTML = '💡 <strong>Focus area:</strong> Your lowest score is in <a href="' +
+        worst.m.href + '">' + worst.m.label + '</a> (' + score + ' pts, ' + pct + '%). ' +
+        'Practise it to strengthen your weakest area!';
+      banner.style.display = 'block';
+    }
+
+    /* ─── Badges ─── */
+    var BADGE_DEFS = [
+      { id:'first-note',  icon:'🎵', label:'First Note',    desc:'Play any module',         check: function() { return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
+      { id:'perfect-10',  icon:'💯', label:'Perfect 10',    desc:'Score 10+ in any module', check: function() { return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>=10; }); } },
+      { id:'all-modules', icon:'🏆', label:'Completionist', desc:'Play all 9 modules',      check: function() { return SCORED.every(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
+      { id:'streak-5',    icon:'🔥', label:'On Fire',       desc:'5-answer streak',         check: function() { return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=5; }); } },
+      { id:'streak-10',   icon:'⭐', label:'Superstar',     desc:'10-answer streak',        check: function() { return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=10; }); } },
+      { id:'daily-1',     icon:'📅', label:'Daily Player',  desc:'Complete a daily challenge', check: function() {
+        var keys = Object.keys(localStorage).filter(function(k){ return k.startsWith('mm-daily-'); });
+        return keys.some(function(k){ try{ return JSON.parse(localStorage.getItem(k)).completed; }catch(e){ return false; } });
+      }},
+      { id:'polyglot',    icon:'🌍', label:'Bilingual',     desc:'Switch to Chinese',       check: function() { return localStorage.getItem('cc-lang') === 'zh'; } }
+    ];
+
+    function initBadges() {
+      var row = document.getElementById('badges-row');
+      var section = document.getElementById('badges-section');
+      var earned = 0;
+      row.innerHTML = '';
+      BADGE_DEFS.forEach(function(b) {
+        var ok = b.check();
+        if (ok) earned++;
+        var chip = document.createElement('div');
+        chip.className = 'badge-chip' + (ok ? ' earned' : '');
+        chip.title = b.desc;
+        chip.innerHTML = '<span class="badge-icon">' + b.icon + '</span>' + b.label;
+        row.appendChild(chip);
+      });
+      if (earned > 0) section.style.display = 'block';
+    }
+
+    /* ─── Onboarding ─── */
+    function initOnboard() {
+      if (!localStorage.getItem('mm-onboarded')) {
+        document.getElementById('onboard-overlay').style.display = 'flex';
+      }
+    }
+    function dismissOnboard() {
+      localStorage.setItem('mm-onboarded', '1');
+      document.getElementById('onboard-overlay').style.display = 'none';
+    }
+
+    /* ─── Init all ─── */
     buildCards();
+    initWelcome();
+    initTrialPill();
+    initExamBoard();
+    initWeakArea();
+    initBadges();
+    initOnboard();
   </script>
 </body>
 </html>

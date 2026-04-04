@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🎼 Scale Builder — CC's Music Game</title>
+  <title>🎼 Scale Builder — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
     .page-header { background: linear-gradient(90deg, #4dbb95, #C7F2E3); }
@@ -116,7 +117,7 @@
     <div class="feedback empty" id="feedback"></div>
 
     <!-- Celebration Box -->
-    <div class="celebration" id="celebration">⭐⭐⭐ Scale complete! Well done CC! ⭐⭐⭐</div>
+    <div class="celebration" id="celebration">⭐⭐⭐ Scale complete! Well done! ⭐⭐⭐</div>
 
     <!-- Piano Keyboard -->
     <div class="keyboard-scroll">
@@ -292,8 +293,10 @@
       scaleComplete = true;
       score.onCorrect();
       document.getElementById('note-counter').textContent = 'All 8 notes done! 🎉';
-      document.getElementById('celebration').style.display = 'block';
-      const cel = document.getElementById('celebration');
+      var cel = document.getElementById('celebration');
+      var pn = getPlayerName();
+      cel.textContent = '⭐⭐⭐ Scale complete! Well done' + (pn ? ', ' + pn : '') + '! ⭐⭐⭐';
+      cel.style.display = 'block';
       triggerStarburst(cel);
       setFeedback(randomCorrect(), 'correct');
       setTimeout(function() { playScale(currentScale.notes, 100); }, 400);
