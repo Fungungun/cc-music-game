@@ -78,18 +78,18 @@ function initSampler(onReady) {
   }
 
   try {
+    var base = "https://tonejs.github.io/audio/salamander/";
     sampler = new Tone.Sampler({
       urls: {
-        "A0":"A0.mp3",  "C1":"C1.mp3",  "Eb1":"Ds1.mp3", "Gb1":"Fs1.mp3",
-        "A1":"A1.mp3",  "C2":"C2.mp3",  "Eb2":"Ds2.mp3", "Gb2":"Fs2.mp3",
-        "A2":"A2.mp3",  "C3":"C3.mp3",  "Eb3":"Ds3.mp3", "Gb3":"Fs3.mp3",
-        "A3":"A3.mp3",  "C4":"C4.mp3",  "Eb4":"Ds4.mp3", "Gb4":"Fs4.mp3",
-        "A4":"A4.mp3",  "C5":"C5.mp3",  "Eb5":"Ds5.mp3", "Gb5":"Fs5.mp3",
-        "A5":"A5.mp3",  "C6":"C6.mp3",  "Eb6":"Ds6.mp3", "Gb6":"Fs6.mp3",
-        "A6":"A6.mp3",  "C7":"C7.mp3",  "Eb7":"Ds7.mp3", "Gb7":"Fs7.mp3",
-        "A7":"A7.mp3",  "C8":"C8.mp3"
+        "A0":base+"A0.mp3",  "C1":base+"C1.mp3",  "Eb1":base+"Ds1.mp3", "Gb1":base+"Fs1.mp3",
+        "A1":base+"A1.mp3",  "C2":base+"C2.mp3",  "Eb2":base+"Ds2.mp3", "Gb2":base+"Fs2.mp3",
+        "A2":base+"A2.mp3",  "C3":base+"C3.mp3",  "Eb3":base+"Ds3.mp3", "Gb3":base+"Fs3.mp3",
+        "A3":base+"A3.mp3",  "C4":base+"C4.mp3",  "Eb4":base+"Ds4.mp3", "Gb4":base+"Fs4.mp3",
+        "A4":base+"A4.mp3",  "C5":base+"C5.mp3",  "Eb5":base+"Ds5.mp3", "Gb5":base+"Fs5.mp3",
+        "A5":base+"A5.mp3",  "C6":base+"C6.mp3",  "Eb6":base+"Ds6.mp3", "Gb6":base+"Fs6.mp3",
+        "A6":base+"A6.mp3",  "C7":base+"C7.mp3",  "Eb7":base+"Ds7.mp3", "Gb7":base+"Fs7.mp3",
+        "A7":base+"A7.mp3",  "C8":base+"C8.mp3"
       },
-      baseUrl: "https://tonejs.github.io/audio/salamander/",
       onload: finish,
       onerror: finish
     }).toDestination();
