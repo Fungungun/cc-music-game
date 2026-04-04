@@ -115,6 +115,7 @@
     <button class="topic-btn" onclick="scrollTo('intervals')">📐 Intervals</button>
     <button class="topic-btn" onclick="scrollTo('chords')">🎹 Chords</button>
     <button class="topic-btn" onclick="scrollTo('terms')">📚 Terms</button>
+    <button class="topic-btn" onclick="scrollTo('cadences')">🎵 Cadences</button>
     <button class="topic-btn" onclick="scrollTo('guitar')">🎸 Guitar</button>
   </nav>
 
@@ -516,6 +517,79 @@
 
   <hr class="divider">
 
+  <!-- ═══════════════════════════════════════ CADENCES -->
+  <section class="learn-section" id="cadences">
+    <div class="section-title">🎵 Cadences</div>
+
+    <div class="subsection">
+      <h3>What is a cadence?</h3>
+      <p>A <strong>cadence</strong> is a pair of chords that ends a phrase — like a musical full stop or comma. The chord built on each degree of the scale has a Roman numeral:</p>
+      <table>
+        <tr><th>Degree</th><th>Roman numeral</th><th>In C major</th></tr>
+        <tr><td>1st (tonic)</td><td><strong>I</strong></td><td>C major</td></tr>
+        <tr><td>4th (subdominant)</td><td><strong>IV</strong></td><td>F major</td></tr>
+        <tr><td>5th (dominant)</td><td><strong>V</strong></td><td>G major</td></tr>
+        <tr><td>6th (submediant)</td><td><strong>VI</strong></td><td>A minor</td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Perfect Cadence — V → I <span class="grade-badge g1" style="vertical-align:middle;">G1</span></h3>
+      <p>The <strong>perfect cadence</strong> (also called an <em>authentic cadence</em>) goes from chord <strong>V</strong> to chord <strong>I</strong>. It sounds <em>finished</em> — like a musical full stop.</p>
+      <div class="staff-box"><div id="staff-perfect"></div></div>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick</div>
+        <strong>V → I = "done!"</strong> — think of it as coming home. In C major: G major → C major. It's the most common ending in music.
+      </div>
+      <div class="tip">
+        <div class="tip-label">🎵 Sound like…</div>
+        The ending of "Twinkle Twinkle Little Star" — that final G → C is a perfect cadence!
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Plagal Cadence — IV → I <span class="grade-badge g1" style="vertical-align:middle;">G1</span></h3>
+      <p>The <strong>plagal cadence</strong> goes from chord <strong>IV</strong> to chord <strong>I</strong>. It sounds gentle and settled — softer than a perfect cadence.</p>
+      <div class="staff-box"><div id="staff-plagal"></div></div>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick</div>
+        <strong>IV → I = "Amen"</strong> — this is the "Amen" cadence you hear at the end of hymns. In C major: F major → C major.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Imperfect Cadence — ends on V <span class="grade-badge g3" style="vertical-align:middle;">G3</span></h3>
+      <p>An <strong>imperfect cadence</strong> ends on chord <strong>V</strong>. It sounds <em>unfinished</em> — like a musical comma, leaving you expecting more.</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick</div>
+        <strong>Ends on V = "not finished yet…"</strong> Any chord → V. Common: I → V or IV → V. In C major: C major → G major.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Interrupted Cadence — V → VI <span class="grade-badge g3" style="vertical-align:middle;">G3</span></h3>
+      <p>The <strong>interrupted cadence</strong> (also called a <em>deceptive cadence</em>) goes from chord <strong>V</strong> to chord <strong>VI</strong> — a surprise! You expect V → I, but get VI instead.</p>
+      <div class="tip">
+        <div class="tip-label">🧠 Memory Trick</div>
+        <strong>V → VI = "surprise!"</strong> — the music tricks your ear. In C major: G major → A minor. Listen for the "wait, that's not right!" feeling.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Quick summary</h3>
+      <table>
+        <tr><th>Cadence</th><th>Chords</th><th>Feeling</th><th>Grade</th></tr>
+        <tr><td><strong>Perfect</strong></td><td>V → I</td><td>Finished ✅</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td><strong>Plagal</strong></td><td>IV → I</td><td>Gentle / "Amen"</td><td><span class="grade-badge g1">G1</span></td></tr>
+        <tr><td><strong>Imperfect</strong></td><td>any → V</td><td>Unfinished…</td><td><span class="grade-badge g3">G3</span></td></tr>
+        <tr><td><strong>Interrupted</strong></td><td>V → VI</td><td>Surprise! 😲</td><td><span class="grade-badge g3">G3</span></td></tr>
+      </table>
+      <p style="margin-top:8px;">→ <a href="chord-game.html" style="color:#2E8B6E;font-weight:700;">Practice identifying cadences in Chord Game 🎹</a></p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
   <!-- ═══════════════════════════════════════ GUITAR -->
   <section class="learn-section" id="guitar">
     <div class="section-title">🎸 Guitar Basics</div>
@@ -569,6 +643,26 @@
     </div>
   </section>
 
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ QUICK LINKS -->
+  <section class="learn-section" id="practice-links" style="padding-bottom:32px;">
+    <div class="section-title">🚀 Ready to Practice?</div>
+    <p style="color:#555;margin-bottom:20px;">Jump straight into a module to test what you've just read!</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      <a href="note-namer.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FFE0E8,#FFB7C5);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🎵 Note Namer</a>
+      <a href="interval-quiz.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#EBE0FF,#C9B8F0);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🎶 Interval Quiz</a>
+      <a href="scale-builder.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#C7F2E3,#A0DECA);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🎼 Scale Builder</a>
+      <a href="chord-game.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FFF3B0,#FFE066);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🎹 Chord Game</a>
+      <a href="rhythm-tapper.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FFD4A3,#FFA858);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🥁 Rhythm Tapper</a>
+      <a href="terms-flashcards.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#D4EEFF,#80C4F0);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">📚 Terms Flashcards</a>
+      <a href="aural-training.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#C7F2F2,#80D9D9);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">🎧 Aural Training</a>
+      <a href="daily-challenge.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FFE5CC,#FFB77A);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">📅 Daily Challenge</a>
+      <a href="barline-quiz.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#F0D4FF,#D090F0);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">📏 Barline Quiz</a>
+      <a href="mock-test.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#E8E8E8,#C8C8C8);border-radius:16px;padding:14px 16px;text-decoration:none;font-weight:700;color:#333;font-size:0.95rem;">📝 Exam Practice</a>
+    </div>
+  </section>
+
   <div style="height:40px;"></div>
 
   <script src="i18n.js"></script>
@@ -591,6 +685,18 @@
     ABCJS.renderAbc('staff-bass',
       'X:1\nT:\nM:4/4\nL:1/4\nK:C clef=bass\nG, B, D F A|]',
       { scale: 2.0, staffwidth: 260, paddingtop: 10, paddingbottom: 5, paddingleft: 20, paddingright: 20 });
+
+    /* Cadence staves — Perfect (G→C) and Plagal (F→C) in C major */
+    if (document.getElementById('staff-perfect')) {
+      ABCJS.renderAbc('staff-perfect',
+        'X:1\nT:V → I (G major → C major)\nM:4/4\nL:1/4\nK:C\n[GBd]4 [ceg]4|]',
+        { scale: 2.0, staffwidth: 280, paddingtop: 10, paddingbottom: 5, paddingleft: 20, paddingright: 20 });
+    }
+    if (document.getElementById('staff-plagal')) {
+      ABCJS.renderAbc('staff-plagal',
+        'X:1\nT:IV → I (F major → C major)\nM:4/4\nL:1/4\nK:C\n[FAc]4 [ceg]4|]',
+        { scale: 2.0, staffwidth: 280, paddingtop: 10, paddingbottom: 5, paddingleft: 20, paddingright: 20 });
+    }
 
     /* ---- Guitar chord diagrams ---- */
     // frets: array of 6 (strings 6→1, low E to high e)
