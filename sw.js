@@ -1,5 +1,6 @@
-/* Music Maestro — Service Worker v3.0 */
-var CACHE = 'music-maestro-v3';
+/* Music Maestro — Service Worker v4.0 */
+var CACHE = 'music-maestro-v4';
+/* Use canonical URLs (no .html) — Cloudflare Pages redirects .html → no-extension */
 var STATIC = [
   '/',
   '/index.html',
@@ -8,27 +9,26 @@ var STATIC = [
   '/i18n.js',
   '/manifest.json',
   '/icon.svg',
-  '/note-namer.html',
-  '/scale-builder.html',
-  '/interval-quiz.html',
-  '/chord-game.html',
-  '/rhythm-tapper.html',
-  '/terms-flashcards.html',
-  '/form-detective.html',
-  '/guitar-chords.html',
-  '/mock-test.html',
-  '/aural-training.html',
-  '/daily-challenge.html',
-  '/barline-quiz.html',
-  '/learn.html',
-  '/landing.html',
-  '/privacy.html'
+  '/note-namer',
+  '/scale-builder',
+  '/interval-quiz',
+  '/chord-game',
+  '/rhythm-tapper',
+  '/terms-flashcards',
+  '/form-detective',
+  '/guitar-chords',
+  '/mock-test',
+  '/aural-training',
+  '/daily-challenge',
+  '/barline-quiz',
+  '/learn',
+  '/landing',
+  '/privacy'
 ];
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(cache) {
-      /* Cache each file individually — one failure won't block the rest */
       return Promise.all(
         STATIC.map(function(url) {
           return cache.add(url).catch(function(err) {
@@ -53,18 +53,21 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
-  /* Network-first for CDN resources (Tone.js, Tonal, abcjs, Salamander audio) */
+  /* Network-first for CDN resources */
   if (e.request.url.includes('cdn') || e.request.url.includes('tonejs.github.io') || e.request.url.includes('cdnjs')) {
     e.respondWith(
       fetch(e.request).catch(function() { return caches.match(e.request); })
     );
     return;
   }
-  /* Cache-first for local assets, with network fallback and error handling */
+
+  /* Cache-first for local assets.
+     Use redirect:'follow' so Cloudflare's .html → no-extension redirects
+     are resolved transparently and the final response is returned + cached. */
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;
-      return fetch(e.request).then(function(resp) {
+      return fetch(e.request, { redirect: 'follow' }).then(function(resp) {
         if (resp && resp.status === 200) {
           var clone = resp.clone();
           caches.open(CACHE).then(function(cache){ cache.put(e.request, clone); });
@@ -72,7 +75,6 @@ self.addEventListener('fetch', function(e) {
         return resp;
       });
     }).catch(function() {
-      /* If both cache and network fail, return a minimal offline page */
       return caches.match('/index.html');
     })
   );
