@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v3.4 · 2026-04-04";
+const APP_VERSION = "v3.5 · 2026-04-06";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -225,6 +225,23 @@ function hasFullAccess() {
 /* ── Stripe ── */
 var STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04';
 
+/* Gate payment behind sign-in. Call this from any "Unlock" button. */
+function gotoPayment() {
+  if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
+    window.location.href = STRIPE_PAYMENT_LINK;
+  } else {
+    /* Show auth modal — on success go straight to Stripe */
+    if (typeof showAuthModal === 'function') {
+      showAuthModal({
+        allowGuest: false,
+        onSuccess: function() { window.location.href = STRIPE_PAYMENT_LINK; }
+      });
+    } else {
+      window.location.href = STRIPE_PAYMENT_LINK;
+    }
+  }
+}
+
 function showUpgradeModal() {
   var existing = document.getElementById('upgrade-modal');
   if (existing) { existing.style.display = 'flex'; return; }
@@ -244,7 +261,7 @@ function showUpgradeModal() {
         '<li style="padding:4px 0;">✅ Full exam practice tests</li>' +
         '<li style="padding:4px 0;">✅ Bilingual English &amp; Chinese</li>' +
       '</ul>' +
-      '<a href="' + STRIPE_PAYMENT_LINK + '" style="display:block;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:16px;padding:16px;font-size:1.1rem;font-weight:800;text-decoration:none;margin-bottom:8px;box-shadow:0 4px 16px rgba(255,143,171,0.35);">Unlock Full Access — $14.99 AUD 🚀</a>' +
+      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\';gotoPayment();" style="display:block;width:100%;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:16px;padding:16px;font-size:1.1rem;font-weight:800;border:none;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 16px rgba(255,143,171,0.35);">Unlock Full Access — $14.99 AUD 🚀</button>' +
       '<p style="font-size:0.75rem;color:#bbb;margin:0 0 14px;">One-time payment · Secure checkout via Stripe</p>' +
       '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:0.88rem;text-decoration:underline;">Continue with Grade 1 (free)</button>' +
     '</div>';

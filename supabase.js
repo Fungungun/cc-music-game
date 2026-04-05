@@ -334,7 +334,7 @@ function showAccountMenu(anchorEl) {
       (unlocked ? '✅ Full access unlocked' : '🔒 Grade 1 (free)') +
     '</div>' +
     (unlocked ? '' :
-      '<a href="https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04" style="display:block;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:10px;padding:8px 12px;text-decoration:none;font-size:0.88rem;font-weight:800;text-align:center;">Unlock Grade 2 &amp; 3 →</a>'
+      '<button onclick="document.getElementById(\'mm-account-menu\').remove();if(typeof gotoPayment===\'function\')gotoPayment();" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:10px;padding:8px 12px;font-size:0.88rem;font-weight:800;cursor:pointer;box-sizing:border-box;">Unlock Grade 2 &amp; 3 →</button>'
     ) +
     '<button onclick="mmSignOut().then(function(){location.reload();})" style="display:block;width:100%;margin-top:10px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#999;cursor:pointer;">Sign out</button>' +
     '<button onclick="document.getElementById(\'mm-account-menu\').remove()" style="display:block;width:100%;margin-top:4px;background:none;border:none;color:#ccc;font-size:0.8rem;cursor:pointer;">✕ Close</button>';
