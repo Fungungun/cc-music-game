@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v3.1 · 2026-04-05";
+const APP_VERSION = "v3.2 · 2026-04-05";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -211,32 +211,13 @@ function setPlayerName(n) {
   localStorage.setItem('player-name', n.trim().slice(0, 20));
 }
 
-/* ============ Trial / Access ============ */
-var TRIAL_DAYS = 30;
-
-function startTrialIfNeeded() {
-  if (!localStorage.getItem('mm-trial-start')) {
-    localStorage.setItem('mm-trial-start', String(Date.now()));
-  }
-}
-
-function getTrialDaysLeft() {
-  startTrialIfNeeded();
-  var start = parseInt(localStorage.getItem('mm-trial-start'));
-  var elapsed = (Date.now() - start) / (1000 * 60 * 60 * 24);
-  return Math.max(0, Math.ceil(TRIAL_DAYS - elapsed));
-}
-
-function isTrialActive() {
-  return getTrialDaysLeft() > 0;
-}
-
+/* ============ Access ============ */
 function isUnlocked() {
   return localStorage.getItem('mm-unlocked') === 'true';
 }
 
 function hasFullAccess() {
-  return isUnlocked() || isTrialActive();
+  return isUnlocked();
 }
 
 /* ── Stripe ── */
@@ -246,11 +227,6 @@ function showUpgradeModal() {
   var existing = document.getElementById('upgrade-modal');
   if (existing) { existing.style.display = 'flex'; return; }
 
-  var daysLeft = getTrialDaysLeft();
-  var trialHtml = daysLeft > 0
-    ? '<div style="background:#fff8e1;border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:0.88rem;color:#795548;">⏳ Free trial ends in <strong>' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + '</strong></div>'
-    : '<div style="background:#ffeaea;border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:0.88rem;color:#c62828;">⏰ Your 30-day free trial has ended.</div>';
-
   var modal = document.createElement('div');
   modal.id = 'upgrade-modal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
@@ -258,8 +234,7 @@ function showUpgradeModal() {
     '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.25);">' +
       '<div style="font-size:3rem;margin-bottom:10px;">🎹</div>' +
       '<h2 style="margin:0 0 6px;color:#333;font-size:1.45rem;">Unlock Grade 2 &amp; 3</h2>' +
-      '<p style="color:#777;font-size:0.92rem;margin:0 0 14px;line-height:1.5;">All modules · All exam content · Yours forever</p>' +
-      trialHtml +
+      '<p style="color:#777;font-size:0.92rem;margin:0 0 18px;line-height:1.5;">All modules · All exam content · Yours forever</p>' +
       '<ul style="text-align:left;padding:0 0 0 4px;margin:0 0 20px;list-style:none;font-size:0.9rem;color:#555;">' +
         '<li style="padding:4px 0;">✅ Intervals, cadences &amp; inversions</li>' +
         '<li style="padding:4px 0;">✅ Compound time signatures</li>' +

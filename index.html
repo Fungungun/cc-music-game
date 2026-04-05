@@ -54,13 +54,6 @@
     .name-form input:focus { border-color: #FF8FAB; }
 
     /* Trial pill */
-    .trial-pill {
-      font-size: 0.8rem; font-weight: 600; padding: 5px 12px;
-      border-radius: 20px; white-space: nowrap;
-    }
-    .trial-pill.good { background: #e8f8e8; color: #2e7d32; }
-    .trial-pill.warn { background: #fff8e1; color: #e65100; }
-    .trial-pill.over { background: #ffeaea; color: #c62828; cursor: pointer; }
 
     /* Exam board selector */
     .exam-bar {
@@ -158,7 +151,7 @@
         <li>🌍 English &amp; Chinese interface</li>
         <li>📱 Works on tablet, phone &amp; desktop</li>
       </ul>
-      <p style="font-size:0.85rem;color:#999;">Grade 1 is always free. Grade 2–3 included in your 30-day trial.</p>
+      <p style="font-size:0.85rem;color:#999;">Grade 1 is always free · Grade 2–3 from $14.99 AUD</p>
       <button class="btn btn-pink" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Let's start! 🚀</button>
     </div>
   </div>
@@ -168,7 +161,7 @@
     <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
 
-  <!-- Info bar: name + trial -->
+  <!-- Info bar: name + unlock status -->
   <div class="info-bar">
     <div id="player-greeting" class="welcome-pill" style="display:none;">
       <span>👋 Welcome back, <strong id="greeting-name"></strong>!</span>
@@ -182,7 +175,6 @@
       <button class="icon-btn" onclick="skipNameForm()" title="Skip">✕</button>
     </div>
     <div class="info-bar-right">
-      <span class="trial-pill" id="trial-pill"></span>
       <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.85rem;color:#ccc;">⚙️</button>
     </div>
   </div>
@@ -196,9 +188,9 @@
     <button class="exam-btn" id="eb-trinity" disabled>Trinity <span class="soon-tag">soon</span></button>
   </div>
 
-  <!-- Upgrade banner (shown when trial expired) -->
+  <!-- Upgrade banner (shown when not unlocked) -->
   <div id="upgrade-banner" style="display:none;background:linear-gradient(90deg,#FF8FAB,#FFB74D);padding:14px 20px;text-align:center;">
-    <span style="color:white;font-weight:700;font-size:0.95rem;">⏰ Your free trial has ended. </span>
+    <span style="color:white;font-weight:700;font-size:0.95rem;">🎹 Enjoying Music Maestro? </span>
     <a href="https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04" style="color:white;font-weight:900;text-decoration:underline;font-size:0.95rem;">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
   </div>
 
@@ -305,25 +297,6 @@
       document.getElementById('player-greeting').style.display = 'none';
       document.getElementById('player-name-form').style.display = 'flex';
       document.getElementById('name-input').value = getPlayerName();
-    }
-
-    /* ─── Trial pill ─── */
-    function initTrialPill() {
-      var el = document.getElementById('trial-pill');
-      if (!el) return;
-      var days = getTrialDaysLeft();
-      if (isUnlocked()) {
-        el.textContent = '✓ Full access'; el.className = 'trial-pill good';
-      } else if (days > 7) {
-        el.textContent = '🎵 Trial: ' + days + 'd left'; el.className = 'trial-pill good';
-      } else if (days > 0) {
-        el.textContent = '⚠️ Trial: ' + days + 'd left'; el.className = 'trial-pill warn';
-      } else {
-        el.textContent = '🔒 Trial ended'; el.className = 'trial-pill over';
-        el.onclick = showUpgradeModal;
-      }
-    }
-
     /* ─── Exam board ─── */
     function chooseBoard(b) {
       setExamBoard(b);
@@ -448,20 +421,19 @@
     /* ─── Init all ─── */
     buildCards();
     initWelcome();
-    initTrialPill();
     initExamBoard();
     initWeakArea();
     initBadges();
     initOnboard();
-    /* Show upgrade banner if trial expired */
-    if (!isUnlocked() && !isTrialActive()) {
+    /* Show upgrade banner if not unlocked */
+    if (!isUnlocked()) {
       document.getElementById('upgrade-banner').style.display = 'block';
     }
 
     /* ---- Reset data ---- */
     function showResetConfirm() {
-      if (!confirm('Reset ALL progress data?\n\nThis will clear scores, streaks, flashcard history, and your name. Your trial timer will NOT be reset.\n\nThis cannot be undone.')) return;
-      var keep = ['mm-trial-start', 'mm-unlocked', 'mm-exam-board', 'cc-lang', 'mm-onboarded'];
+      if (!confirm('Reset ALL progress data?\n\nThis will clear scores, streaks, flashcard history, and your name.\n\nThis cannot be undone.')) return;
+      var keep = ['mm-unlocked', 'mm-exam-board', 'cc-lang', 'mm-onboarded'];
       Object.keys(localStorage).forEach(function(k) {
         if (keep.indexOf(k) === -1) localStorage.removeItem(k);
       });
