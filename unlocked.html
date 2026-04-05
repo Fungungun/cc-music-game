@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Full Access — Music Maestro</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; background:linear-gradient(135deg,#FFF0F5,#FFF8F0); }
+    .unlock-box { background:white; border-radius:28px; padding:40px 32px; max-width:400px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.12); }
+    .unlock-icon { font-size:4.5rem; margin-bottom:12px; }
+    h1 { font-size:1.8rem; font-weight:900; color:#333; margin:0 0 10px; }
+    p  { color:#666; margin:0 0 8px; line-height:1.6; }
+    .features { text-align:left; margin:20px 0; padding:0; list-style:none; }
+    .features li { padding:6px 0; font-size:0.95rem; color:#555; border-bottom:1px solid #f5f5f5; }
+    .features li:last-child { border:none; }
+    .cta { display:block; background:linear-gradient(90deg,#FF8FAB,#FFB74D); color:white; border-radius:16px; padding:16px; font-size:1.1rem; font-weight:800; text-decoration:none; margin-top:24px; box-shadow:0 4px 16px rgba(255,143,171,0.35); }
+    .already-msg { display:none; }
+  </style>
+</head>
+<body>
+  <div class="unlock-box" id="success-box" style="display:none;">
+    <div class="unlock-icon">🎉</div>
+    <h1>You're unlocked!</h1>
+    <p>Welcome to Music Maestro Full Access. All Grade 2 &amp; 3 content is now yours forever.</p>
+    <ul class="features">
+      <li>✅ Grade 2 &amp; 3 modules unlocked</li>
+      <li>✅ All 12 practice modules</li>
+      <li>✅ Full exam practice tests</li>
+      <li>✅ Intervals, cadences &amp; inversions</li>
+      <li>✅ Compound time signatures</li>
+    </ul>
+    <a href="/" class="cta">Start practising now 🎹</a>
+  </div>
+
+  <div class="unlock-box" id="already-box" style="display:none;">
+    <div class="unlock-icon">🎹</div>
+    <h1>You already have full access!</h1>
+    <p>Your account is fully unlocked. Jump straight into practice.</p>
+    <a href="/" class="cta">Go to Music Maestro →</a>
+  </div>
+
+  <div class="unlock-box" id="error-box" style="display:none;">
+    <div class="unlock-icon">🤔</div>
+    <h1>Something looks off</h1>
+    <p>We couldn't confirm your payment. If you've just paid, please contact us with your Stripe receipt and we'll sort it right away.</p>
+    <a href="/" class="cta" style="background:#eee;color:#666;box-shadow:none;">← Back to Music Maestro</a>
+  </div>
+
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var success = params.get('success') === '1';
+      var alreadyUnlocked = localStorage.getItem('mm-unlocked') === 'true';
+
+      if (alreadyUnlocked) {
+        document.getElementById('already-box').style.display = 'block';
+        return;
+      }
+
+      if (success) {
+        /* Set permanent unlock */
+        localStorage.setItem('mm-unlocked', 'true');
+        document.getElementById('success-box').style.display = 'block';
+        /* Fire starburst after short delay */
+        setTimeout(function() {
+          var emojis = ['🎉','🌟','⭐','🎵','🎹','✨','💫','🎶'];
+          for (var i = 0; i < 12; i++) {
+            (function(idx) {
+              setTimeout(function() {
+                var el = document.createElement('div');
+                el.style.cssText = 'position:fixed;font-size:2rem;pointer-events:none;z-index:999;animation:burst 0.9s ease forwards;';
+                el.style.left = Math.random() * 90 + 'vw';
+                el.style.top  = Math.random() * 80 + 'vh';
+                el.textContent = emojis[idx % emojis.length];
+                document.body.appendChild(el);
+                el.addEventListener('animationend', function(){ el.remove(); });
+              }, idx * 120);
+            })(i);
+          }
+        }, 300);
+      } else {
+        document.getElementById('error-box').style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

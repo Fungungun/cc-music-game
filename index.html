@@ -133,6 +133,15 @@
     .btn-sm { padding: 6px 14px; font-size: 0.9rem; min-width: unset; border-radius: 12px; }
     .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#aaa; padding:0 2px; }
   </style>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Music Maestro — Interactive Music Theory for Grade 1–3" />
+  <meta property="og:description" content="Make AMEB, ABRSM and RCM exam prep fun. 12 interactive modules, real piano audio, bilingual English &amp; Chinese. Grade 1 free forever." />
+  <meta property="og:image" content="https://music.vensoai.com/icon-512.png" />
+  <meta property="og:url" content="https://music.vensoai.com/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Music Maestro — Music Theory Practice" />
+  <meta name="twitter:description" content="12 interactive modules, real piano audio. Grade 1 free forever." />
+  <meta name="twitter:image" content="https://music.vensoai.com/icon-512.png" />
 </head>
 <body>
 
@@ -185,6 +194,12 @@
     <button class="exam-btn" id="eb-abrsm" disabled>ABRSM <span class="soon-tag">soon</span></button>
     <button class="exam-btn" id="eb-rcm"   disabled>RCM <span class="soon-tag">soon</span></button>
     <button class="exam-btn" id="eb-trinity" disabled>Trinity <span class="soon-tag">soon</span></button>
+  </div>
+
+  <!-- Upgrade banner (shown when trial expired) -->
+  <div id="upgrade-banner" style="display:none;background:linear-gradient(90deg,#FF8FAB,#FFB74D);padding:14px 20px;text-align:center;">
+    <span style="color:white;font-weight:700;font-size:0.95rem;">⏰ Your free trial has ended. </span>
+    <a href="https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04" style="color:white;font-weight:900;text-decoration:underline;font-size:0.95rem;">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
   </div>
 
   <!-- Weak area recommendation -->
@@ -438,6 +453,10 @@
     initWeakArea();
     initBadges();
     initOnboard();
+    /* Show upgrade banner if trial expired */
+    if (!isUnlocked() && !isTrialActive()) {
+      document.getElementById('upgrade-banner').style.display = 'block';
+    }
 
     /* ---- Reset data ---- */
     function showResetConfirm() {

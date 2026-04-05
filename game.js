@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v3.0 · 2026-04-05";
+const APP_VERSION = "v3.1 · 2026-04-05";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -239,50 +239,42 @@ function hasFullAccess() {
   return isUnlocked() || isTrialActive();
 }
 
+/* ── Stripe ── */
+var STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04';
+
 function showUpgradeModal() {
   var existing = document.getElementById('upgrade-modal');
   if (existing) { existing.style.display = 'flex'; return; }
 
   var daysLeft = getTrialDaysLeft();
-  var msg = daysLeft > 0
-    ? 'You have <strong>' + daysLeft + ' days</strong> left in your free trial.'
-    : 'Your 30-day free trial has ended.';
+  var trialHtml = daysLeft > 0
+    ? '<div style="background:#fff8e1;border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:0.88rem;color:#795548;">⏳ Free trial ends in <strong>' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + '</strong></div>'
+    : '<div style="background:#ffeaea;border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:0.88rem;color:#c62828;">⏰ Your 30-day free trial has ended.</div>';
 
   var modal = document.createElement('div');
   modal.id = 'upgrade-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
   modal.innerHTML =
-    '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.25);">' +
-      '<div style="font-size:3rem;margin-bottom:10px;">🔒</div>' +
-      '<h2 style="margin:0 0 8px;color:#333;font-size:1.4rem;">Grade 2 &amp; 3 Content</h2>' +
-      '<p style="color:#666;margin-bottom:6px;">' + msg + '</p>' +
-      '<p style="color:#888;font-size:0.9rem;margin-bottom:20px;">Full access unlock is coming soon!<br>Enter your email to be notified.</p>' +
-      '<input type="email" id="upgrade-email" placeholder="your@email.com" style="width:100%;box-sizing:border-box;border:2px solid #FFB7C5;border-radius:12px;padding:11px 14px;font-size:1rem;margin-bottom:12px;outline:none;" />' +
-      '<button onclick="saveUpgradeEmail()" style="background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px 24px;font-size:1rem;cursor:pointer;width:100%;margin-bottom:10px;font-weight:600;">Notify me 🎵</button>' +
-      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:0.9rem;">Continue with Grade 1</button>' +
+    '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.25);">' +
+      '<div style="font-size:3rem;margin-bottom:10px;">🎹</div>' +
+      '<h2 style="margin:0 0 6px;color:#333;font-size:1.45rem;">Unlock Grade 2 &amp; 3</h2>' +
+      '<p style="color:#777;font-size:0.92rem;margin:0 0 14px;line-height:1.5;">All modules · All exam content · Yours forever</p>' +
+      trialHtml +
+      '<ul style="text-align:left;padding:0 0 0 4px;margin:0 0 20px;list-style:none;font-size:0.9rem;color:#555;">' +
+        '<li style="padding:4px 0;">✅ Intervals, cadences &amp; inversions</li>' +
+        '<li style="padding:4px 0;">✅ Compound time signatures</li>' +
+        '<li style="padding:4px 0;">✅ All 12 practice modules unlocked</li>' +
+        '<li style="padding:4px 0;">✅ Full exam practice tests</li>' +
+        '<li style="padding:4px 0;">✅ Bilingual English &amp; Chinese</li>' +
+      '</ul>' +
+      '<a href="' + STRIPE_PAYMENT_LINK + '" style="display:block;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:16px;padding:16px;font-size:1.1rem;font-weight:800;text-decoration:none;margin-bottom:8px;box-shadow:0 4px 16px rgba(255,143,171,0.35);">Unlock Full Access — $14.99 AUD 🚀</a>' +
+      '<p style="font-size:0.75rem;color:#bbb;margin:0 0 14px;">One-time payment · Secure checkout via Stripe</p>' +
+      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:0.88rem;text-decoration:underline;">Continue with Grade 1 (free)</button>' +
     '</div>';
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e) {
     if (e.target === modal) modal.style.display = 'none';
   });
-}
-
-function saveUpgradeEmail() {
-  var input = document.getElementById('upgrade-email');
-  var email = input ? input.value.trim() : '';
-  if (!email || !email.includes('@')) {
-    if (input) input.style.borderColor = '#FF6B6B';
-    return;
-  }
-  var list = JSON.parse(localStorage.getItem('mm-notify-list') || '[]');
-  if (list.indexOf(email) === -1) list.push(email);
-  localStorage.setItem('mm-notify-list', JSON.stringify(list));
-  var modal = document.getElementById('upgrade-modal');
-  if (modal) modal.querySelector('div').innerHTML =
-    '<div style="font-size:3rem;margin-bottom:10px;">🎉</div>' +
-    '<h2 style="margin:0 0 10px;color:#333;">You\'re on the list!</h2>' +
-    '<p style="color:#666;margin-bottom:20px;">We\'ll notify you as soon as full access is available.</p>' +
-    '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px 24px;font-size:1rem;cursor:pointer;font-weight:600;">Continue with Grade 1 🎵</button>';
 }
 
 /* ============ Grade System ============ */
