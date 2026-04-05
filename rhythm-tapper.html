@@ -452,10 +452,14 @@ function showResult(p) {
   document.getElementById('next-btn').style.display = '';
   document.getElementById('again-btn').style.display = '';
 
+  var _rp = PATTERNS[currentPatternIdx];
+  var _rpLabel = _rp ? _rp.name : 'pattern';
   if (stars >= 2) {
+    trackAnswer('rhythm-tapper', _rpLabel, true);
     score.onCorrect();
     triggerStarburst(document.getElementById('result-area'));
   } else {
+    trackAnswer('rhythm-tapper', _rpLabel, false);
     score.onWrong();
   }
 }
@@ -470,6 +474,7 @@ function nextPattern() {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('rhythm-tapper');
+  attachMilestoneTracker(score, 5);
   buildGradeSelector('grade-selector', function() {
     // reset to first pattern in new grade pool
     const pool = PATTERNS.filter(function(p) { return p.grade <= getGrade(); });

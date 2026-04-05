@@ -324,39 +324,67 @@
     }
 
     /* ─── Weak area tracker ─── */
+    var MODULE_HREFS = {
+      'note-namer':'/note-namer','interval-quiz':'/interval-quiz','aural-training':'/aural-training',
+      'scale-builder':'/scale-builder','chord-game':'/chord-game','rhythm-tapper':'/rhythm-tapper',
+      'terms-flashcards':'/terms-flashcards','form-detective':'/form-detective',
+      'barline-quiz':'/barline-quiz','guitar-chords':'/guitar-chords'
+    };
+    var MODULE_LABELS = {
+      'note-namer':'Note Namer','interval-quiz':'Interval Quiz','aural-training':'Aural Training',
+      'scale-builder':'Scale Builder','chord-game':'Chord Game','rhythm-tapper':'Rhythm Tapper',
+      'terms-flashcards':'Terms Flashcards','form-detective':'Form Detective',
+      'barline-quiz':'Barline Quiz','guitar-chords':'Guitar Chords'
+    };
+
     function initWeakArea() {
       var banner = document.getElementById('weak-banner');
+      /* Try concept-level mastery first */
+      var weak = getWeakConcepts(3);
+      if (weak.length >= 1) {
+        var html = '<strong>💡 Focus areas — based on your answers:</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">';
+        weak.forEach(function(w) {
+          var pct = Math.round(w.accuracy * 100);
+          var color = pct >= 70 ? '#4CAF50' : pct >= 40 ? '#FFB74D' : '#FF6B6B';
+          var href = MODULE_HREFS[w.module] || '/';
+          var modLabel = MODULE_LABELS[w.module] || w.module;
+          html += '<div style="background:white;border-radius:10px;padding:8px 12px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+              '<span style="font-size:0.9rem;font-weight:600;color:#444;">' + w.concept + ' <span style="font-weight:400;color:#aaa;font-size:0.8rem;">(' + modLabel + ')</span></span>' +
+              '<a href="' + href + '" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Practise →</a>' +
+            '</div>' +
+            '<div style="background:#f0f0f0;border-radius:4px;height:6px;">' +
+              '<div style="background:' + color + ';width:' + pct + '%;height:100%;border-radius:4px;"></div>' +
+            '</div>' +
+          '</div>';
+        });
+        html += '</div>';
+        banner.innerHTML = html;
+        banner.style.display = 'block';
+        return;
+      }
+
+      /* Fallback: module-level scoring */
       var scored = [
-        { id:'note-namer',      label:'Note Namer',       href:'note-namer.html',      max:20 },
-        { id:'aural-training',  label:'Aural Training',   href:'aural-training.html',  max:20 },
-        { id:'scale-builder',   label:'Scale Builder',    href:'scale-builder.html',   max:15 },
-        { id:'interval-quiz',   label:'Interval Quiz',    href:'interval-quiz.html',   max:20 },
-        { id:'chord-game',      label:'Chord Game',       href:'chord-game.html',      max:20 },
-        { id:'rhythm-tapper',   label:'Rhythm Tapper',    href:'rhythm-tapper.html',   max:15 },
-        { id:'terms-flashcards',label:'Terms Flashcards', href:'terms-flashcards.html',max:20 },
-        { id:'form-detective',  label:'Form Detective',   href:'form-detective.html',  max:15 },
-        { id:'guitar-chords',   label:'Guitar Chords',    href:'guitar-chords.html',   max:15 },
-        { id:'barline-quiz',    label:'Barline & Time Sig', href:'barline-quiz.html',  max:20 }
+        { id:'note-namer', label:'Note Namer', href:'/note-namer', max:20 },
+        { id:'aural-training', label:'Aural Training', href:'/aural-training', max:20 },
+        { id:'scale-builder', label:'Scale Builder', href:'/scale-builder', max:15 },
+        { id:'interval-quiz', label:'Interval Quiz', href:'/interval-quiz', max:20 },
+        { id:'chord-game', label:'Chord Game', href:'/chord-game', max:20 },
+        { id:'rhythm-tapper', label:'Rhythm Tapper', href:'/rhythm-tapper', max:15 },
+        { id:'terms-flashcards', label:'Terms Flashcards', href:'/terms-flashcards', max:20 },
+        { id:'form-detective', label:'Form Detective', href:'/form-detective', max:15 },
+        { id:'barline-quiz', label:'Barline Quiz', href:'/barline-quiz', max:20 }
       ];
-
-      var played = scored.filter(function(m) {
-        var d = getModuleData(m.id);
-        return (d.highScore || 0) > 0;
-      });
-
-      if (played.length < 2) return; // not enough data yet
-
-      var worst = played.reduce(function(acc, m) {
-        var d = getModuleData(m.id);
-        var pct = (d.highScore || 0) / m.max;
-        return pct < acc.pct ? { m: m, pct: pct } : acc;
-      }, { m: played[0], pct: 1 });
-
-      var score = getModuleData(worst.m.id).highScore || 0;
-      var pct = Math.round(worst.m.pct * 100);
+      var played = scored.filter(function(m) { return (getModuleData(m.id).highScore||0) > 0; });
+      if (played.length < 2) return;
+      var worst = played.reduce(function(a, m) {
+        var pct = (getModuleData(m.id).highScore||0) / m.max;
+        return pct < a.pct ? { m:m, pct:pct } : a;
+      }, { m:played[0], pct:1 });
+      var pct = Math.round(worst.pct * 100);
       banner.innerHTML = '💡 <strong>Focus area:</strong> Your lowest score is in <a href="' +
-        worst.m.href + '">' + worst.m.label + '</a> (' + score + ' pts, ' + pct + '%). ' +
-        'Practise it to strengthen your weakest area!';
+        worst.m.href + '" style="color:#FF8FAB;font-weight:700;">' + worst.m.label + '</a> (' + pct + '%). Practise it!';
       banner.style.display = 'block';
     }
 

@@ -104,8 +104,10 @@
     <!-- Play buttons -->
     <div class="play-row">
       <button class="btn btn-lavender" id="btn-play" onclick="playCurrentInterval()" data-i18n="play-notes">▶ Play Notes</button>
+      <button class="btn btn-secondary" id="btn-hint" onclick="showHint()" style="display:none;">💡 Hint</button>
       <button class="btn btn-secondary" onclick="nextQuestion()" data-i18n="skip">Skip →</button>
     </div>
+    <div id="hint-box" style="display:none;background:#fffde7;border-radius:12px;padding:10px 14px;margin:6px 0;font-size:0.9rem;color:#795548;text-align:center;"></div>
 
     <!-- Feedback -->
     <div class="feedback empty" id="feedback"></div>
@@ -183,6 +185,16 @@
     let answeredThisRound = false;
     let displayMode = 'harmonic';
     const score = new SessionScore('interval-quiz');
+    attachMilestoneTracker(score, 10);
+
+    function showHint() {
+      var hint = INTERVAL_SONGS[currentInterval.short];
+      if (!hint) return;
+      var box = document.getElementById('hint-box');
+      box.textContent = '🎵 Think: ' + hint;
+      box.style.display = 'block';
+      document.getElementById('btn-hint').style.display = 'none';
+    }
 
     function setDisplayMode(mode) {
       displayMode = mode;
@@ -280,6 +292,7 @@
         var hint = INTERVAL_SONGS[currentInterval.short] ? ' 🎵 ' + INTERVAL_SONGS[currentInterval.short] : '';
         setFeedback(randomCorrect() + hint, 'correct');
         triggerStarburst(btn);
+        trackAnswer('interval-quiz', currentInterval.short, true);
         score.onCorrect();
         playCurrentInterval();
         setTimeout(function() { nextQuestion(); }, 2000);
@@ -288,6 +301,7 @@
         btn.classList.add('wrong-ans');
         addShake(btn);
         setFeedback(randomWrong(), 'wrong');
+        trackAnswer('interval-quiz', currentInterval.short, false);
         score.onWrong();
 
         if (wrongAttempts >= 2) {
@@ -323,6 +337,14 @@
       setFeedback('', 'empty');
       document.getElementById('interval-info').textContent =
         'Root: ' + currentRoot + ' — what is the interval?';
+      // Reset hint
+      document.getElementById('hint-box').style.display = 'none';
+      var hintBtn = document.getElementById('btn-hint');
+      if (INTERVAL_SONGS[currentInterval.short]) {
+        hintBtn.style.display = 'inline-flex';
+      } else {
+        hintBtn.style.display = 'none';
+      }
     }
 
     /* ---- Start ---- */

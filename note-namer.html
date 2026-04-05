@@ -186,6 +186,7 @@
     let wrongAttempts = 0;
     let answeredThisRound = false;
     const score = new SessionScore('note-namer');
+    attachMilestoneTracker(score, 10);
 
     /* ---- Init ---- */
     function setClef(clef) {
@@ -241,6 +242,7 @@
         playNote(currentNote.tone, '2n');
         triggerStarburst(btn || document.getElementById('staff'));
         setFeedback(randomCorrect(), 'correct');
+        trackAnswer('note-namer', currentNote.name + '-' + (currentNote.clef||'treble'), true);
         score.onCorrect();
         setTimeout(function() { nextNote(); }, 1200);
       } else {
@@ -251,6 +253,7 @@
           addShake(btn);
         }
         setFeedback(randomWrong(), 'wrong');
+        trackAnswer('note-namer', currentNote.name + '-' + (currentNote.clef||'treble'), false);
         score.onWrong();
 
         if (wrongAttempts >= 2) {

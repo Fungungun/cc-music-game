@@ -166,6 +166,7 @@
     let wrongAttempts = 0;
     let answeredThisRound = false;
     const score = new SessionScore('chord-game');
+    attachMilestoneTracker(score, 10);
 
     function setMode(mode) {
       if (mode === 'cadences' && getGrade() < 2) {
@@ -283,6 +284,8 @@
       btn.classList.add('correct-ans');
       triggerStarburst(btn);
       setFeedback(randomCorrect(), 'correct');
+      var _concept = gameMode === 'chords' ? (currentChord ? currentChord.id : '') : (currentCadence ? currentCadence.type : '');
+      trackAnswer('chord-game', _concept, true);
       score.onCorrect();
       if (playFn) playFn();
       setTimeout(function() { nextQuestion(); }, 1800);
@@ -293,6 +296,8 @@
       btn.classList.add('wrong-ans');
       addShake(btn);
       setFeedback(randomWrong(), 'wrong');
+      var _wConcept = gameMode === 'chords' ? (currentChord ? currentChord.id : '') : (currentCadence ? currentCadence.type : '');
+      trackAnswer('chord-game', _wConcept, false);
       score.onWrong();
 
       if (wrongAttempts >= 2) {

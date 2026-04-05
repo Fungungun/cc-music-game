@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v2.6 · 2026-04-05";
+const APP_VERSION = "v3.0 · 2026-04-05";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -532,4 +532,169 @@ function clearPianoHighlights() {
   document.querySelectorAll('.piano-key').forEach(function(k) {
     k.classList.remove('active','correct','wrong-key','scale-hint');
   });
+}
+
+/* ============================================================
+   CONCEPT MASTERY TRACKING
+   Tracks per-concept accuracy across all modules.
+   Key format: "module:concept"  e.g. "interval-quiz:P5"
+   ============================================================ */
+function getMasteryData() {
+  try { return JSON.parse(localStorage.getItem('mm-mastery') || '{}'); } catch(e) { return {}; }
+}
+function saveMasteryData(d) {
+  try { localStorage.setItem('mm-mastery', JSON.stringify(d)); } catch(e) {}
+}
+
+function trackAnswer(module, concept, isCorrect) {
+  var d = getMasteryData();
+  var key = module + ':' + concept;
+  if (!d[key]) d[key] = { correct: 0, wrong: 0, lastSeen: 0 };
+  if (isCorrect) d[key].correct++;
+  else           d[key].wrong++;
+  d[key].lastSeen = Date.now();
+  saveMasteryData(d);
+}
+
+/* Returns [{key, module, concept, accuracy, total}] sorted worst first */
+function getWeakConcepts(n) {
+  var d = getMasteryData();
+  var rows = Object.keys(d).map(function(k) {
+    var v = d[k];
+    var total = v.correct + v.wrong;
+    var parts = k.split(':');
+    return { key: k, module: parts[0], concept: parts.slice(1).join(':'),
+             accuracy: total > 0 ? v.correct / total : 0, total: total };
+  }).filter(function(r) { return r.total >= 3; });
+  rows.sort(function(a, b) { return a.accuracy - b.accuracy; });
+  return rows.slice(0, n || 5);
+}
+
+/* Returns concepts for a specific module, sorted worst first */
+function getWeakConceptsForModule(module, n) {
+  return getWeakConcepts(100).filter(function(r) { return r.module === module; }).slice(0, n || 5);
+}
+
+/* Weighted random pick — weaker concepts appear more often */
+function weightedPickConcept(pool) {
+  // pool: [{concept, accuracy, ...}] or any array
+  // Each item gets weight = 1 + (1 - accuracy) * 3 so weak items are ~4x more likely
+  var weights = pool.map(function(p) { return 1 + (1 - (p.accuracy || 0.5)) * 3; });
+  var total = weights.reduce(function(a, b) { return a + b; }, 0);
+  var r = Math.random() * total;
+  var acc = 0;
+  for (var i = 0; i < pool.length; i++) {
+    acc += weights[i];
+    if (r <= acc) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+/* ============================================================
+   SESSION SUMMARY MODAL
+   Call showSessionSummary({module, correct, total, onContinue})
+   after a practice run. Shows accuracy, weak spots, next step.
+   ============================================================ */
+function showSessionSummary(opts) {
+  opts = opts || {};
+  var module   = opts.module || '';
+  var correct  = opts.correct || 0;
+  var total    = opts.total   || 0;
+  var onContinue = opts.onContinue;
+  var pct = total > 0 ? Math.round(correct / total * 100) : 0;
+
+  var star = pct >= 90 ? '🌟🌟🌟' : pct >= 70 ? '🌟🌟' : '🌟';
+  var headline = pct >= 90 ? 'Outstanding session!' :
+                 pct >= 70 ? 'Great work!' : 'Keep practising!';
+  var sub = pct >= 90 ? 'You\'re really getting it!' :
+            pct >= 70 ? 'You\'re making solid progress.' :
+            'Every expert was once a beginner.';
+
+  /* Weak concepts for this module */
+  var weak = getWeakConceptsForModule(module, 3);
+  var weakHtml = '';
+  if (weak.length) {
+    weakHtml = '<div style="margin:16px 0 8px;text-align:left;">' +
+      '<div style="font-size:0.78rem;font-weight:700;color:#aaa;letter-spacing:0.05em;margin-bottom:8px;">NEEDS WORK</div>';
+    weak.forEach(function(w) {
+      var pctW = Math.round(w.accuracy * 100);
+      var barColor = pctW >= 70 ? '#4CAF50' : pctW >= 40 ? '#FFB74D' : '#FF6B6B';
+      weakHtml +=
+        '<div style="margin-bottom:8px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#555;margin-bottom:3px;">' +
+            '<span>' + w.concept + '</span><span>' + pctW + '%</span>' +
+          '</div>' +
+          '<div style="background:#f0f0f0;border-radius:6px;height:7px;">' +
+            '<div style="background:' + barColor + ';width:' + pctW + '%;height:100%;border-radius:6px;transition:width 0.6s;"></div>' +
+          '</div>' +
+        '</div>';
+    });
+    weakHtml += '</div>';
+  }
+
+  /* Module link map for "what to practice next" */
+  var NEXT = {
+    'note-namer':      { label: 'Interval Quiz',    href: '/interval-quiz' },
+    'interval-quiz':   { label: 'Aural Training',   href: '/aural-training' },
+    'aural-training':  { label: 'Chord Game',        href: '/chord-game' },
+    'scale-builder':   { label: 'Interval Quiz',    href: '/interval-quiz' },
+    'chord-game':      { label: 'Form Detective',   href: '/form-detective' },
+    'rhythm-tapper':   { label: 'Barline Quiz',     href: '/barline-quiz' },
+    'terms-flashcards':{ label: 'Daily Challenge',  href: '/daily-challenge' },
+    'barline-quiz':    { label: 'Rhythm Tapper',    href: '/rhythm-tapper' },
+    'form-detective':  { label: 'Mock Test',        href: '/mock-test' },
+    'aural-training':  { label: 'Interval Quiz',    href: '/interval-quiz' }
+  };
+  var next = NEXT[module];
+  var nextHtml = next
+    ? '<a href="' + next.href + '" style="display:block;margin-top:4px;background:#f5f0ff;color:#7B52C9;border-radius:12px;padding:11px 16px;text-decoration:none;font-weight:700;font-size:0.9rem;">Next up: ' + next.label + ' →</a>'
+    : '';
+
+  var existing = document.getElementById('session-summary-modal');
+  if (existing) existing.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'session-summary-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
+  modal.innerHTML =
+    '<div style="background:white;border-radius:24px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.2);">' +
+      '<div style="text-align:center;margin-bottom:4px;font-size:2rem;">' + star + '</div>' +
+      '<h2 style="text-align:center;margin:0 0 4px;color:#333;font-size:1.4rem;">' + headline + '</h2>' +
+      '<p style="text-align:center;color:#888;font-size:0.9rem;margin:0 0 14px;">' + sub + '</p>' +
+      '<div style="background:linear-gradient(135deg,#f5f0ff,#fff0f5);border-radius:16px;padding:14px 16px;text-align:center;margin-bottom:12px;">' +
+        '<span style="font-size:2rem;font-weight:900;color:#7B52C9;">' + correct + '</span>' +
+        '<span style="color:#aaa;font-size:1rem;"> / ' + total + ' correct</span>' +
+        '<div style="background:#e8e0ff;border-radius:8px;height:10px;margin-top:10px;">' +
+          '<div style="background:linear-gradient(90deg,#9b7ee8,#FF8FAB);width:' + pct + '%;height:100%;border-radius:8px;transition:width 0.8s;"></div>' +
+        '</div>' +
+      '</div>' +
+      weakHtml +
+      nextHtml +
+      '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;">Keep practising 🎵</button>' +
+      '<a href="/" style="display:block;text-align:center;margin-top:10px;color:#aaa;font-size:0.85rem;text-decoration:none;">← Back to home</a>' +
+    '</div>';
+
+  if (onContinue) window._summaryOnContinue = onContinue;
+  document.body.appendChild(modal);
+}
+
+/* ============================================================
+   SESSION MILESTONE TRACKER
+   Attach to a SessionScore to auto-show summary every N questions
+   ============================================================ */
+function attachMilestoneTracker(sessionScore, everyN) {
+  everyN = everyN || 10;
+  var lastMilestone = 0;
+  var orig_update = sessionScore._update.bind(sessionScore);
+  sessionScore._update = function() {
+    orig_update();
+    if (sessionScore.total > 0 && sessionScore.total % everyN === 0 && sessionScore.total !== lastMilestone) {
+      lastMilestone = sessionScore.total;
+      showSessionSummary({
+        module: sessionScore.module,
+        correct: sessionScore.correct,
+        total: sessionScore.total
+      });
+    }
+  };
 }

@@ -191,6 +191,7 @@
     var hasPlayed = false;
 
     var score = new SessionScore('aural-training');
+    attachMilestoneTracker(score, 10);
 
     function setPlayMode(m) {
       playMode = m;
@@ -272,12 +273,14 @@
         var hint = INTERVAL_SONGS[currentInterval.short] || '';
         setFeedback(randomCorrect() + (hint ? ' 🎵 Think: ' + hint : ''), 'correct');
         triggerStarburst(btn);
+        trackAnswer('aural-training', currentInterval.short, true);
         score.onCorrect();
         setTimeout(function(){ nextQuestion(); }, 2200);
       } else {
         wrongAttempts++;
         btn.classList.add('wrong-ans');
         addShake(btn);
+        trackAnswer('aural-training', currentInterval.short, false);
         score.onWrong();
         updateAttemptDots();
 

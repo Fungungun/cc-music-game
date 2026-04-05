@@ -253,13 +253,38 @@
 
     var questionBuilders = [makeNoteQ, makeIntervalQ, makeTermQ, makeScaleQ, makeTimeSigQ];
 
+    /* Map module names to question builder */
+    var MODULE_BUILDER = {
+      'note-namer':    makeNoteQ,
+      'interval-quiz': makeIntervalQ,
+      'aural-training':makeIntervalQ,
+      'terms-flashcards': makeTermQ,
+      'scale-builder': makeScaleQ,
+      'barline-quiz':  makeTimeSigQ
+    };
+
     function buildDailySet() {
+      /* Find weak modules and bias toward them */
+      var weak = getWeakConcepts(5);
       var qs = [];
+      var used = {};
+
+      /* First: one question per distinct weak module (up to 3) */
+      weak.forEach(function(w) {
+        if (qs.length < 3 && MODULE_BUILDER[w.module] && !used[w.module]) {
+          qs.push(MODULE_BUILDER[w.module]());
+          used[w.module] = true;
+        }
+      });
+
+      /* Fill remaining slots with shuffled builders */
       var builders = shuffle(questionBuilders);
-      for (var i = 0; i < 5; i++) {
-        qs.push(builders[i % builders.length]());
+      var bi = 0;
+      while (qs.length < 5) {
+        qs.push(builders[bi % builders.length]());
+        bi++;
       }
-      return qs;
+      return shuffle(qs);
     }
 
     /* ── Challenge state ── */

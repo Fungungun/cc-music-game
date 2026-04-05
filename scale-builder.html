@@ -177,6 +177,7 @@
     let scaleComplete = false;
     let showMode = false;
     const score = new SessionScore('scale-builder');
+    attachMilestoneTracker(score, 5);
 
     /* ---- Build Keyboard ---- */
     function buildKb() {
@@ -214,6 +215,7 @@
         el.classList.add('wrong-key');
         addShake(el);
         setFeedback(randomWrong(), 'wrong');
+        trackAnswer('scale-builder', currentScale.name, false);
         score.onWrong();
         setTimeout(function() { el.classList.remove('wrong-key'); }, 600);
       }
@@ -291,6 +293,7 @@
 
     function finishScale() {
       scaleComplete = true;
+      trackAnswer('scale-builder', currentScale.name, true);
       score.onCorrect();
       document.getElementById('note-counter').textContent = 'All 8 notes done! 🎉';
       var cel = document.getElementById('celebration');
