@@ -1,11 +1,12 @@
-/* Music Maestro — Service Worker v5.0 */
-var CACHE = 'music-maestro-v5';
+/* Music Maestro — Service Worker v6.0 */
+var CACHE = 'music-maestro-v6';
 
 /* Only cache truly static assets — NOT HTML pages.
    HTML is always fetched fresh so stale cached pages never cause navigation failures. */
 var STATIC_ASSETS = [
   '/style.css',
   '/game.js',
+  '/supabase.js',
   '/i18n.js',
   '/manifest.json',
   '/icon.svg'

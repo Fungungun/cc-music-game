@@ -6,6 +6,8 @@
   <title>Welcome to Full Access — Music Maestro</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase.js"></script>
   <style>
     body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; background:linear-gradient(135deg,#FFF0F5,#FFF8F0); }
     .unlock-box { background:white; border-radius:28px; padding:40px 32px; max-width:400px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.12); }
@@ -60,9 +62,13 @@
       }
 
       if (success) {
-        /* Set permanent unlock */
+        /* Set permanent unlock (localStorage + Supabase) */
         localStorage.setItem('mm-unlocked', 'true');
         document.getElementById('success-box').style.display = 'block';
+        /* If signed in, update Supabase profile too */
+        if (typeof mmMarkUnlocked === 'function') {
+          mmMarkUnlocked().catch(function(){});
+        }
         /* Fire starburst after short delay */
         setTimeout(function() {
           var emojis = ['🎉','🌟','⭐','🎵','🎹','✨','💫','🎶'];

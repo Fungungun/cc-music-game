@@ -161,7 +161,7 @@
     <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
 
-  <!-- Info bar: name + unlock status -->
+  <!-- Info bar: name + account -->
   <div class="info-bar">
     <div id="player-greeting" class="welcome-pill" style="display:none;">
       <span>👋 Welcome back, <strong id="greeting-name"></strong>!</span>
@@ -175,6 +175,11 @@
       <button class="icon-btn" onclick="skipNameForm()" title="Skip">✕</button>
     </div>
     <div class="info-bar-right">
+      <!-- Account button — changes based on auth state -->
+      <button id="account-btn" onclick="onAccountBtnClick(this)"
+              style="background:none;border:1px solid #FFB7C5;border-radius:20px;padding:5px 12px;font-size:0.82rem;font-weight:600;color:#FF8FAB;cursor:pointer;">
+        Sign in
+      </button>
       <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.85rem;color:#ccc;">⚙️</button>
     </div>
   </div>
@@ -221,6 +226,8 @@
   </main>
 
   <script src="i18n.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase.js"></script>
   <script src="game.js"></script>
   <script>
     /* ─── Module definitions ─── */
@@ -420,6 +427,40 @@
       document.getElementById('onboard-overlay').style.display = 'none';
     }
 
+    /* ─── Account button ─── */
+    function onAccountBtnClick(btn) {
+      if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
+        showAccountMenu(btn);
+      } else {
+        showAuthModal({ allowGuest: true });
+      }
+    }
+
+    function updateAccountBtn() {
+      var btn = document.getElementById('account-btn');
+      if (!btn) return;
+      if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
+        var profile = mmGetProfile();
+        var user    = mmGetUser();
+        var label   = (profile && profile.name) || (user && user.email && user.email.split('@')[0]) || '👤 Account';
+        btn.textContent = label;
+        btn.style.borderColor = '#4CAF50';
+        btn.style.color       = '#2e7d32';
+        /* Refresh upgrade banner */
+        var banner = document.getElementById('upgrade-banner');
+        if (banner) banner.style.display = hasFullAccess() ? 'none' : 'block';
+      } else {
+        btn.textContent = 'Sign in';
+        btn.style.borderColor = '#FFB7C5';
+        btn.style.color       = '#FF8FAB';
+      }
+    }
+
+    /* React to Supabase auth changes */
+    window.addEventListener('mm-auth-changed', function() {
+      updateAccountBtn();
+    });
+
     /* ─── Init all ─── */
     buildCards();
     initWelcome();
@@ -427,6 +468,7 @@
     initWeakArea();
     initBadges();
     initOnboard();
+    updateAccountBtn();
     /* Show upgrade banner if not unlocked */
     if (!isUnlocked()) {
       document.getElementById('upgrade-banner').style.display = 'block';

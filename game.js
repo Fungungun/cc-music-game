@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v3.3 · 2026-04-05";
+const APP_VERSION = "v3.4 · 2026-04-04";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -217,6 +217,8 @@ function isUnlocked() {
 }
 
 function hasFullAccess() {
+  /* Prefer Supabase profile if available, fall back to localStorage cache */
+  if (typeof mmHasFullAccess === 'function') return mmHasFullAccess();
   return isUnlocked();
 }
 
@@ -514,6 +516,7 @@ function saveMasteryData(d) {
 }
 
 function trackAnswer(module, concept, isCorrect) {
+  /* localStorage — primary, synchronous */
   var d = getMasteryData();
   var key = module + ':' + concept;
   if (!d[key]) d[key] = { correct: 0, wrong: 0, lastSeen: 0 };
@@ -521,6 +524,8 @@ function trackAnswer(module, concept, isCorrect) {
   else           d[key].wrong++;
   d[key].lastSeen = Date.now();
   saveMasteryData(d);
+  /* Supabase — secondary, fire-and-forget (only if signed in) */
+  if (typeof mmSyncProgress === 'function') mmSyncProgress(module, concept, isCorrect);
 }
 
 /* Returns [{key, module, concept, accuracy, total}] sorted worst first */
