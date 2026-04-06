@@ -1,6 +1,6 @@
 /* =============================================
-   Music Maestro — i18n (Bilingual Support)
-   English + Simplified Chinese
+   Music Maestro — i18n (Multilingual Support)
+   English + Simplified Chinese + Spanish
    ============================================= */
 
 window.TRANSLATIONS = {
@@ -8,6 +8,7 @@ window.TRANSLATIONS = {
     // Nav
     'back': '←',
     'lang-toggle': '中文',
+    // (en → zh → es → en cycle; each shows next language label)
     'score-label': 'Score',
     'streak-label': 'Streak',
     'skip': 'Skip →',
@@ -133,7 +134,7 @@ window.TRANSLATIONS = {
   zh: {
     // Nav
     'back': '←',
-    'lang-toggle': 'English',
+    'lang-toggle': 'Español',
     'score-label': '得分',
     'streak-label': '连续',
     'skip': '跳过 →',
@@ -254,6 +255,132 @@ window.TRANSLATIONS = {
       "快到了，{name}！再来一次😊",
       "不要放弃，{name}，你在进步！🌟"
     ]
+  },
+
+  es: {
+    // Nav
+    'back': '←',
+    'lang-toggle': 'English',
+    'score-label': 'Puntos',
+    'streak-label': 'Racha',
+    'skip': 'Saltar →',
+
+    // Index
+    'app-title': '🎹 Music Maestro',
+    'app-tagline': '¡Bienvenido! ¡Vamos a aprender teoría musical! 🌟',
+    'overall-progress': 'Progreso general',
+
+    // Module names
+    'mod-aural-training':  '🎧 Entrenamiento auditivo',
+    'mod-daily-challenge': '📅 Desafío diario',
+    'mod-barline-quiz':    '📏 Compases y barras',
+    'mod-note-namer': '🎵 Nombra la nota',
+    'mod-scale-builder': '🎼 Construye la escala',
+    'mod-interval-quiz': '🎶 Quiz de intervalos',
+    'mod-chord-game': '🎸 Juego de acordes',
+    'mod-rhythm-tapper': '🥁 Marcador de ritmo',
+    'mod-terms-flashcards': '📚 Flashcards de términos',
+    'mod-form-detective': '🔍 Detective de forma',
+    'mod-mock-test': '📝 Examen de práctica',
+    'mod-learn': '📖 Guía de teoría',
+    'mod-guitar-chords': '🎸 Acordes de guitarra',
+
+    // Module descriptions
+    'desc-aural-training':  'Identifica intervalos de oído — ¡sin pentagrama!',
+    'desc-daily-challenge': '5 preguntas cada día — construye tu racha',
+    'desc-barline-quiz':    'Domina compases, tiempos y barras de compás',
+    'desc-note-namer': 'Identifica notas en el pentagrama',
+    'desc-scale-builder': 'Construye escalas mayores y menores',
+    'desc-interval-quiz': 'Nombra intervalos musicales',
+    'desc-chord-game': 'Identifica acordes y cadencias',
+    'desc-rhythm-tapper': 'Marca el ritmo al compás',
+    'desc-terms-flashcards': 'Términos musicales en italiano y francés',
+    'desc-form-detective': 'Identifica formas musicales',
+    'desc-mock-test': 'Practica preguntas de examen de Grado 1-3',
+    'desc-learn': 'Referencia de teoría con trucos y reglas mnemónicas',
+    'desc-guitar-chords': 'Aprende y practica acordes abiertos de guitarra',
+
+    // How to play intros
+    'how-note-namer': '¡Aparecerá una nota en el pentagrama. Observa bien dónde se sitúa en las líneas y espacios, y luego toca el nombre correcto (C D E F G A B)!',
+    'how-scale-builder': 'Aparecerá el nombre de una escala en la parte superior. Toca las notas correctas en el teclado del piano en orden de la más baja a la más alta. ¡Cada nota correcta se ilumina en verde!',
+    'how-interval-quiz': 'Se mostrarán dos notas en el pentagrama. Cuenta la distancia entre ellas y elige el nombre del intervalo correcto. ¡Puedes presionar Reproducir para escuchar ambas notas!',
+    'how-chord-game': 'Aparecerá un acorde en el pentagrama. Elige si es mayor o menor y si está en posición fundamental o primera inversión. ¡En el modo Cadencia, identifica el tipo de cadencia!',
+    'how-rhythm-tapper': 'Se mostrará un patrón rítmico. Presiona Iniciar, escucha el compás de entrada, luego toca el botón TAP (o la barra espaciadora) al ritmo. ¡Cuanto más preciso sea tu ritmo, más estrellas ganarás!',
+    'how-terms-flashcards': 'Aparece un término musical en el frente de la tarjeta. Intenta recordar su significado, luego toca la tarjeta para darle la vuelta y ver la respuesta. Presiona ✓ ¡Lo sé! si lo sabías, o ✗ No estoy seguro si no.',
+    'how-form-detective': 'Escucha una pieza musical corta y responde preguntas sobre su forma (Binaria AB o Ternaria ABA), el tipo de cadencia al final, o el compás.',
+    'how-mock-test': 'Responde preguntas de teoría de estilo Grado 1-3 sobre notas, escalas, intervalos, acordes, términos y ritmo. ¡Intenta acertar 8 o más!',
+
+    // Common buttons
+    'how-to-play': 'Cómo jugar',
+    'hide-intro': 'Ocultar',
+    'new-note': 'Nueva nota ↩',
+    'show-me': '👁 Muéstrame',
+    'try-another': 'Otra escala 🎲',
+    'play-scale': '▶ Tocar escala',
+    'play-notes': '▶ Tocar notas',
+    'play': '▶ Reproducir',
+    'start': '▶ Iniciar',
+    'next-pattern': '⏭ Siguiente patrón',
+    'try-again': '🔄 Intentar de nuevo',
+    'flip-hint': '👆 Toca para revelar el significado',
+    'got-it': '✓ ¡Lo sé!',
+    'not-sure': '✗ No estoy seguro',
+    'reset-progress': '🔄 Reiniciar progreso',
+    'next-question': 'Siguiente pregunta ⏭',
+    'start-test': '▶ Iniciar examen',
+    'next-test': '🎲 Nuevo examen',
+    'submit': 'Enviar respuesta',
+    'treble-clef': 'Clave de sol',
+    'bass-clef': 'Clave de fa',
+    'harmonic': 'Armónico (juntas)',
+    'melodic': 'Melódico (una por una)',
+    'chord-id': '🎵 Identificar acordes',
+    'cadence-game': '🎶 Juego de cadencias',
+    'all-grades': 'Todos los grados',
+    'grade-1': 'Grado 1',
+    'grade-2': 'Grado 2',
+    'all-questions': 'Todas las preguntas',
+    'form-q': 'Forma (AB/ABA)',
+    'cadence-q': 'Cadencias',
+    'timesig-q': 'Compases',
+    'mastered': 'dominado',
+    'card-of': 'Tarjeta',
+    'of': 'de',
+
+    // Loading
+    'loading': 'Cargando sonidos del piano… 🎹',
+    'tap-skip': '(toca aquí para saltar)',
+
+    // Mock test
+    'test-title': '📝 Examen de práctica',
+    'test-grade': 'Grado',
+    'test-question': 'Pregunta',
+    'test-of': 'de',
+    'test-score': 'Tu puntuación:',
+    'test-pass': '🎉 ¡Excelente! ¡Listo para el examen!',
+    'test-good': '👍 ¡Bien hecho! ¡Sigue practicando!',
+    'test-try': '💪 ¡Sigue adelante! ¡Inténtalo de nuevo!',
+
+    // Correct messages
+    correct: [
+      "¡Increíble, {name}! 🌟",
+      "¡Eres una estrella musical, {name}! 🎵",
+      "¡Brillante, {name}! ¡Sigue así! ✨",
+      "¡Correcto, {name}! ¡Eres muy listo! 🎹",
+      "¡Viva {name}! ¡Tu profesor de música estaría orgulloso! 🏆",
+      "¡Correcto! ¡{name} está en racha hoy! 🔥",
+      "¡Sí sí sí! ¡Lo conseguiste, {name}! 🎉",
+      "¡{name}, eres increíble en esto! 💫",
+      "¡Perfecto, {name}! ¡Vas a aprobar ese examen! 🎓",
+      "¡La superestrella {name} vuelve a triunfar! ⭐"
+    ],
+    wrong: [
+      "¡Casi, {name}! Inténtalo de nuevo 💪",
+      "No del todo, {name} — ¡tú puedes! 🌈",
+      "¡Ups! Inténtalo de nuevo, {name}, ¡creo en ti! 🎵",
+      "¡Casi lo tienes, {name}! Prueba otra vez 😊",
+      "¡No te rindas, {name}, estás aprendiendo! 🌟"
+    ]
   }
 };
 
@@ -287,7 +414,8 @@ window.applyTranslations = function() {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
   });
   // Update html lang attribute
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  var langMap = { zh: 'zh-CN', es: 'es', en: 'en' };
+  document.documentElement.lang = langMap[lang] || 'en';
   // Update lang toggle button
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = t('lang-toggle');
@@ -299,9 +427,10 @@ window.setLanguage = function(lang) {
   applyTranslations();
 };
 
-// ── toggleLanguage ──
+// ── toggleLanguage (cycles en → zh → es → en) ──
 window.toggleLanguage = function() {
-  setLanguage(getCurrentLang() === 'en' ? 'zh' : 'en');
+  var cycle = { en: 'zh', zh: 'es', es: 'en' };
+  setLanguage(cycle[getCurrentLang()] || 'en');
 };
 
 // Apply on load
