@@ -416,7 +416,9 @@ window.applyTranslations = function() {
   // Update html lang attribute
   var langMap = { zh: 'zh-CN', es: 'es', en: 'en' };
   document.documentElement.lang = langMap[lang] || 'en';
-  // Update lang toggle button
+  // Sync language dropdown (index.html) and legacy toggle button
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = lang;
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = t('lang-toggle');
 };

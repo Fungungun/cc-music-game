@@ -138,7 +138,11 @@
 
   <header class="page-header">
     <h1 data-i18n="app-title">🎹 Music Maestro</h1>
-    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+    <select id="lang-select" class="lang-btn" onchange="setLanguage(this.value)" title="Language / 语言 / Idioma">
+      <option value="en">🌐 English</option>
+      <option value="zh">🌐 中文</option>
+      <option value="es">🌐 Español</option>
+    </select>
     <!-- Account button — in nav -->
     <button id="account-btn" onclick="onAccountBtnClick(this)"
             style="background:none;border:2px solid #FFB7C5;border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:800;color:#FF8FAB;cursor:pointer;white-space:nowrap;">

@@ -618,7 +618,7 @@ body {
   .cards-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Language toggle button ── */
+/* ── Language selector (button or select) ── */
 .lang-btn {
   background: #f0f2f7;
   border: 2px solid #e0e4ee;
@@ -631,8 +631,11 @@ body {
   transition: background 0.2s, border-color 0.2s;
   font-family: inherit;
   white-space: nowrap;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
 }
-.lang-btn:hover { background: #e4e8f4; border-color: #c8cedf; }
+.lang-btn:hover, .lang-btn:focus { background: #e4e8f4; border-color: #c8cedf; }
 
 /* ── How to Play intro box ── */
 .intro-box {
