@@ -117,6 +117,9 @@ async function mmSignOut() {
   await window._mmDb.auth.signOut();
   window._mmSession = null;
   window._mmProfile = null;
+  /* Clear cached values that belong to the signed-in user */
+  localStorage.removeItem('mm-unlocked');
+  localStorage.removeItem('player-name');
 }
 
 /* ── Progress sync ── */
