@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v3.5 · 2026-04-06";
+const APP_VERSION = "v3.6 · 2026-04-06";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -205,6 +205,20 @@ function getExamBoardLabel() {
 
 /* ============ Player Name ============ */
 function getPlayerName() {
+  /* Prefer Supabase profile name → localStorage → email username → empty */
+  if (typeof mmGetProfile === 'function') {
+    var profile = mmGetProfile();
+    if (profile && profile.name) return profile.name;
+  }
+  if (typeof mmGetUser === 'function') {
+    var user = mmGetUser();
+    if (user && user.email) {
+      var stored = localStorage.getItem('player-name');
+      if (stored) return stored;
+      /* Derive from email if nothing stored */
+      return user.email.split('@')[0];
+    }
+  }
   return localStorage.getItem('player-name') || '';
 }
 function setPlayerName(n) {
@@ -230,15 +244,14 @@ function gotoPayment() {
   if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
     window.location.href = STRIPE_PAYMENT_LINK;
   } else {
-    /* Show auth modal — on success go straight to Stripe */
+    /* Always require sign-in before payment */
     if (typeof showAuthModal === 'function') {
       showAuthModal({
         allowGuest: false,
         onSuccess: function() { window.location.href = STRIPE_PAYMENT_LINK; }
       });
-    } else {
-      window.location.href = STRIPE_PAYMENT_LINK;
     }
+    /* If auth modal unavailable, do nothing — never redirect to payment unauthenticated */
   }
 }
 

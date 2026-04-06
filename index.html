@@ -7,22 +7,9 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    body { background: linear-gradient(135deg, #FFF8FB 0%, #F5F0FF 50%, #F0FFF8 100%); }
-    .page-header { background: linear-gradient(90deg, #FF8FAB, #FFB74D); color: white; }
-    .page-header h1 { color: white; }
-    .module-card[data-accent="pink"]    { background: linear-gradient(135deg, #FFB7C5, #FFD0DA); }
-    .module-card[data-accent="mint"]    { background: linear-gradient(135deg, #C7F2E3, #A8EED4); }
-    .module-card[data-accent="lavender"]{ background: linear-gradient(135deg, #E0D4F7, #CEC0F5); }
-    .module-card[data-accent="yellow"]  { background: linear-gradient(135deg, #FFF3B0, #FFE87A); }
-    .module-card[data-accent="coral"]   { background: linear-gradient(135deg, #FFD4A3, #FFBF7A); }
-    .module-card[data-accent="sky"]     { background: linear-gradient(135deg, #D4EEFF, #AADCFF); }
-    .module-card[data-accent="purple"]  { background: linear-gradient(135deg, #F0D4FF, #E0BAFF); }
-    .module-card[data-accent="grape"]   { background: linear-gradient(135deg, #E8D0FF, #D4AAFF); }
-    .module-card[data-accent="mint2"]   { background: linear-gradient(135deg, #B2DFDB, #80CBC4); }
-    .module-card[data-accent="brown"]   { background: linear-gradient(135deg, #FFD4A3, #FFAB76); }
-    .module-card[data-accent="teal"]    { background: linear-gradient(135deg, #B2EBF2, #80DEEA); }
-    .module-card[data-accent="orange"]  { background: linear-gradient(135deg, #FFE0B2, #FFCC80); }
-    .module-card.card-learn { border: 3px solid #2E8B6E; }
+    /* ── Nav bar (Epic-style: white, clean, rainbow underline from style.css) ── */
+    .page-header { background: #fff; }
+    .page-header h1 { color: #1a2233; }
 
     /* ── Top info bar ── */
     .info-bar {
@@ -30,101 +17,94 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.75);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding: 8px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e8ecf4;
     }
     .info-bar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-    /* Player name */
+    /* Player greeting */
     .welcome-pill {
       display: flex; align-items: center; gap: 6px;
-      font-size: 0.9rem; color: #555;
+      font-size: 0.88rem; color: #5a6480; font-weight: 600;
     }
-    .welcome-pill strong { color: #333; }
-    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#aaa; padding:0 2px; }
+    .welcome-pill strong { color: #1a2233; }
+    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#ccc; padding:0 2px; }
     .icon-btn:hover { color: #FF8FAB; }
-
-    /* Name form */
-    .name-form { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .name-form input {
-      border: 2px solid #FFB7C5; border-radius: 10px;
-      padding: 5px 10px; font-size: 0.9rem; outline: none; width: 130px;
-    }
-    .name-form input:focus { border-color: #FF8FAB; }
-
-    /* Trial pill */
 
     /* Exam board selector */
     .exam-bar {
       display: flex; align-items: center; gap: 6px;
-      padding: 6px 16px; background: rgba(255,255,255,0.5);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      flex-wrap: wrap; font-size: 0.85rem; color: #666;
+      padding: 6px 20px; background: #f7f8fc;
+      border-bottom: 1px solid #e8ecf4;
+      flex-wrap: wrap; font-size: 0.82rem; color: #888;
     }
     .exam-btn {
-      padding: 4px 12px; border-radius: 16px; border: 2px solid #ddd;
-      background: white; cursor: pointer; font-size: 0.82rem; font-weight: 600;
-      color: #666; transition: all 0.15s;
+      padding: 4px 12px; border-radius: 16px; border: 2px solid #dde1ef;
+      background: white; cursor: pointer; font-size: 0.8rem; font-weight: 700;
+      color: #888; transition: all 0.15s;
     }
     .exam-btn.active { border-color: #FF8FAB; background: #FF8FAB; color: white; }
-    .exam-btn:disabled { opacity: 0.45; cursor: default; }
+    .exam-btn:disabled { opacity: 0.4; cursor: default; }
     .soon-tag {
-      font-size: 0.65rem; background: #eee; color: #999;
+      font-size: 0.62rem; background: #eee; color: #aaa;
       border-radius: 8px; padding: 1px 5px; margin-left: 3px;
       vertical-align: middle;
     }
 
     /* Weak area banner */
     .weak-banner {
-      margin: 10px 16px 0;
-      padding: 10px 16px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 14px;
+      margin: 12px 20px 0;
+      padding: 12px 16px;
+      background: #fff;
+      border-radius: 16px;
       border-left: 4px solid #FFB74D;
-      font-size: 0.9rem; color: #555;
+      font-size: 0.88rem; color: #555;
       display: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .weak-banner strong { color: #E65100; }
-    .weak-banner a { color: #E65100; font-weight: 600; text-decoration: none; }
+    .weak-banner a { color: #E65100; font-weight: 700; text-decoration: none; }
     .weak-banner a:hover { text-decoration: underline; }
 
     /* Badges */
     .badges-section {
-      margin: 14px 16px 0;
+      margin: 14px 20px 0;
       padding: 14px 16px;
-      background: rgba(255,255,255,0.7);
+      background: #fff;
       border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-    .badges-title { font-size: 0.85rem; color: #888; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.03em; }
+    .badges-title { font-size: 0.78rem; color: #aaa; margin-bottom: 8px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
     .badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .badge-chip {
       display: flex; align-items: center; gap: 5px;
       padding: 5px 12px; border-radius: 20px;
-      font-size: 0.82rem; font-weight: 600;
-      background: #f0f0f0; color: #999;
+      font-size: 0.8rem; font-weight: 700;
+      background: #f0f2f7; color: #aaa;
     }
     .badge-chip.earned { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
-    .badge-chip.earned .badge-icon { filter: none; }
-    .badge-icon { font-size: 1.1rem; }
+    .badge-icon { font-size: 1rem; }
 
     /* Onboarding modal */
     .onboard-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      position: fixed; inset: 0; background: rgba(10,15,30,0.6);
       z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .onboard-box {
-      background: white; border-radius: 24px; padding: 32px 28px;
+      background: white; border-radius: 28px; padding: 36px 28px;
       max-width: 420px; width: 100%; text-align: center;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     }
-    .onboard-box h2 { margin: 0 0 10px; font-size: 1.5rem; color: #333; }
-    .onboard-box p  { color: #666; margin: 0 0 14px; line-height: 1.6; }
-    .onboard-features { text-align: left; margin: 16px 0; }
-    .onboard-features li { padding: 4px 0; color: #555; font-size: 0.95rem; }
+    .onboard-box h2 { margin: 0 0 10px; font-size: 1.6rem; font-weight: 900; color: #1a2233; }
+    .onboard-box p  { color: #5a6480; margin: 0 0 14px; line-height: 1.6; }
+    .onboard-features { text-align: left; margin: 16px 0; list-style: none; padding: 0; }
+    .onboard-features li { padding: 5px 0; color: #444; font-size: 0.95rem; font-weight: 600; }
 
-    .btn-sm { padding: 6px 14px; font-size: 0.9rem; min-width: unset; border-radius: 12px; }
-    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#aaa; padding:0 2px; }
+    .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-width: unset; border-radius: 12px; }
+
+    /* Main content width */
+    .main-content { max-width: 900px; }
   </style>
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Music Maestro — Interactive Music Theory for Grade 1–3" />
@@ -159,28 +139,18 @@
   <header class="page-header">
     <h1 data-i18n="app-title">🎹 Music Maestro</h1>
     <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+    <!-- Account button — in nav -->
+    <button id="account-btn" onclick="onAccountBtnClick(this)"
+            style="background:none;border:2px solid #FFB7C5;border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:800;color:#FF8FAB;cursor:pointer;white-space:nowrap;">
+      Sign in
+    </button>
+    <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.95rem;color:#ccc;">⚙️</button>
   </header>
 
-  <!-- Info bar: name + account -->
+  <!-- Info bar: greeting -->
   <div class="info-bar">
-    <div id="player-greeting" class="welcome-pill" style="display:none;">
-      <span>👋 Welcome back, <strong id="greeting-name"></strong>!</span>
-      <button class="icon-btn" onclick="showNameForm()" title="Change name">✎</button>
-    </div>
-    <div id="player-name-form" class="name-form">
-      <span>👋 Your name?</span>
-      <input type="text" id="name-input" placeholder="Enter name" maxlength="20"
-             onkeydown="if(event.key==='Enter')saveName()" />
-      <button class="btn btn-pink btn-sm" onclick="saveName()">Save</button>
-      <button class="icon-btn" onclick="skipNameForm()" title="Skip">✕</button>
-    </div>
-    <div class="info-bar-right">
-      <!-- Account button — changes based on auth state -->
-      <button id="account-btn" onclick="onAccountBtnClick(this)"
-              style="background:none;border:1px solid #FFB7C5;border-radius:20px;padding:5px 12px;font-size:0.82rem;font-weight:600;color:#FF8FAB;cursor:pointer;">
-        Sign in
-      </button>
-      <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.85rem;color:#ccc;">⚙️</button>
+    <div id="player-greeting" class="welcome-pill">
+      <span>👋 Hi, <strong id="greeting-name">Guest</strong>!</span>
     </div>
   </div>
 
@@ -265,10 +235,12 @@
         var title = t(mod.titleKey);
         var desc  = t(mod.descKey);
         card.innerHTML =
-          '<span class="card-icon">' + mod.emoji + '</span>' +
-          '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
-          '<div class="card-desc"  data-i18n="' + mod.descKey  + '">' + desc  + '</div>' +
-          (mod.noScore ? '' : '<div class="card-score">Best: ' + score + ' ✨</div>');
+          '<div class="card-band"><span class="card-icon">' + mod.emoji + '</span></div>' +
+          '<div class="card-body">' +
+            '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
+            '<div class="card-desc"  data-i18n="' + mod.descKey  + '">' + desc  + '</div>' +
+            (mod.noScore ? '' : '<div class="card-score">Best: ' + score + ' ✨</div>') +
+          '</div>';
         grid.appendChild(card);
       });
 
@@ -276,34 +248,16 @@
       var starStr = '';
       for (var i = 0; i < Math.min(totalScore, 20); i++) starStr += '⭐';
       starsEl.innerHTML =
-        '<div style="margin-bottom:6px;font-size:1rem;color:#666;" data-i18n="overall-progress">' +
+        '<div style="margin-bottom:6px;font-size:0.95rem;color:#888;font-weight:700;" data-i18n="overall-progress">' +
           t('overall-progress') + ': ' + totalScore + '</div>' +
-        '<div style="font-size:1.4rem;line-height:1.8;">' +
+        '<div style="font-size:1.3rem;line-height:1.8;">' +
           (starStr || '🎵 Start playing to earn stars!') + '</div>';
     }
 
-    /* ─── Player name ─── */
-    function initWelcome() {
-      var name = getPlayerName();
-      if (name) {
-        document.getElementById('greeting-name').textContent = name;
-        document.getElementById('player-greeting').style.display = 'flex';
-        document.getElementById('player-name-form').style.display = 'none';
-      }
-    }
-    function saveName() {
-      var val = document.getElementById('name-input').value.trim().slice(0, 20);
-      if (!val) return;
-      setPlayerName(val);
-      initWelcome();
-    }
-    function skipNameForm() {
-      document.getElementById('player-name-form').style.display = 'none';
-    }
-    function showNameForm() {
-      document.getElementById('player-greeting').style.display = 'none';
-      document.getElementById('player-name-form').style.display = 'flex';
-      document.getElementById('name-input').value = getPlayerName();
+    /* ─── Player greeting (no name form — derive from auth) ─── */
+    function updateGreeting() {
+      var name = getPlayerName() || 'Guest';
+      document.getElementById('greeting-name').textContent = name;
     }
 
     /* ─── Exam board ─── */
@@ -459,11 +413,12 @@
     /* React to Supabase auth changes */
     window.addEventListener('mm-auth-changed', function() {
       updateAccountBtn();
+      updateGreeting();
     });
 
     /* ─── Init all ─── */
     buildCards();
-    initWelcome();
+    updateGreeting();
     initExamBoard();
     initWeakArea();
     initBadges();
