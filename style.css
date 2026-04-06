@@ -538,6 +538,7 @@ body {
 .mode-btn.active { background: #FF8FAB; color: white; border-color: #FF8FAB; }
 .mode-btn:hover:not(.active):not(.locked) { background: #f0f0f0; }
 .mode-btn.locked { opacity: 0.55; cursor: pointer; border-style: dashed; }
+.mode-btn.coming-soon { opacity: 0.45; cursor: default; border-style: dashed; border-color: #ccc; color: #aaa; }
 
 .stars-display { font-size: 1.8rem; text-align: center; margin: 12px 0; }
 .result-box {

@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v4.1 · 2026-04-06";
+const APP_VERSION = "v4.2 · 2026-04-06";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -296,6 +296,8 @@ function setGrade(g) {
 function buildGradeSelector(containerId, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
+
+  /* Active grades */
   [1, 2, 3].forEach(function(g) {
     var locked = g > 1 && !hasFullAccess();
     var btn = document.createElement('button');
@@ -308,6 +310,16 @@ function buildGradeSelector(containerId, onChange) {
       btn.classList.add('active');
       if (onChange) onChange(g);
     };
+    container.appendChild(btn);
+  });
+
+  /* Coming soon grades */
+  [4, 5].forEach(function(g) {
+    var btn = document.createElement('button');
+    btn.className = 'mode-btn coming-soon';
+    btn.disabled = true;
+    btn.title = 'Grade ' + g + ' is coming soon!';
+    btn.innerHTML = '🔜 Grade ' + g + ' <span style="font-size:0.65rem;background:rgba(0,0,0,0.08);border-radius:6px;padding:1px 5px;margin-left:2px;font-weight:700;vertical-align:middle;">soon</span>';
     container.appendChild(btn);
   });
 }
