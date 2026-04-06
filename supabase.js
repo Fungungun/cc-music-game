@@ -418,8 +418,9 @@ function showAccountMenu(anchorEl) {
     (unlocked ? '' :
       '<button onclick="document.getElementById(\'mm-account-menu\').remove();if(typeof gotoPayment===\'function\')gotoPayment();" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:10px;padding:8px 12px;font-size:0.88rem;font-weight:800;cursor:pointer;box-sizing:border-box;">Unlock Grade 2 &amp; 3 →</button>'
     ) +
-    '<button onclick="mmSignOut().then(function(){location.reload();})" style="display:block;width:100%;margin-top:10px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#999;cursor:pointer;">Sign out</button>' +
-    '<button onclick="document.getElementById(\'mm-account-menu\').remove()" style="display:block;width:100%;margin-top:4px;background:none;border:none;color:#ccc;font-size:0.8rem;cursor:pointer;">✕ Close</button>';
+    '<button onclick="document.getElementById(\'mm-account-menu\').remove();_mmChangePassword();" style="display:block;width:100%;margin-top:10px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#666;cursor:pointer;font-family:inherit;">🔑 Change password</button>' +
+    '<button onclick="mmSignOut().then(function(){location.reload();})" style="display:block;width:100%;margin-top:6px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#999;cursor:pointer;font-family:inherit;">Sign out</button>' +
+    '<button onclick="document.getElementById(\'mm-account-menu\').remove()" style="display:block;width:100%;margin-top:4px;background:none;border:none;color:#ccc;font-size:0.8rem;cursor:pointer;font-family:inherit;">✕ Close</button>';
   document.body.appendChild(menu);
 
   /* Close on outside click */
@@ -432,6 +433,22 @@ function showAccountMenu(anchorEl) {
       }
     });
   }, 10);
+}
+
+/* ── Change password (sends reset email to signed-in user) ── */
+async function _mmChangePassword() {
+  var user = mmGetUser();
+  if (!user || !user.email) return;
+
+  var result = await window._mmDb.auth.resetPasswordForEmail(user.email, {
+    redirectTo: window.location.origin + '/reset-password'
+  });
+
+  if (result.error) {
+    alert('Could not send reset email: ' + result.error.message);
+  } else {
+    alert('📧 Password reset link sent to ' + user.email + '\n\nCheck your inbox and follow the link to set a new password.');
+  }
 }
 
 /* ── Bootstrap ── */
