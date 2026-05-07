@@ -197,6 +197,7 @@
       <a href="privacy" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">Privacy</a>
       <a href="terms" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">Terms</a>
       <a href="landing" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">About</a>
+      <a href="teachers" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">For Teachers</a>
     </div>
   </main>
 
@@ -432,6 +433,12 @@
     /* Show upgrade banner if not unlocked */
     if (!isUnlocked()) {
       document.getElementById('upgrade-banner').style.display = 'block';
+    }
+
+    /* If coming from landing page with unlock intent, trigger payment flow */
+    if (new URLSearchParams(location.search).get('unlock') === '1') {
+      history.replaceState(null, '', '/');
+      setTimeout(gotoPayment, 400);
     }
 
     /* ---- Reset data ---- */
