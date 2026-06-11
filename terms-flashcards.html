@@ -72,7 +72,7 @@
 </div>
 
 <header class="page-header">
-  <a href="/" class="back-btn" title="Back">←</a>
+  <a href="index.html" class="back-btn" title="Back">←</a>
   <h1 class="page-title">📚 Terms Flashcards</h1>
   <div class="score-display">
     <span id="score-correct">0/0</span>
@@ -126,78 +126,17 @@
 </div>
 
 <script>
-/* ===== TERM DATA ===== */
-const ALL_TERMS = [
-  // Grade 1
-  {id:'adagio',      term:'Adagio',           meaning:'Slowly',                                       grade:1},
-  {id:'andante',     term:'Andante',           meaning:'At a walking pace',                            grade:1},
-  {id:'moderato',    term:'Moderato',          meaning:'At a moderate speed',                          grade:1},
-  {id:'allegro',     term:'Allegro',           meaning:'Fast and lively',                              grade:1},
-  {id:'presto',      term:'Presto',            meaning:'Very fast',                                    grade:1},
-  {id:'accel',       term:'Accelerando',       meaning:'Gradually getting faster (accel.)',            grade:1},
-  {id:'rall',        term:'Rallentando',       meaning:'Gradually getting slower (rall.)',             grade:1},
-  {id:'rit',         term:'Ritardando',        meaning:'Gradually getting slower (rit.)',              grade:1},
-  {id:'riten',       term:'Ritenuto',          meaning:'Immediately slower (riten.)',                  grade:1},
-  {id:'atempo',      term:'A tempo',           meaning:'Return to the original tempo',                 grade:1},
-  {id:'cresc',       term:'Crescendo',         meaning:'Gradually getting louder (cresc.)',            grade:1},
-  {id:'decresc',     term:'Decrescendo',       meaning:'Gradually getting quieter (decresc.)',         grade:1},
-  {id:'dim',         term:'Diminuendo',        meaning:'Gradually getting quieter (dim.)',             grade:1},
-  {id:'forte',       term:'Forte',             meaning:'Loud (f)',                                     grade:1},
-  {id:'piano',       term:'Piano',             meaning:'Soft (p)',                                     grade:1},
-  {id:'legato',      term:'Legato',            meaning:'Smoothly connected',                           grade:1},
-  {id:'staccato',    term:'Staccato',          meaning:'Short and detached',                           grade:1},
-  // Grade 2
-  {id:'lento',       term:'Lento',             meaning:'Slowly',                                       grade:2},
-  {id:'largo',       term:'Largo',             meaning:'Very slow and broad',                          grade:2},
-  {id:'allegretto',  term:'Allegretto',        meaning:'Fairly fast (a little slower than Allegro)',   grade:2},
-  {id:'vivace',      term:'Vivace',            meaning:'Lively and fast',                              grade:2},
-  {id:'vivo',        term:'Vivo',              meaning:'Lively',                                       grade:2},
-  {id:'allarg',      term:'Allargando',        meaning:'Broadening — becoming slower and louder',      grade:2},
-  {id:'piumosso',    term:'Più mosso',         meaning:'More movement / faster',                       grade:2},
-  {id:'menomosso',   term:'Meno mosso',        meaning:'Less movement / slower',                       grade:2},
-  {id:'pp',          term:'Pianissimo',        meaning:'Very soft (pp)',                               grade:2},
-  {id:'ff',          term:'Fortissimo',        meaning:'Very loud (ff)',                               grade:2},
-  {id:'mf',          term:'Mezzo forte',       meaning:'Moderately loud (mf)',                         grade:2},
-  {id:'mp',          term:'Mezzo piano',       meaning:'Moderately soft (mp)',                         grade:2},
-  {id:'maestoso',    term:'Maestoso',          meaning:'Majestically',                                 grade:2},
-  {id:'sostenuto',   term:'Sostenuto',         meaning:'Sustained',                                    grade:2},
-  {id:'sempre',      term:'Sempre',            meaning:'Always',                                       grade:2},
-  {id:'poco',        term:'Poco',              meaning:'A little',                                     grade:2},
-  {id:'molto',       term:'Molto',             meaning:'Very / much',                                  grade:2},
-  {id:'senza',       term:'Senza',             meaning:'Without',                                      grade:2},
-  {id:'cantabile',   term:'Cantabile',         meaning:'In a singing style',                           grade:2},
-  {id:'leggiero',    term:'Leggiero',          meaning:'Light and nimble',                             grade:2},
-  {id:'dalsegno',    term:'Dal segno',         meaning:'From the sign (D.S.)',                         grade:2},
-  {id:'dacapo',      term:'Da capo al fine',   meaning:'From the beginning to Fine (D.C. al Fine)',   grade:2},
-  {id:'mstaccato',   term:'Mezzo staccato',    meaning:'Moderately detached / portato',               grade:2},
-  // Grade 3
-  {id:'largamente',  term:'Largamente',        meaning:'Broadly',                                      grade:3},
-  {id:'larghetto',   term:'Larghetto',         meaning:'Rather broad (a little faster than Largo)',   grade:3},
-  {id:'prestissimo', term:'Prestissimo',       meaning:'As fast as possible',                          grade:3},
-  {id:'conmoto',     term:'Con moto',          meaning:'With motion',                                  grade:3},
-  {id:'calando',     term:'Calando',           meaning:'Getting softer and slower',                    grade:3},
-  {id:'morendo',     term:'Morendo',           meaning:'Dying away',                                   grade:3},
-  {id:'fp',          term:'Forte-piano',       meaning:'Loud then immediately soft (fp)',              grade:3},
-  {id:'sfz',         term:'Sforzando',         meaning:'With sudden emphasis (sfz)',                   grade:3},
-  {id:'agitato',     term:'Agitato',           meaning:'Agitated / restless',                          grade:3},
-  {id:'attacca',     term:'Attacca',           meaning:'Proceed without a break',                      grade:3},
-  {id:'animato',     term:'Animato',           meaning:'Animated / lively',                            grade:3},
-  {id:'tranquillo',  term:'Tranquillo',        meaning:'Tranquil / calm',                              grade:3},
-  {id:'conanima',    term:'Con anima',         meaning:'With soul / spirit',                           grade:3},
-  {id:'conbrio',     term:'Con brio',          meaning:'With vigour / spirit',                         grade:3},
-  {id:'congrazia',   term:'Con grazia',        meaning:'With grace',                                   grade:3},
-  {id:'conforza',    term:'Con forza',         meaning:'With force',                                   grade:3},
-  {id:'dolce',       term:'Dolce',             meaning:'Sweetly',                                      grade:3},
-  {id:'risoluto',    term:'Risoluto',          meaning:'Resolute and bold',                            grade:3},
-  {id:'benmarcato',  term:'Ben marcato',       meaning:'Well marked / well accented',                  grade:3},
-  {id:'maindroite',  term:'Main droite',       meaning:'Right hand — French (m.d.)',                  grade:3},
-  {id:'maingauche',  term:'Main gauche',       meaning:'Left hand — French (m.g.)',                   grade:3},
-  {id:'unacorda',    term:'Una corda',         meaning:'One string — use the soft pedal',              grade:3},
-  {id:'trecorde',    term:'Tre corde',         meaning:'Three strings — release the soft pedal',      grade:3},
-  {id:'adlib',       term:'Ad libitum',        meaning:'At liberty / freely (ad lib.)',               grade:3},
-  {id:'opus',        term:'Opus',              meaning:'A numbered musical work (op.)',                grade:3},
-  {id:'loco',        term:'Loco',              meaning:'At normal pitch — used after 8va',            grade:3},
-];
+/* ===== TERM DATA (from SYLLABUS) ===== */
+// Terms include a 'grade' property added dynamically below
+var ALL_TERMS = (function() {
+  var out = [];
+  [1, 2, 3].forEach(function(g) {
+    SYLLABUS.terms[g].forEach(function(t) {
+      out.push({ id: t.id, term: t.term, meaning: t.meaning, grade: g });
+    });
+  });
+  return out;
+}());
 
 /* ===== SRS (Spaced Repetition) ===== */
 const SRS_KEY = 'cc-terms-srs';
@@ -251,7 +190,10 @@ let score;
 
 function getFilteredTerms() {
   if (currentGrade === 'all') return ALL_TERMS.slice();
-  return ALL_TERMS.filter(t => t.grade === parseInt(currentGrade));
+  var g = parseInt(currentGrade);
+  return SYLLABUS.terms[g] ? SYLLABUS.terms[g].map(function(t) {
+    return { id: t.id, term: t.term, meaning: t.meaning, grade: g };
+  }) : [];
 }
 
 function buildQueue() {
@@ -381,41 +323,44 @@ document.addEventListener('keydown', e => {
 var SCALE_5 = ['C4','D4','E4','F4','G4'];
 var TERM_AUDIO = {
   // Tempo — same scale at different speeds
-  'grave':      function(){ playMelodic(SCALE_5,'4n',36); },
-  'largo':      function(){ playMelodic(SCALE_5,'4n',40); },
-  'lento':      function(){ playMelodic(SCALE_5,'4n',44); },
-  'adagio':     function(){ playMelodic(SCALE_5,'4n',52); },
-  'andante':    function(){ playMelodic(SCALE_5,'4n',76); },
-  'moderato':   function(){ playMelodic(SCALE_5,'4n',108); },
-  'allegretto': function(){ playMelodic(SCALE_5,'4n',126); },
-  'allegro':    function(){ playMelodic(SCALE_5,'4n',152); },
-  'vivace':     function(){ playMelodic(SCALE_5,'4n',168); },
-  'vivo':       function(){ playMelodic(SCALE_5,'4n',168); },
-  'presto':     function(){ playMelodic(SCALE_5,'4n',192); },
-  // Articulation — same notes, different duration
-  'legato':     function(){ playMelodic(['C4','E4','G4','E4','C4'],'2n',80); },
-  'staccato':   function(){ playMelodic(['C4','E4','G4','E4','C4'],'16n',100); },
-  'tenuto':     function(){ playMelodic(['C4','E4','G4'],'2n',72); },
-  // Structure
-  'dc':         function(){
+  'largo':        function(){ playMelodic(SCALE_5,'4n',40); },
+  'lento':        function(){ playMelodic(SCALE_5,'4n',44); },
+  'adagio':       function(){ playMelodic(SCALE_5,'4n',52); },
+  'andante':      function(){ playMelodic(SCALE_5,'4n',76); },
+  'moderato':     function(){ playMelodic(SCALE_5,'4n',108); },
+  'allegretto':   function(){ playMelodic(SCALE_5,'4n',126); },
+  'allegro':      function(){ playMelodic(SCALE_5,'4n',152); },
+  'vivace':       function(){ playMelodic(SCALE_5,'4n',168); },
+  'vivo':         function(){ playMelodic(SCALE_5,'4n',168); },
+  'presto':       function(){ playMelodic(SCALE_5,'4n',192); },
+  'prestissimo':  function(){ playMelodic(SCALE_5,'4n',220); },
+  'largamente':   function(){ playMelodic(SCALE_5,'4n',38); },
+  'larghetto':    function(){ playMelodic(SCALE_5,'4n',46); },
+  // Articulation
+  'legato':       function(){ playMelodic(['C4','E4','G4','E4','C4'],'2n',80); },
+  'staccato':     function(){ playMelodic(['C4','E4','G4','E4','C4'],'16n',100); },
+  'mezzostaccato':function(){ playMelodic(['C4','E4','G4','E4','C4'],'8n',90); },
+  // Direction
+  'dacapo':       function(){
     playMelodic(['C4','D4','E4','F4','G4'],'4n',100);
     setTimeout(function(){ playMelodic(['C4','D4','E4','F4','G4'],'4n',100); }, 2500);
   },
-  'fine':       function(){
-    playChord(['G3','B3','D4'],'2n');
-    setTimeout(function(){ playChord(['C3','E3','G3'],'2n'); }, 1200);
-  },
-  'seg':        function(){
+  'dalsegno':     function(){
     playMelodic(['C4','E4','G4'],'4n',100);
     setTimeout(function(){ playMelodic(['A4','C5','E5'],'4n',100); }, 1500);
   },
-  // Dynamics — play chord to show the concept
-  'forte':      function(){ playChord(['C3','E3','G3','C4','E4','G4'],'1n'); },
-  'piano':      function(){ playChord(['C4','E4','G4'],'1n'); },
-  'mf':         function(){ playChord(['C3','E3','G3','C4'],'1n'); },
-  'mp':         function(){ playChord(['C4','E4','G4'],'2n'); },
-  'ff':         function(){ playChord(['C2','G2','C3','E3','G3','C4','E4','G4'],'1n'); },
-  'pp':         function(){ playChord(['C5','E5'],'1n'); }
+  // Dynamics
+  'forte':        function(){ playChord(['C3','E3','G3','C4','E4','G4'],'1n'); },
+  'piano':        function(){ playChord(['C4','E4','G4'],'1n'); },
+  'mezzoforte':   function(){ playChord(['C3','E3','G3','C4'],'1n'); },
+  'mezzopiano':   function(){ playChord(['C4','E4','G4'],'2n'); },
+  'fortissimo':   function(){ playChord(['C2','G2','C3','E3','G3','C4','E4','G4'],'1n'); },
+  'pianissimo':   function(){ playChord(['C5','E5'],'1n'); },
+  'fortepiano':   function(){
+    playChord(['C3','E3','G3','C4'],'8n');
+    setTimeout(function(){ playChord(['C4','E4'],'2n'); }, 300);
+  },
+  'sforzando':    function(){ playChord(['C3','E3','G3','C4','E4','G4'],'8n'); }
 };
 
 function playTermAudio() {
