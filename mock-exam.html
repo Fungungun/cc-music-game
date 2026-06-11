@@ -353,6 +353,20 @@ function genTermReverse(grade) {
   };
 }
 
+function genRelativeMinor(grade) {
+  var pool = SYLLABUS.keySignatures[Math.min(grade, 3)];
+  var ks   = pick(pool);
+  var allMinors = SYLLABUS.keySignatures[3].map(function(k){ return k.relativeMinor; });
+  return {
+    chip:'🔑 Key Signatures',
+    text:'What is the relative minor of <strong>' + ks.key + '</strong>?',
+    answer:ks.relativeMinor,
+    choices:choices4(ks.relativeMinor, allMinors),
+    explanation:'The relative minor of <strong>' + ks.key + '</strong> is <strong>' + ks.relativeMinor + '</strong>.',
+    concept:'relminor-' + ks.key,
+  };
+}
+
 function genCadence(grade) {
   var cadences = SYLLABUS.chords[Math.min(grade, 3)].cadences;
   var c = pick(cadences);
@@ -375,8 +389,9 @@ function genCadence(grade) {
 /* ── Question type weights ────────────────────── */
 var Q_TYPES = [
   { fn: genNoteNaming,    wt: 4, minGrade: 1 },
-  { fn: genKeySig,        wt: 3, minGrade: 1, usesGrade: true },
-  { fn: genKeySigReverse, wt: 2, minGrade: 1, usesGrade: true },
+  { fn: genKeySig,          wt: 3, minGrade: 1, usesGrade: true },
+  { fn: genKeySigReverse,   wt: 2, minGrade: 1, usesGrade: true },
+  { fn: genRelativeMinor,   wt: 2, minGrade: 1, usesGrade: true },
   { fn: genInterval,      wt: 4, minGrade: 1, usesGrade: true },
   { fn: genNoteValue,     wt: 3, minGrade: 1, usesGrade: true },
   { fn: genTermMeaning,   wt: 3, minGrade: 1, usesGrade: true },

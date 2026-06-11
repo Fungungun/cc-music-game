@@ -1,4 +1,4 @@
-# CLAUDE.md — CC Music Game (v5.3)
+# CLAUDE.md — CC Music Game (v5.5)
 
 Context for Claude Code sessions working on this project.
 
@@ -62,6 +62,7 @@ aural-training.html     Ear training — intervals, pitch direction, sing-back
 form-detective.html     Binary/Ternary form, cadence types, time signatures
 learn.html              Theory reference — all testable content per grade
 mock-exam.html          Mock exam — 20-question sessions drawn from 100-question banks
+syllabus.html           AMEB Piano 2026 Section III coverage map — what's tested vs what's in the app
 
 landing.html            Public landing page (auth gate)
 reset-password.html     Password reset flow
@@ -358,7 +359,7 @@ Format: `"vX.Y · YYYY-MM-DD"`
 
 ---
 
-## Build status (as of v5.3)
+## Build status (as of v5.5)
 
 | Phase | Status | Files |
 |---|---|---|
@@ -369,3 +370,4 @@ Format: `"vX.Y · YYYY-MM-DD"`
 | Phase 5 — Specialist | ✅ Done | `aural-training.html`, `form-detective.html`, `learn.html` |
 | Phase 6 — Mock Exam | ✅ Done | `mock-exam.html` |
 | Phase 7 — Polish + Deploy | ✅ Done | All modules v5.3 |
+| Phase 8 — Syllabus Alignment | ✅ Done | `syllabus.html` (new), `key-signatures.html` (+ relative minor mode), `mock-exam.html` (+ relative minor Qs) |

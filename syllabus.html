@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMEB Syllabus Coverage — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #4A1070, #8B2FC9); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+    .back-btn:hover { background: rgba(255,255,255,0.5); }
+
+    .ameb-intro { background: white; border-radius: 16px; padding: 18px 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .ameb-intro p { font-size: 0.9rem; color: var(--text); margin: 0 0 8px; line-height: 1.6; }
+    .ameb-intro p:last-child { margin: 0; }
+    .ameb-intro strong { color: #4A1070; }
+
+    .sections-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    .section-chip { border-radius: 20px; padding: 6px 14px; font-size: 0.82rem; font-weight: 800; }
+    .section-chip.app    { background: #E8F5E9; color: #2E7D32; }
+    .section-chip.noapp  { background: #FFF3E0; color: #7B4000; }
+    .section-chip.partial{ background: #FFF8E1; color: #7B5A00; }
+
+    .coverage-block { background: white; border-radius: 16px; padding: 16px; margin: 10px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .coverage-block-title { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: #4A1070; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #F0D4FF; }
+
+    .cov-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F5F5F5; }
+    .cov-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .cov-status { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin-top: 1px; }
+    .s-full    { background: #E8F5E9; }
+    .s-partial { background: #FFF8E1; }
+    .s-gap     { background: #FFEBEE; }
+    .s-voice   { background: #F3E5F5; }
+
+    .cov-body { flex: 1; min-width: 0; }
+    .cov-topic { font-size: 0.875rem; font-weight: 700; color: var(--text); line-height: 1.45; }
+    .cov-note  { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; line-height: 1.4; }
+    .cov-module { display: inline-block; margin-top: 4px; font-size: 0.76rem; font-weight: 800; color: #6A1A9A; text-decoration: none; background: #F0D4FF; border-radius: 8px; padding: 2px 8px; }
+    .cov-module:hover { background: #E0C4F0; }
+    .cov-module.no-link { background: #EEE; color: #888; cursor: default; }
+
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 14px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-light); }
+
+    .grade-note-box { background: #F0D4FF; border-radius: 12px; padding: 10px 14px; font-size: 0.84rem; color: #4A1070; margin: 8px 0 12px; }
+    .grade-note-box strong { font-weight: 900; }
+
+    .coverage-summary { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 14px; }
+    .cs-chip { border-radius: 20px; padding: 5px 13px; font-size: 0.82rem; font-weight: 800; }
+    .cs-full    { background: #E8F5E9; color: #2E7D32; }
+    .cs-partial { background: #FFF8E1; color: #7B5A00; }
+    .cs-gap     { background: #FFEBEE; color: #B71C1C; }
+
+    .gaps-box { background: #FFF8E1; border: 1.5px solid #FFE082; border-radius: 14px; padding: 16px; margin: 16px 0; }
+    .gaps-box h3 { font-size: 0.92rem; font-weight: 900; color: #7B5A00; margin: 0 0 10px; }
+    .gaps-list { list-style: none; padding: 0; margin: 0; }
+    .gaps-list li { font-size: 0.85rem; color: #555; padding: 7px 0; border-bottom: 1px solid #FFECB3; line-height: 1.5; }
+    .gaps-list li:last-child { border-bottom: none; }
+    .gaps-list li strong { color: #4A3000; }
+
+    .teacher-box { background: #E8F5E9; border: 1.5px solid #A5D6A7; border-radius: 14px; padding: 16px; margin: 16px 0; }
+    .teacher-box h3 { font-size: 0.92rem; font-weight: 900; color: #1B5E20; margin: 0 0 8px; }
+    .teacher-box p { font-size: 0.85rem; color: #2E5A30; margin: 0; line-height: 1.55; }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div style="flex:1;">
+      <h1>📋 AMEB Syllabus</h1>
+      <div class="subtitle">Piano 2026 · Section III Coverage</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <div class="ameb-intro">
+      <p>The AMEB Piano exam has three sections. This app focuses on <strong>Section III: General Knowledge</strong> — the theory and aural component administered by the examiner.</p>
+      <p><strong>Section I</strong> (Technical Work: scales, arpeggios) and <strong>Section II</strong> (Performance Pieces) require supervised practice with a teacher.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="cov-status s-full">✅</span> Fully covered</div>
+      <div class="legend-item"><span class="cov-status s-partial">⚠️</span> Partly covered</div>
+      <div class="legend-item"><span class="cov-status s-gap">❌</span> Not yet in app</div>
+      <div class="legend-item"><span class="cov-status s-voice">🎤</span> Requires voice/teacher</div>
+    </div>
+
+    <!-- Grade tabs -->
+    <div class="mode-toggle" id="grade-tabs"></div>
+
+    <!-- Coverage content (rendered by JS) -->
+    <div id="coverage-content"></div>
+
+    <div class="gaps-box">
+      <h3>What this app cannot cover</h3>
+      <ul class="gaps-list">
+        <li><strong>Aural sing-back (all grades):</strong> Singing back a 5–6 note phrase requires a microphone and voice recognition. Practice this with your teacher — they will play a phrase and ask you to sing it back.</li>
+        <li><strong>Key changes (Grade 2+):</strong> Identifying a modulation at an obvious point in a printed score requires real piece excerpts. Your teacher will show you examples from your exam pieces.</li>
+        <li><strong>Piece-specific questions (all grades):</strong> The examiner will ask about YOUR exam pieces — title, composer, key, time signature, terms marked in the score. Use the Learn page and flashcards to prepare the theory; apply it to your own pieces.</li>
+        <li><strong>Grade 3 intervals in key context:</strong> Grade 3 asks you to name an interval as a degree of a named scale (e.g., "In D major, this is the Major 3rd"). The Interval Quiz teaches the interval names — apply that knowledge to any key by remembering the scale degrees.</li>
+        <li><strong>Section I: Technical Work:</strong> Scales and arpeggios performed hands-together in specific tempos, articulations, and octave ranges — the Scale Builder helps you learn the notes, but performance technique requires teacher feedback.</li>
+      </ul>
+    </div>
+
+    <div class="teacher-box">
+      <h3>How to use this app alongside lessons</h3>
+      <p>Use this app for daily theory drilling — notes, intervals, terms, key signatures. Bring your exam pieces to every lesson and ask your teacher to quiz you on the piece-specific questions (title, composer, key, terms in the score). Together, the app + teacher lessons give you comprehensive Section III preparation.</p>
+    </div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase.js"></script>
+  <script src="game.js"></script>
+  <script>
+
+  /* Coverage data — aligned to AMEB Piano 2026 Section III */
+  var COV = {
+    1: {
+      note: null,
+      sections: [
+        {
+          title: 'Notes and Notation',
+          rows: [
+            { topic:'Name any note on the treble clef staff', sub:'Including one ledger line above (A5) and below (B3)', status:'full', module:'Note Namer', href:'note-namer.html' },
+            { topic:'Name any note on the bass clef staff', sub:'Including one ledger line above (C4, middle C) and below', status:'full', module:'Note Namer', href:'note-namer.html' },
+            { topic:'State the value of notes in beats', sub:'Semibreve (4), minim (2), crotchet (1), quaver (½), semiquaver (¼)', status:'full', module:'Note Values', href:'note-values.html' },
+            { topic:'State the value of rests in beats', sub:'All five rest values matching the notes above', status:'full', module:'Note Values', href:'note-values.html' },
+            { topic:'Identify the time signature and beats per bar', sub:'2/4 (duple), 3/4 (triple), 4/4 (quadruple)', status:'full', module:'Rhythm Trainer', href:'rhythm-trainer.html' },
+            { topic:'Recognise common signs and symbols', sub:'Sharp ♯, flat ♭, natural ♮, staccato, slur, tie, repeat signs, D.C., D.S., Fine', status:'partial', module:'Learn (reference)', href:'learn.html', note:'All signs explained in the Theory Guide — no standalone quiz for symbol recognition' },
+          ]
+        },
+        {
+          title: 'Keys and Scales',
+          rows: [
+            { topic:'Identify C, G, F major from key signature', sub:'Match sharps/flats to the correct major key name', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'Name the relative minor of a major key', sub:'A minor (C), E minor (G), D minor (F)', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'Name notes of C, G, F major scales', sub:'All 8 notes in ascending order', status:'full', module:'Scale Builder', href:'scale-builder.html' },
+            { topic:'Name notes of A, D, E harmonic minor scales', sub:'Including raised 7th degree (G♯, C♯, D♯)', status:'full', module:'Scale Builder', href:'scale-builder.html' },
+          ]
+        },
+        {
+          title: 'Intervals',
+          rows: [
+            { topic:'Name intervals above a given note by number', sub:'Perfect Unison, 2nd, 3rd, 4th, 5th, Octave — number only, no quality needed', status:'full', module:'Interval Quiz', href:'interval-quiz.html' },
+          ]
+        },
+        {
+          title: 'Chords and Cadences',
+          rows: [
+            { topic:'Identify C, G, F major triads in root position', sub:'Name the triad type and key from the three notes', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'Identify Perfect cadence (V–I) by ear', sub:'Dominant chord resolving to tonic — in C major', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'Identify Plagal cadence (IV–I) by ear', sub:'Subdominant chord resolving to tonic ("Amen" cadence) — in C major', status:'full', module:'Chord Game', href:'chord-game.html' },
+          ]
+        },
+        {
+          title: 'Musical Terms',
+          rows: [
+            { topic:'Define 17 Italian terms for tempo, dynamics, and articulation', sub:'Adagio, Andante, Moderato, Allegro, Presto, Accelerando, Rallentando, Ritardando, Ritenuto, A tempo, forte, piano, crescendo, decrescendo, diminuendo, legato, staccato', status:'full', module:'Terms Flashcards', href:'terms-flashcards.html' },
+          ]
+        },
+        {
+          title: 'Aural Tests',
+          rows: [
+            { topic:'Identify whether a second pitch is higher or lower', sub:'Two pitches played — state which is higher', status:'full', module:'Aural Training', href:'aural-training.html' },
+            { topic:'Sing back a 5–6 note phrase', sub:'Examiner plays a short melody; student sings it back', status:'voice', module:null, note:'Requires vocal input — practice with your teacher' },
+            { topic:'Clap beats in duple or triple time', sub:'Maintain a steady beat while music plays', status:'voice', module:null, note:'Physical clapping requires a teacher — Rhythm Trainer prepares the underlying beat sense' },
+          ]
+        },
+        {
+          title: 'Piece-Specific Questions',
+          rows: [
+            { topic:'Name the title and composer of each exam piece', sub:'From your performance repertoire', status:'voice', module:null, note:'Specific to your own exam pieces — prepare with your teacher' },
+            { topic:'Identify the key and tonality of your piece', sub:'Major or minor; name the tonic', status:'partial', module:'Key Signatures + Learn', href:'key-signatures.html', note:'Theory tools cover key identification — apply to your own pieces' },
+            { topic:'Identify and explain terms and signs in the score', sub:'Any term or sign marked in your exam pieces', status:'partial', module:'Terms Flashcards', href:'terms-flashcards.html', note:'App covers all Grade 1 terms — specific score context requires teacher' },
+          ]
+        },
+      ]
+    },
+
+    2: {
+      note: 'Grade 2 is cumulative — includes all Grade 1 topics above, plus the additions below.',
+      sections: [
+        {
+          title: 'Notes and Notation — Grade 2 Additions',
+          rows: [
+            { topic:'Dotted minim: 3 beats in simple time', sub:'A minim with a dot adds half its value', status:'full', module:'Note Values', href:'note-values.html' },
+            { topic:'Dotted crotchet: 1½ beats (simple time)', sub:'Used frequently in 6/8 and syncopated patterns', status:'full', module:'Note Values', href:'note-values.html' },
+            { topic:'6/8 time signature: compound duple', sub:'6 quavers per bar, felt as 2 dotted-crotchet beats', status:'full', module:'Rhythm Trainer', href:'rhythm-trainer.html' },
+          ]
+        },
+        {
+          title: 'Keys and Scales — Grade 2 Additions',
+          rows: [
+            { topic:'Identify D major (2♯), A major (3♯) from key signature', sub:'Sharp keys extending the Grade 1 range', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'Identify B♭ major (2♭), E♭ major (3♭) from key signature', sub:'Flat keys extending the Grade 1 range', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'Relative minors for Grade 2 keys', sub:'B minor (D), F♯ minor (A), G minor (B♭), C minor (E♭)', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'G and C harmonic minor scales', sub:'Scales introduced in Grade 2', status:'full', module:'Scale Builder', href:'scale-builder.html' },
+            { topic:'Identify key changes at obvious points in a piece', sub:'Detect when music modulates to a closely related key', status:'gap', module:null, note:'Requires score excerpts with modulation — not yet in app; practise with your teacher' },
+          ]
+        },
+        {
+          title: 'Intervals — Grade 2 Additions',
+          rows: [
+            { topic:'Name all 12 intervals with full quality + number', sub:'Major 2nd, Minor 3rd, Major 3rd, Perfect 4th, Diminished 5th, Perfect 5th, Minor 6th, Major 6th, Minor 7th, Major 7th, Perfect Octave', status:'full', module:'Interval Quiz', href:'interval-quiz.html' },
+          ]
+        },
+        {
+          title: 'Chords and Cadences — Grade 2 Additions',
+          rows: [
+            { topic:'D major and A major triads (root position)', sub:'Two new major triads added in Grade 2', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'A, D, E minor triads in root position', sub:'Minor triads introduced at Grade 2', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'Perfect and Plagal cadences in G and F major', sub:'Same cadence types but in two additional keys', status:'full', module:'Chord Game', href:'chord-game.html' },
+          ]
+        },
+        {
+          title: 'Musical Terms — Grade 2 Additions',
+          rows: [
+            { topic:'24 additional Italian/French terms', sub:'Lento, Largo, Allegretto, Vivace, Maestoso, Cantabile, Grazioso, Dolce, Risoluto, Scherzando, pp, ff, mp, mf, sforzando, and more', status:'full', module:'Terms Flashcards', href:'terms-flashcards.html' },
+          ]
+        },
+        {
+          title: 'Aural Tests — Grade 2 Additions',
+          rows: [
+            { topic:'Identify a note as a Major 3rd or Perfect 5th above/below the tonic', sub:'Examiner plays a note; student identifies its interval from tonic', status:'full', module:'Aural Training', href:'aural-training.html' },
+            { topic:'Identify whether a given melody is in duple or triple time', sub:'Listen and state whether music has 2 or 3 main beats per bar', status:'full', module:'Rhythm Trainer', href:'rhythm-trainer.html' },
+            { topic:'Sing back melodic phrases', sub:'Longer phrases than Grade 1', status:'voice', module:null, note:'Requires vocal input — practice with your teacher' },
+          ]
+        },
+      ]
+    },
+
+    3: {
+      note: 'Grade 3 is cumulative — includes all Grade 1 and 2 topics above, plus the additions below.',
+      sections: [
+        {
+          title: 'Notes and Notation — Grade 3 Additions',
+          rows: [
+            { topic:'2/2 time (alla breve / cut time): 2 minim beats per bar', sub:'Minim = 1 beat in cut time; often faster, march-like feel', status:'full', module:'Rhythm Trainer', href:'rhythm-trainer.html' },
+            { topic:'9/8 time: compound triple (3 dotted-crotchet beats)', sub:'9 quavers per bar, felt as 3 compound beats', status:'full', module:'Rhythm Trainer', href:'rhythm-trainer.html' },
+            { topic:'Dotted quaver: ¾ beat', sub:'Used in dotted quaver + semiquaver patterns', status:'full', module:'Note Values', href:'note-values.html' },
+          ]
+        },
+        {
+          title: 'Keys and Scales — Grade 3 Additions',
+          rows: [
+            { topic:'E major (4♯), B major (5♯), A♭ major (4♭) key signatures', sub:'Three more key signatures completing the Grade 3 set', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'Relative minors: C♯ minor (E), G♯ minor (B), F minor (A♭)', sub:'Relative minor for each Grade 3 major key', status:'full', module:'Key Signatures', href:'key-signatures.html' },
+            { topic:'E major and A♭ major scales', sub:'Two new major scales', status:'full', module:'Scale Builder', href:'scale-builder.html' },
+          ]
+        },
+        {
+          title: 'Intervals — Grade 3 Additions',
+          rows: [
+            { topic:'Name intervals as degrees of a named scale (keynote given)', sub:'E.g., "In D major, this note is the Major 3rd" — same 12 intervals, answered in key context', status:'partial', module:'Interval Quiz', href:'interval-quiz.html', note:'The quiz teaches full interval names (Grade 2 format); Grade 3 framing means saying "the Major 3rd of C major" — apply the same knowledge to each key' },
+          ]
+        },
+        {
+          title: 'Chords and Cadences — Grade 3 Additions',
+          rows: [
+            { topic:'1st inversions of C, G, F major and A, D, E minor', sub:'Triads with the 3rd in the bass (e.g., E–G–C for C major 1st inversion)', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'Imperfect cadence (I–V) by ear', sub:'Tonic chord moving to dominant — an "unfinished" ending', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'Interrupted cadence (V–VI) by ear', sub:'Dominant resolving to submediant — a "surprise" ending', status:'full', module:'Chord Game', href:'chord-game.html' },
+            { topic:'All 4 cadence types in C, G, and F major', sub:'Perfect, Plagal, Imperfect, and Interrupted in three keys', status:'full', module:'Chord Game', href:'chord-game.html' },
+          ]
+        },
+        {
+          title: 'Musical Terms — Grade 3 Additions',
+          rows: [
+            { topic:'27 additional Italian/French terms', sub:'Agitato, Tranquillo, Dolce, Sforzando, Attacca, Una corda, Tre corde, Con brio, Fuoco, Mesto, and more', status:'full', module:'Terms Flashcards', href:'terms-flashcards.html' },
+          ]
+        },
+        {
+          title: 'Musical Form (Grade 2+)',
+          rows: [
+            { topic:'Identify Binary form (AB)', sub:'Two distinct sections, each usually repeated; first section often ends on dominant', status:'full', module:'Form Detective', href:'form-detective.html' },
+            { topic:'Identify Ternary form (ABA)', sub:'Three sections — first theme returns after contrasting middle section', status:'full', module:'Form Detective', href:'form-detective.html' },
+            { topic:'Identify cadences and time signatures within a musical passage', sub:'Apply all cadence and time signature knowledge to a complete excerpt', status:'full', module:'Form Detective', href:'form-detective.html' },
+          ]
+        },
+        {
+          title: 'Key Changes (Grade 2+)',
+          rows: [
+            { topic:'Identify key changes at obvious places in a musical excerpt', sub:'Detect modulation to closely related keys (dominant, relative minor, etc.)', status:'gap', module:null, note:'Requires printed score excerpts with modulations — not yet in app; practise with your teacher using your exam repertoire' },
+          ]
+        },
+      ]
+    }
+  };
+
+  var STATUS_META = {
+    full:    { cls:'s-full',    icon:'✅' },
+    partial: { cls:'s-partial', icon:'⚠️' },
+    gap:     { cls:'s-gap',     icon:'❌' },
+    voice:   { cls:'s-voice',   icon:'🎤' },
+  };
+
+  function countStatus(grade) {
+    var counts = { full:0, partial:0, gap:0, voice:0 };
+    COV[grade].sections.forEach(function(sec) {
+      sec.rows.forEach(function(r) { counts[r.status]++; });
+    });
+    return counts;
+  }
+
+  function renderGrade(g) {
+    var data = COV[g];
+    var html = '';
+
+    if (data.note) {
+      html += '<div class="grade-note-box">ℹ️ ' + data.note + '</div>';
+    }
+
+    var c = countStatus(g);
+    html += '<div class="coverage-summary">' +
+      '<span class="cs-chip cs-full">✅ ' + c.full + ' fully covered</span>' +
+      (c.partial ? '<span class="cs-chip cs-partial">⚠️ ' + c.partial + ' partially covered</span>' : '') +
+      (c.gap ? '<span class="cs-chip cs-gap">❌ ' + c.gap + ' not in app</span>' : '') +
+      '</div>';
+
+    data.sections.forEach(function(sec) {
+      html += '<div class="coverage-block">' +
+        '<div class="coverage-block-title">' + sec.title + '</div>';
+
+      sec.rows.forEach(function(row) {
+        var sm = STATUS_META[row.status] || STATUS_META.gap;
+        var moduleHtml = '';
+        if (row.href) {
+          moduleHtml = '<a href="' + row.href + '" class="cov-module">' + row.module + ' →</a>';
+        } else if (row.module) {
+          moduleHtml = '<span class="cov-module no-link">' + row.module + '</span>';
+        }
+
+        html += '<div class="cov-row">' +
+          '<div class="cov-status ' + sm.cls + '">' + sm.icon + '</div>' +
+          '<div class="cov-body">' +
+            '<div class="cov-topic">' + row.topic + '</div>' +
+            (row.sub ? '<div class="cov-note">' + row.sub + '</div>' : '') +
+            (row.note ? '<div class="cov-note" style="color:#b05000;margin-top:3px;">Note: ' + row.note + '</div>' : '') +
+            (moduleHtml ? '<div style="margin-top:5px;">' + moduleHtml + '</div>' : '') +
+          '</div>' +
+        '</div>';
+      });
+
+      html += '</div>';
+    });
+
+    document.getElementById('coverage-content').innerHTML = html;
+  }
+
+  /* Grade tabs */
+  var curGrade = getGrade();
+  var tabsEl = document.getElementById('grade-tabs');
+  [1, 2, 3].forEach(function(g) {
+    var btn = document.createElement('button');
+    btn.className = 'mode-btn' + (g === curGrade ? ' active' : '');
+    var label = 'Grade ' + g;
+    if (g >= 2 && !hasFullAccess()) label += ' 🔒';
+    btn.textContent = label;
+    btn.onclick = function() {
+      document.querySelectorAll('#grade-tabs .mode-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      curGrade = g;
+      renderGrade(g);
+    };
+    tabsEl.appendChild(btn);
+  });
+
+  renderGrade(curGrade);
+
+  </script>
+</body>
+</html>

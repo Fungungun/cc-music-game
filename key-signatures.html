@@ -140,6 +140,7 @@
     <div class="mode-toggle" style="margin-top:10px;">
       <button class="mode-btn active" id="mode-identify" onclick="setMode('identify')">🔑 Sig → Key Name</button>
       <button class="mode-btn" id="mode-reverse" onclick="setMode('reverse')">🔄 Key Name → Sig</button>
+      <button class="mode-btn" id="mode-relminor" onclick="setMode('relminor')">🎵 Relative Minor</button>
     </div>
 
     <!-- Question card -->
@@ -187,7 +188,7 @@
     });
 
     /* ---- State ---- */
-    var mode = 'identify'; // 'identify' or 'reverse'
+    var mode = 'identify'; // 'identify', 'reverse', or 'relminor'
     var currentQ = null;
     var answered = false;
     var score = new SessionScore('key-signatures');
@@ -197,6 +198,7 @@
       mode = m;
       document.getElementById('mode-identify').classList.toggle('active', m === 'identify');
       document.getElementById('mode-reverse').classList.toggle('active', m === 'reverse');
+      document.getElementById('mode-relminor').classList.toggle('active', m === 'relminor');
       nextQuestion();
     }
 
@@ -261,7 +263,7 @@
           grid.appendChild(btn);
         });
 
-      } else {
+      } else if (mode === 'reverse') {
         /* Show key name → answer sig count */
         card.innerHTML =
           '<div class="q-prompt">How many sharps or flats does</div>' +
@@ -296,6 +298,29 @@
         });
 
         currentQ.correctLabel = correctLabel;
+
+      } else {
+        /* relminor mode: show major key name → answer relative minor */
+        card.innerHTML =
+          '<div class="q-prompt">What is the relative minor of</div>' +
+          '<div class="q-main">' + ks.key + '</div>' +
+          '<div class="q-sub">Tap the correct relative minor below</div>';
+
+        /* Always draw from the full Grade 3 pool for 3 wrong answers */
+        var allPool = SYLLABUS.keySignatures[3];
+        var wrongMinors = allPool
+          .filter(function(k){ return k.relativeMinor !== ks.relativeMinor; })
+          .sort(function(){ return Math.random() - 0.5; })
+          .slice(0, 3)
+          .map(function(k){ return k.relativeMinor; });
+        var choicesRel = [ks.relativeMinor].concat(wrongMinors).sort(function(){ return Math.random() - 0.5; });
+        choicesRel.forEach(function(choice) {
+          var btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          btn.textContent = choice;
+          btn.onclick = function() { checkAnswer(choice, ks.relativeMinor, btn); };
+          grid.appendChild(btn);
+        });
       }
     }
 
@@ -314,7 +339,8 @@
         btn.classList.add('correct-ans');
         triggerStarburst(btn);
         setFeedback(randomCorrect(), 'correct');
-        trackAnswer('key-signatures', ks.key, true);
+        var concept = mode === 'relminor' ? 'relminor-' + ks.key : ks.key;
+        trackAnswer('key-signatures', concept, true);
         score.onCorrect();
       } else {
         btn.classList.add('wrong-ans');
@@ -324,7 +350,8 @@
           if (b.textContent === correct) b.classList.add('correct-ans');
         });
         setFeedback(randomWrong(), 'wrong');
-        trackAnswer('key-signatures', ks.key, false);
+        var concept2 = mode === 'relminor' ? 'relminor-' + ks.key : ks.key;
+        trackAnswer('key-signatures', concept2, false);
         score.onWrong();
       }
 
