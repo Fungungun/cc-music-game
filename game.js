@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v5.3 · 2026-06-11";
+const APP_VERSION = "v5.4 · 2026-06-11";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');

@@ -1,4 +1,4 @@
-# CLAUDE.md — CC Music Game (v5.0)
+# CLAUDE.md — CC Music Game (v5.3)
 
 Context for Claude Code sessions working on this project.
 
@@ -143,6 +143,7 @@ git push                           # auto-deploys within ~60s
 | `cc-terms-flashcards` | `{ highScore, streak }` |
 | `cc-aural-training` | `{ highScore, streak }` |
 | `cc-form-detective` | `{ highScore, streak }` |
+| `cc-mock-exam` | `{ highScore, streak }` |
 | `cc-terms-srs` | `{ [termId]: { nextDue, interval, reps } }` |
 | `mm-mastery` | `{ [module:concept]: { correct, wrong, lastSeen } }` |
 | `cc-grade` | `"1"` / `"2"` / `"3"` |
@@ -312,11 +313,14 @@ weightedPickConcept(pool)                  // Picks from pool weighted by weakne
 
 ## Mock Exam architecture (mock-exam.html)
 
-- **3 grade banks**: Grade 1 (~60 Qs), Grade 2 (~80 Qs), Grade 3 (~100 Qs)
-- **Session**: 20 randomly sampled questions per run (reshuffled each attempt)
-- **12 question types**: note naming, key sig ID, interval visual, interval aural, note/rest value, scale notes, chord ID, cadence ID, term definition, rhythm/time sig, form ID (G2+), key change ID (G2+)
-- **Score descriptor**: <50% Satisfactory, 50-64% Credit, 65-79% Honours, 80%+ High Distinction
-- **Wrong answer review**: shown at end of session
+Questions are **dynamically generated** from `SYLLABUS` data (not a fixed question bank), giving infinite variety per session.
+
+- **Session**: 20 questions, weighted-random across 8 question types
+- **Types**: note naming, key sig → name, name → key sig, interval visual, note value, term meaning, meaning → term, cadence aural
+- **Cadence questions**: aural (play button mandatory before answering)
+- **Scoring**: HD ≥85% · Distinction ≥75% · Credit ≥65% · Pass ≥50% · Not Yet Passing <50%
+- **Wrong answer review**: shown at end of session with correct answers
+- **Retake**: reshuffles new questions on each attempt
 
 ---
 
@@ -354,14 +358,14 @@ Format: `"vX.Y · YYYY-MM-DD"`
 
 ---
 
-## Build status (as of v5.0)
+## Build status (as of v5.3)
 
 | Phase | Status | Files |
 |---|---|---|
-| Phase 1 — Foundation | Done | `game.js`, `style.css`, `CLAUDE.md` |
-| Phase 2 — Home + Auth | Next | `index.html`, `i18n.js` |
-| Phase 3 — Basic Modules | Pending | `note-namer.html`, `scale-builder.html`, `key-signatures.html`, `note-values.html` |
-| Phase 4 — Advanced Modules | Pending | `interval-quiz.html`, `chord-game.html`, `rhythm-trainer.html`, `terms-flashcards.html` |
-| Phase 5 — Specialist | Pending | `aural-training.html`, `form-detective.html`, `learn.html` |
-| Phase 6 — Mock Exam | Pending | `mock-exam.html` |
-| Phase 7 — Polish + Deploy | Pending | All files |
+| Phase 1 — Foundation | ✅ Done | `game.js`, `style.css`, `CLAUDE.md` |
+| Phase 2 — Home + Auth | ✅ Done | `index.html`, `i18n.js` |
+| Phase 3 — Basic Modules | ✅ Done | `note-namer.html`, `scale-builder.html`, `key-signatures.html`, `note-values.html` |
+| Phase 4 — Advanced Modules | ✅ Done | `interval-quiz.html`, `chord-game.html`, `rhythm-trainer.html`, `terms-flashcards.html` |
+| Phase 5 — Specialist | ✅ Done | `aural-training.html`, `form-detective.html`, `learn.html` |
+| Phase 6 — Mock Exam | ✅ Done | `mock-exam.html` |
+| Phase 7 — Polish + Deploy | ✅ Done | All modules v5.3 |
