@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>♩ Note Values — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #E07B20, #FFD4A3); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+    .back-btn:hover { background: rgba(255,255,255,0.5); }
+
+    /* Note value display */
+    .note-display {
+      background: white;
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .time-sig-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .note-symbol {
+      font-size: 5rem;
+      line-height: 1;
+      margin: 8px 0;
+      user-select: none;
+    }
+    .note-name-label {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .q-prompt {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 12px 0 8px;
+    }
+    .q-sub {
+      font-size: 0.88rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    /* Answer grid */
+    .beats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .beat-btn {
+      padding: 16px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 1.3rem;
+      font-weight: 900;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      background: white;
+      transition: all 0.15s;
+      font-family: var(--font);
+      text-align: center;
+    }
+    .beat-btn .beat-sub { font-size: 0.72rem; font-weight: 600; color: var(--text-light); display: block; margin-top: 2px; }
+    .beat-btn:hover:not(:disabled) { background: #fff3e0; border-color: #E07B20; transform: translateY(-1px); }
+    .beat-btn.correct-ans { background: #c8f7dc; border-color: #4caf50; }
+    .beat-btn.wrong-ans   { background: #fdd; border-color: #f44336; }
+    .beat-btn:disabled { cursor: default; }
+
+    /* Hint */
+    .note-table-toggle {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .note-table {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 0.88rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: none;
+      margin-bottom: 12px;
+    }
+    .note-table table { width: 100%; border-collapse: collapse; }
+    .note-table th, .note-table td { padding: 7px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    .note-table th { background: #fff3e0; font-weight: 700; }
+
+    /* Rest toggle */
+    .type-toggle { display: flex; gap: 8px; justify-content: center; margin: 8px 0 14px; flex-wrap: wrap; }
+
+    @media (max-width: 480px) {
+      .beats-grid { grid-template-columns: repeat(2, 1fr); }
+      .note-symbol { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div style="flex:1;">
+      <h1>♩ Note Values</h1>
+      <div class="subtitle">How many beats is it worth?</div>
+    </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+  </header>
+
+  <!-- How to Play -->
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span data-i18n="how-to-play">How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p data-i18n="how-note-values">A note or rest appears. Answer how many beats it is worth in the given time signature. Remember: dotted notes add half their value!</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <!-- Score -->
+    <div class="score-display">
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Grade + Type selectors -->
+    <div class="mode-toggle" id="grade-selector"></div>
+    <div class="type-toggle">
+      <button class="mode-btn active" id="type-notes" onclick="setType('notes')">♩ Notes</button>
+      <button class="mode-btn" id="type-rests" onclick="setType('rests')">𝄽 Rests</button>
+      <button class="mode-btn" id="type-both"  onclick="setType('both')">Mixed</button>
+    </div>
+
+    <!-- Question display -->
+    <div class="note-display" id="note-display">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Question prompt -->
+    <div class="q-prompt" id="q-prompt"></div>
+    <div class="q-sub" id="q-sub"></div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Beat answer buttons -->
+    <div class="beats-grid" id="beats-grid"></div>
+
+    <!-- Reference table toggle -->
+    <div class="note-table-toggle">
+      <button class="btn btn-secondary" style="font-size:0.85rem;padding:8px 18px;" onclick="toggleTable()">📋 Show Reference Table</button>
+    </div>
+    <div class="note-table" id="note-table">
+      <table>
+        <tr><th>Note</th><th>Name</th><th>Beats (in 4/4)</th></tr>
+        <tr><td style="font-size:1.6rem;">𝅝</td><td>Semibreve</td><td>4</td></tr>
+        <tr><td style="font-size:1.6rem;">𝅗𝅥</td><td>Minim</td><td>2</td></tr>
+        <tr><td style="font-size:1.6rem;">♩</td><td>Crotchet</td><td>1</td></tr>
+        <tr><td style="font-size:1.6rem;">♪</td><td>Quaver</td><td>½</td></tr>
+        <tr><td style="font-size:1.6rem; font-size:1.2rem;">𝅘𝅥𝅯</td><td>Semiquaver</td><td>¼</td></tr>
+        <tr><td style="font-size:1.6rem;">𝅗𝅥.</td><td>Dotted minim</td><td>3</td></tr>
+        <tr><td style="font-size:1.6rem;">♩.</td><td>Dotted crotchet</td><td>1½</td></tr>
+        <tr><td style="font-size:1.6rem;">♪.</td><td>Dotted quaver</td><td>¾</td></tr>
+      </table>
+      <div style="font-size:0.8rem;color:#888;margin-top:8px;">In compound time (6/8, 9/8), the beat unit changes — a dotted crotchet = 1 beat.</div>
+    </div>
+
+    <!-- Next button -->
+    <div style="text-align:center;margin:10px 0 16px;">
+      <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()" style="display:none;">Next ⏭</button>
+    </div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      var body = document.getElementById('intro-body');
+      var arrow = document.getElementById('intro-arrow');
+      var isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
+    /* ---- Note value data ----
+       Using text symbols since music Unicode varies by device.
+       Symbol is a display emoji, abcDur is in L:1/4 units (so 4=semibreve).
+    */
+    var NOTE_DATA = [
+      {
+        id:'semibreve',      name:'Semibreve',       symbol:'𝅝',
+        beatsIn44: 4,  fractional: false, isNote: true,
+        grade: 1, description: 'A whole note — lasts the whole bar in 4/4 time'
+      },
+      {
+        id:'semibreve-rest', name:'Semibreve rest',  symbol:'𝄻',
+        beatsIn44: 4,  fractional: false, isNote: false,
+        grade: 1, description: 'Whole bar rest — also used for a whole bar in any time sig'
+      },
+      {
+        id:'minim',          name:'Minim',           symbol:'𝅗𝅥',
+        beatsIn44: 2,  fractional: false, isNote: true,
+        grade: 1, description: 'A half note — worth 2 crotchet beats'
+      },
+      {
+        id:'minim-rest',     name:'Minim rest',      symbol:'𝄼',
+        beatsIn44: 2,  fractional: false, isNote: false,
+        grade: 1, description: 'Half note rest — worth 2 beats'
+      },
+      {
+        id:'crotchet',       name:'Crotchet',        symbol:'♩',
+        beatsIn44: 1,  fractional: false, isNote: true,
+        grade: 1, description: 'A quarter note — the basic beat unit in simple time'
+      },
+      {
+        id:'crotchet-rest',  name:'Crotchet rest',   symbol:'𝄽',
+        beatsIn44: 1,  fractional: false, isNote: false,
+        grade: 1, description: 'Quarter note rest — one beat of silence'
+      },
+      {
+        id:'quaver',         name:'Quaver',          symbol:'♪',
+        beatsIn44: 0.5, fractional: true, isNote: true,
+        grade: 1, description: 'An eighth note — worth half a crotchet'
+      },
+      {
+        id:'quaver-rest',    name:'Quaver rest',     symbol:'𝄾',
+        beatsIn44: 0.5, fractional: true, isNote: false,
+        grade: 1, description: 'Eighth rest — half a beat of silence'
+      },
+      {
+        id:'semiquaver',     name:'Semiquaver',      symbol:'𝅘𝅥𝅯',
+        beatsIn44: 0.25, fractional: true, isNote: true,
+        grade: 1, description: 'A sixteenth note — worth a quarter of a crotchet'
+      },
+      {
+        id:'dotted-minim',   name:'Dotted minim',    symbol:'𝅗𝅥.',
+        beatsIn44: 3,  fractional: false, isNote: true,
+        grade: 2, description: 'Dotted half note — worth 3 beats (2 + 1)'
+      },
+      {
+        id:'dotted-crotchet',name:'Dotted crotchet', symbol:'♩.',
+        beatsIn44: 1.5, fractional: true, isNote: true,
+        grade: 2, description: 'Dotted quarter note — worth 1½ beats (1 + ½)'
+      },
+      {
+        id:'dotted-quaver',  name:'Dotted quaver',   symbol:'♪.',
+        beatsIn44: 0.75, fractional: true, isNote: true,
+        grade: 3, description: 'Dotted eighth note — worth ¾ of a beat'
+      },
+    ];
+
+    /* Beat labels for answer buttons */
+    var BEAT_OPTIONS = [
+      { label: '¼',  value: 0.25 },
+      { label: '½',  value: 0.5  },
+      { label: '¾',  value: 0.75 },
+      { label: '1',  value: 1    },
+      { label: '1½', value: 1.5  },
+      { label: '2',  value: 2    },
+      { label: '3',  value: 3    },
+      { label: '4',  value: 4    },
+    ];
+
+    /* ---- State ---- */
+    var noteType = 'notes'; // 'notes', 'rests', 'both'
+    var currentNote = null;
+    var answered = false;
+    var score = new SessionScore('note-values');
+    attachMilestoneTracker(score, 10);
+
+    function setType(t) {
+      noteType = t;
+      ['notes','rests','both'].forEach(function(id) {
+        document.getElementById('type-' + id).classList.toggle('active', id === t);
+      });
+      nextQuestion();
+    }
+
+    function getPool() {
+      var grade = getGrade();
+      return NOTE_DATA.filter(function(n) {
+        if (n.grade > grade) return false;
+        if (noteType === 'notes') return n.isNote;
+        if (noteType === 'rests') return !n.isNote;
+        return true;
+      });
+    }
+
+    /* ---- Beat label formatter ---- */
+    function beatsLabel(v) {
+      if (v === 0.25) return '¼ beat';
+      if (v === 0.5)  return '½ beat';
+      if (v === 0.75) return '¾ beat';
+      if (v === 1.5)  return '1½ beats';
+      return v + (v === 1 ? ' beat' : ' beats');
+    }
+
+    /* ---- Render question ---- */
+    function nextQuestion() {
+      answered = false;
+      document.getElementById('feedback').className = 'feedback empty';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('next-btn').style.display = 'none';
+
+      var pool = getPool();
+      if (!pool.length) {
+        document.getElementById('note-display').innerHTML =
+          '<div style="padding:20px;color:#888;">No notes available — try changing the type or grade.</div>';
+        return;
+      }
+
+      currentNote = pool[Math.floor(Math.random() * pool.length)];
+
+      /* Display note */
+      document.getElementById('note-display').innerHTML =
+        '<div class="time-sig-label">Time signature: 4/4</div>' +
+        '<div class="note-symbol">' + currentNote.symbol + '</div>' +
+        '<div class="note-name-label">' + currentNote.name + '</div>';
+
+      /* Question prompt */
+      document.getElementById('q-prompt').textContent =
+        'How many beats is a ' + currentNote.name.toLowerCase() + ' worth in 4/4 time?';
+      document.getElementById('q-sub').textContent = 'Choose the correct number of beats below';
+
+      /* Build answer buttons */
+      var grid = document.getElementById('beats-grid');
+      grid.innerHTML = '';
+
+      /* Include correct answer + 3 wrong ones from the option set */
+      var correct = currentNote.beatsIn44;
+      var others = BEAT_OPTIONS.filter(function(o) { return o.value !== correct; });
+      var shuffled = others.sort(function(){ return Math.random() - 0.5; }).slice(0, 3);
+      var allOpts = [{label: beatsLabel(correct).split(' ')[0], value: correct}]
+        .concat(shuffled)
+        .sort(function(){ return Math.random() - 0.5; });
+
+      allOpts.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'beat-btn';
+        btn.dataset.value = opt.value;
+        var displayLabel = opt.label || String(opt.value);
+        btn.innerHTML = displayLabel + '<span class="beat-sub">' + beatsLabel(opt.value) + '</span>';
+        btn.onclick = function() { checkAnswer(opt.value, correct, btn); };
+        grid.appendChild(btn);
+      });
+    }
+
+    /* ---- Check answer ---- */
+    function checkAnswer(chosen, correct, btn) {
+      if (answered) return;
+      answered = true;
+      document.querySelectorAll('.beat-btn').forEach(function(b) { b.disabled = true; });
+
+      var isCorrect = (chosen === correct);
+
+      if (isCorrect) {
+        btn.classList.add('correct-ans');
+        triggerStarburst(btn);
+        setFeedback(randomCorrect() + ' A ' + currentNote.name.toLowerCase() + ' = ' + beatsLabel(correct) + '.', 'correct');
+        trackAnswer('note-values', currentNote.name, true);
+        score.onCorrect();
+        setTimeout(function() { nextQuestion(); }, 1800);
+      } else {
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        /* Highlight correct answer */
+        document.querySelectorAll('.beat-btn').forEach(function(b) {
+          if (parseFloat(b.dataset.value) === correct) b.classList.add('correct-ans');
+        });
+        setFeedback(randomWrong() + ' A ' + currentNote.name.toLowerCase() + ' = ' + beatsLabel(correct) + '.', 'wrong');
+        trackAnswer('note-values', currentNote.name, false);
+        score.onWrong();
+        document.getElementById('next-btn').style.display = 'inline-block';
+      }
+    }
+
+    function setFeedback(msg, type) {
+      var el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    /* ---- Reference table toggle ---- */
+    function toggleTable() {
+      var t = document.getElementById('note-table');
+      t.style.display = t.style.display === 'none' ? 'block' : 'none';
+    }
+
+    /* ---- Init ---- */
+    initSampler(function() {
+      buildGradeSelector('grade-selector', function() { nextQuestion(); });
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>

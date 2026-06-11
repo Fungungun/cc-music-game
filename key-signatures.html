@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔑 Key Signatures — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #0097A7, #80DEEA); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+    .back-btn:hover { background: rgba(255,255,255,0.5); }
+
+    .question-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      margin: 16px 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .q-prompt {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+    .q-main {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .q-sub {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .answer-btn {
+      padding: 14px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      background: white;
+      transition: all 0.15s;
+      font-family: var(--font);
+      min-height: 56px;
+    }
+    .answer-btn:hover:not(:disabled) { background: #e0f7fa; border-color: #0097A7; transform: translateY(-1px); }
+    .answer-btn.correct-ans { background: #c8f7dc; border-color: #4caf50; }
+    .answer-btn.wrong-ans   { background: #fdd; border-color: #f44336; }
+    .answer-btn:disabled { cursor: default; }
+
+    .mode-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 10px 0 0; }
+
+    /* Key sig accidental display */
+    .sig-visual {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin: 8px 0;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .sig-acc { display: inline-block; }
+
+    .fact-box {
+      background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      color: #006064;
+      margin: 12px 0;
+      text-align: left;
+      display: none;
+    }
+    .fact-box strong { font-weight: 800; }
+
+    @media (max-width: 480px) {
+      .answer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+  </div>
+
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
+    <div style="flex:1;">
+      <h1>🔑 Key Signatures</h1>
+      <div class="subtitle">How many sharps or flats?</div>
+    </div>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
+  </header>
+
+  <!-- How to Play -->
+  <div class="intro-box" id="intro-box">
+    <div class="intro-header" onclick="toggleIntro()">
+      <span data-i18n="how-to-play">How to Play</span>
+      <span id="intro-arrow">▼</span>
+    </div>
+    <div class="intro-body" id="intro-body">
+      <p data-i18n="how-key-signatures">A key signature is shown on the staff. Count the sharps or flats and choose the correct major key name. Or answer the reverse: given a key name, find its signature!</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <!-- Score -->
+    <div class="score-display">
+      <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+
+    <!-- Grade Selector -->
+    <div class="mode-toggle" id="grade-selector"></div>
+
+    <!-- Mode tabs -->
+    <div class="mode-toggle" style="margin-top:10px;">
+      <button class="mode-btn active" id="mode-identify" onclick="setMode('identify')">🔑 Sig → Key Name</button>
+      <button class="mode-btn" id="mode-reverse" onclick="setMode('reverse')">🔄 Key Name → Sig</button>
+    </div>
+
+    <!-- Question card -->
+    <div class="question-card" id="question-card">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Fact box (shown after answer) -->
+    <div class="fact-box" id="fact-box"></div>
+
+    <!-- Feedback -->
+    <div class="feedback empty" id="feedback"></div>
+
+    <!-- Answer buttons -->
+    <div class="answer-grid" id="answer-grid"></div>
+
+    <!-- Next button -->
+    <div style="text-align:center;margin:14px 0;">
+      <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()" style="display:none;">Next Question ⏭</button>
+    </div>
+
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase.js"></script>
+  <script src="game.js"></script>
+  <script>
+    /* ---- Intro toggle ---- */
+    function toggleIntro() {
+      var body = document.getElementById('intro-body');
+      var arrow = document.getElementById('intro-arrow');
+      var isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth < 1024) {
+        document.getElementById('intro-body').style.display = 'none';
+        document.getElementById('intro-arrow').textContent = '▼';
+      }
+    });
+
+    /* ---- State ---- */
+    var mode = 'identify'; // 'identify' or 'reverse'
+    var currentQ = null;
+    var answered = false;
+    var score = new SessionScore('key-signatures');
+    attachMilestoneTracker(score, 10);
+
+    function setMode(m) {
+      mode = m;
+      document.getElementById('mode-identify').classList.toggle('active', m === 'identify');
+      document.getElementById('mode-reverse').classList.toggle('active', m === 'reverse');
+      nextQuestion();
+    }
+
+    /* ---- Build question pool from SYLLABUS ---- */
+    function getPool() {
+      return SYLLABUS.keySignatures[Math.min(getGrade(), 3)] || SYLLABUS.keySignatures[1];
+    }
+
+    /* ---- Pick 3 wrong answers ---- */
+    function getWrongAnswers(correct, all, field) {
+      var others = all.filter(function(k) { return k[field] !== correct; });
+      var shuffled = others.sort(function(){ return Math.random() - 0.5; });
+      return shuffled.slice(0, 3).map(function(k) { return k[field]; });
+    }
+
+    /* ---- Render key sig using text symbols ---- */
+    function renderSigText(ks) {
+      var html = '';
+      if (ks.sharps > 0) {
+        for (var i = 0; i < ks.sharps; i++) html += '<span class="sig-acc">♯</span>';
+        html += '<span style="font-size:1rem;font-weight:400;color:#888;margin-left:6px;">(' + ks.sharps + ' sharp' + (ks.sharps > 1 ? 's' : '') + ')</span>';
+      } else if (ks.flats > 0) {
+        for (var j = 0; j < ks.flats; j++) html += '<span class="sig-acc">♭</span>';
+        html += '<span style="font-size:1rem;font-weight:400;color:#888;margin-left:6px;">(' + ks.flats + ' flat' + (ks.flats > 1 ? 's' : '') + ')</span>';
+      } else {
+        html = '<span style="font-size:1rem;color:#888;">No sharps or flats</span>';
+      }
+      return html;
+    }
+
+    /* ---- Build and display a question ---- */
+    function nextQuestion() {
+      answered = false;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className = 'feedback empty';
+      document.getElementById('fact-box').style.display = 'none';
+      document.getElementById('next-btn').style.display = 'none';
+
+      var pool = getPool();
+      var ks = pool[Math.floor(Math.random() * pool.length)];
+      currentQ = { ks: ks };
+
+      var card = document.getElementById('question-card');
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+
+      if (mode === 'identify') {
+        /* Show sig → answer key name */
+        var sigText = renderSigText(ks);
+        card.innerHTML =
+          '<div class="q-prompt">Which major key has this key signature?</div>' +
+          '<div class="sig-visual" id="sig-visual">' + sigText + '</div>' +
+          '<div class="q-sub">Tap the correct key name below</div>';
+
+        var wrongKeys = getWrongAnswers(ks.key, pool, 'key');
+        var choices = [ks.key].concat(wrongKeys).sort(function(){ return Math.random() - 0.5; });
+        choices.forEach(function(choice) {
+          var btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          btn.textContent = choice;
+          btn.onclick = function() { checkAnswer(choice, ks.key, btn); };
+          grid.appendChild(btn);
+        });
+
+      } else {
+        /* Show key name → answer sig count */
+        card.innerHTML =
+          '<div class="q-prompt">How many sharps or flats does</div>' +
+          '<div class="q-main">' + ks.key + '</div>' +
+          '<div class="q-sub">have in its key signature?</div>';
+
+        /* Generate 4 options: correct description + 3 wrong ones */
+        function sigLabel(k) {
+          if (k.sharps > 0) return k.sharps + ' sharp' + (k.sharps > 1 ? 's' : '');
+          if (k.flats > 0)  return k.flats  + ' flat'  + (k.flats  > 1 ? 's' : '');
+          return 'No sharps or flats (C major)';
+        }
+        var correctLabel = sigLabel(ks);
+        var wrongChoices = getWrongAnswers(correctLabel, pool.map(function(k){ return sigLabel(k); }), '');
+        /* fallback if pool is small */
+        var allLabels = pool.map(function(k){ return sigLabel(k); }).filter(function(l){ return l !== correctLabel; });
+        while (allLabels.length < 3) allLabels.push(allLabels[0]);
+        var choices2 = [correctLabel].concat(allLabels.slice(0,3)).sort(function(){ return Math.random() - 0.5; });
+        /* deduplicate */
+        choices2 = choices2.filter(function(v,i,a){ return a.indexOf(v) === i; });
+        while (choices2.length < 4 && pool.length > choices2.length) {
+          var extra = sigLabel(pool[choices2.length % pool.length]);
+          if (choices2.indexOf(extra) === -1) choices2.push(extra);
+        }
+
+        choices2.forEach(function(choice) {
+          var btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          btn.textContent = choice;
+          btn.onclick = function() { checkAnswer(choice, correctLabel, btn); };
+          grid.appendChild(btn);
+        });
+
+        currentQ.correctLabel = correctLabel;
+      }
+    }
+
+    /* ---- Check answer ---- */
+    function checkAnswer(chosen, correct, btn) {
+      if (answered) return;
+      answered = true;
+
+      /* Disable all buttons */
+      document.querySelectorAll('.answer-btn').forEach(function(b) { b.disabled = true; });
+
+      var ks = currentQ.ks;
+      var isCorrect = (chosen === correct);
+
+      if (isCorrect) {
+        btn.classList.add('correct-ans');
+        triggerStarburst(btn);
+        setFeedback(randomCorrect(), 'correct');
+        trackAnswer('key-signatures', ks.key, true);
+        score.onCorrect();
+      } else {
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        /* Highlight correct */
+        document.querySelectorAll('.answer-btn').forEach(function(b) {
+          if (b.textContent === correct) b.classList.add('correct-ans');
+        });
+        setFeedback(randomWrong(), 'wrong');
+        trackAnswer('key-signatures', ks.key, false);
+        score.onWrong();
+      }
+
+      /* Show fact */
+      var factEl = document.getElementById('fact-box');
+      var accStr = ks.accidentals.length > 0 ? ks.accidentals.join(', ') : 'none';
+      factEl.innerHTML =
+        '<strong>' + ks.key + '</strong> — ' +
+        (ks.sharps > 0 ? ks.sharps + ' sharp' + (ks.sharps > 1 ? 's' : '') + ' (' + accStr + ')' :
+         ks.flats  > 0 ? ks.flats  + ' flat'  + (ks.flats  > 1 ? 's' : '') + ' (' + accStr + ')' :
+         'No sharps or flats') +
+        '<br>Relative minor: <strong>' + ks.relativeMinor + '</strong>';
+      factEl.style.display = 'block';
+
+      document.getElementById('next-btn').style.display = 'inline-block';
+
+      if (isCorrect) {
+        setTimeout(function() { nextQuestion(); }, 1600);
+      }
+    }
+
+    function setFeedback(msg, type) {
+      var el = document.getElementById('feedback');
+      el.textContent = msg;
+      el.className = 'feedback ' + (type || 'empty');
+    }
+
+    /* ---- Init ---- */
+    initSampler(function() {
+      buildGradeSelector('grade-selector', function() { nextQuestion(); });
+      nextQuestion();
+    });
+  </script>
+</body>
+</html>
