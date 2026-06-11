@@ -1,9 +1,9 @@
 /* =============================================
-   Music Maestro — Shared Utilities (game.js)
+   CC Music Game — Shared Utilities (game.js)
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v4.4 · 2026-05-07";
+const APP_VERSION = "v5.0 · 2026-06-11";
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
@@ -11,12 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
   footer.textContent = APP_VERSION;
   document.body.appendChild(footer);
 
-  // Register service worker for PWA offline support
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
-
-    // Self-heal: if an old broken SW is causing navigation errors,
-    // unregister all SWs and reload once to get a clean state.
     navigator.serviceWorker.getRegistrations().then(function(regs) {
       regs.forEach(function(reg) {
         if (reg.active && reg.active.scriptURL && !reg.active.scriptURL.includes('/sw.js')) {
@@ -27,6 +23,334 @@ document.addEventListener('DOMContentLoaded', function() {
     }).catch(function(){});
   }
 });
+
+/* ============================================================
+   SYLLABUS DATA — AMEB Piano 2026, Grades 1–3
+   Single source of truth for all curriculum content.
+   Modules read from this instead of hardcoding.
+   ============================================================ */
+const SYLLABUS = {
+
+  /* ---- Scales ---- */
+  scales: {
+    1: [
+      { name:'C major',            key:'C',  type:'major',         notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
+      { name:'G major',            key:'G',  type:'major',         notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
+      { name:'F major',            key:'F',  type:'major',         notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'] },
+      { name:'A harmonic minor',   key:'Am', type:'minor-harmonic', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'] },
+      { name:'D harmonic minor',   key:'Dm', type:'minor-harmonic', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'] },
+      { name:'E harmonic minor',   key:'Em', type:'minor-harmonic', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'] },
+    ],
+    2: [
+      { name:'C major',            key:'C',  type:'major',         notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
+      { name:'G major',            key:'G',  type:'major',         notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
+      { name:'F major',            key:'F',  type:'major',         notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'] },
+      { name:'D major',            key:'D',  type:'major',         notes:['D4','E4','F#4','G4','A4','B4','C#5','D5'] },
+      { name:'A major',            key:'A',  type:'major',         notes:['A3','B3','C#4','D4','E4','F#4','G#4','A4'] },
+      { name:'Bb major',           key:'Bb', type:'major',         notes:['Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'] },
+      { name:'Eb major',           key:'Eb', type:'major',         notes:['Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5'] },
+      { name:'A harmonic minor',   key:'Am', type:'minor-harmonic', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'] },
+      { name:'D harmonic minor',   key:'Dm', type:'minor-harmonic', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'] },
+      { name:'E harmonic minor',   key:'Em', type:'minor-harmonic', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'] },
+      { name:'G harmonic minor',   key:'Gm', type:'minor-harmonic', notes:['G3','A3','Bb3','C4','D4','Eb4','F#4','G4'] },
+      { name:'C harmonic minor',   key:'Cm', type:'minor-harmonic', notes:['C4','D4','Eb4','F4','G4','Ab4','B4','C5'] },
+    ],
+    3: [
+      { name:'C major',            key:'C',  type:'major',         notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
+      { name:'G major',            key:'G',  type:'major',         notes:['G3','A3','B3','C4','D4','E4','F#4','G4'] },
+      { name:'F major',            key:'F',  type:'major',         notes:['F3','G3','A3','Bb3','C4','D4','E4','F4'] },
+      { name:'D major',            key:'D',  type:'major',         notes:['D4','E4','F#4','G4','A4','B4','C#5','D5'] },
+      { name:'A major',            key:'A',  type:'major',         notes:['A3','B3','C#4','D4','E4','F#4','G#4','A4'] },
+      { name:'Bb major',           key:'Bb', type:'major',         notes:['Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'] },
+      { name:'Eb major',           key:'Eb', type:'major',         notes:['Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5'] },
+      { name:'E major',            key:'E',  type:'major',         notes:['E4','F#4','G#4','A4','B4','C#5','D#5','E5'] },
+      { name:'Ab major',           key:'Ab', type:'major',         notes:['Ab3','Bb3','C4','Db4','Eb4','F4','G4','Ab4'] },
+      { name:'A harmonic minor',   key:'Am', type:'minor-harmonic', notes:['A3','B3','C4','D4','E4','F4','G#4','A4'] },
+      { name:'D harmonic minor',   key:'Dm', type:'minor-harmonic', notes:['D4','E4','F4','G4','A4','Bb4','C#5','D5'] },
+      { name:'E harmonic minor',   key:'Em', type:'minor-harmonic', notes:['E4','F#4','G4','A4','B4','C5','D#5','E5'] },
+      { name:'G harmonic minor',   key:'Gm', type:'minor-harmonic', notes:['G3','A3','Bb3','C4','D4','Eb4','F#4','G4'] },
+      { name:'C harmonic minor',   key:'Cm', type:'minor-harmonic', notes:['C4','D4','Eb4','F4','G4','Ab4','B4','C5'] },
+    ]
+  },
+
+  /* ---- Key Signatures ---- */
+  keySignatures: {
+    1: [
+      { key:'C major', relativeMinor:'A minor', sharps:0, flats:0, accidentals:[] },
+      { key:'G major', relativeMinor:'E minor', sharps:1, flats:0, accidentals:['F#'] },
+      { key:'F major', relativeMinor:'D minor', sharps:0, flats:1, accidentals:['Bb'] },
+    ],
+    2: [
+      { key:'C major', relativeMinor:'A minor', sharps:0, flats:0, accidentals:[] },
+      { key:'G major', relativeMinor:'E minor', sharps:1, flats:0, accidentals:['F#'] },
+      { key:'F major', relativeMinor:'D minor', sharps:0, flats:1, accidentals:['Bb'] },
+      { key:'D major', relativeMinor:'B minor', sharps:2, flats:0, accidentals:['F#','C#'] },
+      { key:'A major', relativeMinor:'F# minor', sharps:3, flats:0, accidentals:['F#','C#','G#'] },
+      { key:'Bb major', relativeMinor:'G minor', sharps:0, flats:2, accidentals:['Bb','Eb'] },
+      { key:'Eb major', relativeMinor:'C minor', sharps:0, flats:3, accidentals:['Bb','Eb','Ab'] },
+    ],
+    3: [
+      { key:'C major', relativeMinor:'A minor', sharps:0, flats:0, accidentals:[] },
+      { key:'G major', relativeMinor:'E minor', sharps:1, flats:0, accidentals:['F#'] },
+      { key:'F major', relativeMinor:'D minor', sharps:0, flats:1, accidentals:['Bb'] },
+      { key:'D major', relativeMinor:'B minor', sharps:2, flats:0, accidentals:['F#','C#'] },
+      { key:'A major', relativeMinor:'F# minor', sharps:3, flats:0, accidentals:['F#','C#','G#'] },
+      { key:'Bb major', relativeMinor:'G minor', sharps:0, flats:2, accidentals:['Bb','Eb'] },
+      { key:'Eb major', relativeMinor:'C minor', sharps:0, flats:3, accidentals:['Bb','Eb','Ab'] },
+      { key:'E major', relativeMinor:'C# minor', sharps:4, flats:0, accidentals:['F#','C#','G#','D#'] },
+      { key:'B major', relativeMinor:'G# minor', sharps:5, flats:0, accidentals:['F#','C#','G#','D#','A#'] },
+      { key:'Ab major', relativeMinor:'F minor', sharps:0, flats:4, accidentals:['Bb','Eb','Ab','Db'] },
+    ]
+  },
+
+  /* ---- Intervals ----
+     Grade 1: answer by number only (shortName)
+     Grade 2+: answer by full quality + number (name)          */
+  intervals: {
+    1: [
+      { id:'P1', name:'Perfect Unison', shortName:'1st (Unison)', semitones:0,  song:'Same note' },
+      { id:'M2', name:'Major 2nd',      shortName:'2nd',          semitones:2,  song:'Happy Birthday' },
+      { id:'M3', name:'Major 3rd',      shortName:'3rd',          semitones:4,  song:'When the Saints' },
+      { id:'P4', name:'Perfect 4th',    shortName:'4th',          semitones:5,  song:'Here Comes the Bride' },
+      { id:'P5', name:'Perfect 5th',    shortName:'5th',          semitones:7,  song:'Star Wars Theme' },
+      { id:'P8', name:'Perfect Octave', shortName:'Octave',       semitones:12, song:'Somewhere Over the Rainbow' },
+    ],
+    2: [
+      { id:'P1', name:'Perfect Unison', shortName:'P1', semitones:0,  song:'Same note' },
+      { id:'M2', name:'Major 2nd',      shortName:'M2', semitones:2,  song:'Happy Birthday' },
+      { id:'m3', name:'Minor 3rd',      shortName:'m3', semitones:3,  song:'Greensleeves' },
+      { id:'M3', name:'Major 3rd',      shortName:'M3', semitones:4,  song:'When the Saints' },
+      { id:'P4', name:'Perfect 4th',    shortName:'P4', semitones:5,  song:'Here Comes the Bride' },
+      { id:'d5', name:'Diminished 5th', shortName:'d5', semitones:6,  song:'The Simpsons Theme' },
+      { id:'P5', name:'Perfect 5th',    shortName:'P5', semitones:7,  song:'Star Wars Theme' },
+      { id:'m6', name:'Minor 6th',      shortName:'m6', semitones:8,  song:'The Entertainer' },
+      { id:'M6', name:'Major 6th',      shortName:'M6', semitones:9,  song:'My Bonnie' },
+      { id:'m7', name:'Minor 7th',      shortName:'m7', semitones:10, song:'Somewhere (West Side Story)' },
+      { id:'M7', name:'Major 7th',      shortName:'M7', semitones:11, song:'Take On Me' },
+      { id:'P8', name:'Perfect Octave', shortName:'P8', semitones:12, song:'Somewhere Over the Rainbow' },
+    ]
+  },
+
+  /* Root notes available per grade for interval exercises */
+  intervalRoots: {
+    1: ['C4','G4','F4'],
+    2: ['C4','D4','E4','F4','G4','A4'],
+    3: ['C4','D4','E4','F4','G4','A4'],
+  },
+
+  /* ---- Chords ---- */
+  chords: {
+    1: {
+      triads: [
+        { name:'C major', notes:['C4','E4','G4'], type:'major', inversion:'root', key:'C' },
+        { name:'G major', notes:['G4','B4','D5'], type:'major', inversion:'root', key:'G' },
+        { name:'F major', notes:['F4','A4','C5'], type:'major', inversion:'root', key:'F' },
+      ],
+      cadences: [
+        { name:'Perfect Cadence (V–I)', type:'perfect', key:'C',
+          chords:[['G4','B4','D5'],['C4','E4','G4']], label:'in C major' },
+        { name:'Plagal Cadence (IV–I)', type:'plagal',  key:'C',
+          chords:[['F4','A4','C5'],['C4','E4','G4']], label:'in C major' },
+      ]
+    },
+    2: {
+      triads: [
+        { name:'C major', notes:['C4','E4','G4'], type:'major', inversion:'root', key:'C' },
+        { name:'G major', notes:['G4','B4','D5'], type:'major', inversion:'root', key:'G' },
+        { name:'F major', notes:['F4','A4','C5'], type:'major', inversion:'root', key:'F' },
+        { name:'D major', notes:['D4','F#4','A4'], type:'major', inversion:'root', key:'D' },
+        { name:'A major', notes:['A4','C#5','E5'], type:'major', inversion:'root', key:'A' },
+        { name:'A minor', notes:['A4','C5','E5'],  type:'minor', inversion:'root', key:'Am' },
+        { name:'D minor', notes:['D4','F4','A4'],  type:'minor', inversion:'root', key:'Dm' },
+        { name:'E minor', notes:['E4','G4','B4'],  type:'minor', inversion:'root', key:'Em' },
+      ],
+      cadences: [
+        { name:'Perfect Cadence (V–I)', type:'perfect', key:'C',
+          chords:[['G4','B4','D5'],['C4','E4','G4']], label:'in C major' },
+        { name:'Plagal Cadence (IV–I)', type:'plagal',  key:'C',
+          chords:[['F4','A4','C5'],['C4','E4','G4']], label:'in C major' },
+        { name:'Perfect Cadence (V–I)', type:'perfect', key:'G',
+          chords:[['D4','F#4','A4'],['G4','B4','D5']], label:'in G major' },
+        { name:'Plagal Cadence (IV–I)', type:'plagal',  key:'G',
+          chords:[['C4','E4','G4'],['G4','B4','D5']], label:'in G major' },
+        { name:'Perfect Cadence (V–I)', type:'perfect', key:'F',
+          chords:[['C4','E4','G4'],['F4','A4','C5']], label:'in F major' },
+        { name:'Plagal Cadence (IV–I)', type:'plagal',  key:'F',
+          chords:[['Bb3','D4','F4'],['F4','A4','C5']], label:'in F major' },
+      ]
+    },
+    3: {
+      triads: [
+        /* Root position */
+        { name:'C major',           notes:['C4','E4','G4'],  type:'major', inversion:'root',  key:'C' },
+        { name:'G major',           notes:['G4','B4','D5'],  type:'major', inversion:'root',  key:'G' },
+        { name:'F major',           notes:['F4','A4','C5'],  type:'major', inversion:'root',  key:'F' },
+        { name:'D major',           notes:['D4','F#4','A4'], type:'major', inversion:'root',  key:'D' },
+        { name:'A major',           notes:['A4','C#5','E5'], type:'major', inversion:'root',  key:'A' },
+        { name:'A minor',           notes:['A4','C5','E5'],  type:'minor', inversion:'root',  key:'Am' },
+        { name:'D minor',           notes:['D4','F4','A4'],  type:'minor', inversion:'root',  key:'Dm' },
+        { name:'E minor',           notes:['E4','G4','B4'],  type:'minor', inversion:'root',  key:'Em' },
+        /* 1st inversions */
+        { name:'C major (1st inv.)', notes:['E4','G4','C5'],  type:'major', inversion:'first', key:'C' },
+        { name:'G major (1st inv.)', notes:['B4','D5','G5'],  type:'major', inversion:'first', key:'G' },
+        { name:'F major (1st inv.)', notes:['A4','C5','F5'],  type:'major', inversion:'first', key:'F' },
+        { name:'A minor (1st inv.)', notes:['C5','E5','A5'],  type:'minor', inversion:'first', key:'Am' },
+        { name:'D minor (1st inv.)', notes:['F4','A4','D5'],  type:'minor', inversion:'first', key:'Dm' },
+        { name:'E minor (1st inv.)', notes:['G4','B4','E5'],  type:'minor', inversion:'first', key:'Em' },
+      ],
+      cadences: [
+        { name:'Perfect Cadence (V–I)',    type:'perfect',    key:'C',
+          chords:[['G4','B4','D5'],['C4','E4','G4']], label:'in C major' },
+        { name:'Plagal Cadence (IV–I)',    type:'plagal',     key:'C',
+          chords:[['F4','A4','C5'],['C4','E4','G4']], label:'in C major' },
+        { name:'Imperfect Cadence (I–V)',  type:'imperfect',  key:'C',
+          chords:[['C4','E4','G4'],['G4','B4','D5']], label:'in C major' },
+        { name:'Interrupted Cadence (V–VI)',type:'interrupted',key:'C',
+          chords:[['G4','B4','D5'],['A4','C5','E5']], label:'in C major' },
+        { name:'Perfect Cadence (V–I)',    type:'perfect',    key:'G',
+          chords:[['D4','F#4','A4'],['G4','B4','D5']], label:'in G major' },
+        { name:'Plagal Cadence (IV–I)',    type:'plagal',     key:'G',
+          chords:[['C4','E4','G4'],['G4','B4','D5']], label:'in G major' },
+        { name:'Perfect Cadence (V–I)',    type:'perfect',    key:'F',
+          chords:[['C4','E4','G4'],['F4','A4','C5']], label:'in F major' },
+        { name:'Plagal Cadence (IV–I)',    type:'plagal',     key:'F',
+          chords:[['Bb3','D4','F4'],['F4','A4','C5']], label:'in F major' },
+      ]
+    }
+  },
+
+  /* ---- Musical Terms (68 total across grades) ---- */
+  terms: {
+    1: [
+      { id:'adagio',       term:'Adagio',              meaning:'Slow',                                        category:'tempo' },
+      { id:'andante',      term:'Andante',             meaning:'Walking pace (moderately slow)',              category:'tempo' },
+      { id:'moderato',     term:'Moderato',            meaning:'At a moderate speed',                        category:'tempo' },
+      { id:'allegro',      term:'Allegro',             meaning:'Fast and lively',                            category:'tempo' },
+      { id:'presto',       term:'Presto',              meaning:'Very fast',                                  category:'tempo' },
+      { id:'accelerando',  term:'Accelerando (accel.)', meaning:'Gradually getting faster',                 category:'tempo' },
+      { id:'rallentando',  term:'Rallentando (rall.)', meaning:'Gradually getting slower',                  category:'tempo' },
+      { id:'ritardando',   term:'Ritardando (rit.)',   meaning:'Gradually getting slower',                  category:'tempo' },
+      { id:'ritenuto',     term:'Ritenuto (riten.)',   meaning:'Held back; immediately slower',             category:'tempo' },
+      { id:'atempo',       term:'A tempo',             meaning:'Return to the original speed',               category:'tempo' },
+      { id:'forte',        term:'Forte (f)',           meaning:'Loud',                                      category:'dynamic' },
+      { id:'piano',        term:'Piano (p)',           meaning:'Soft / quiet',                              category:'dynamic' },
+      { id:'crescendo',    term:'Crescendo (cresc.)',  meaning:'Gradually getting louder',                  category:'dynamic' },
+      { id:'decrescendo',  term:'Decrescendo (decresc.)', meaning:'Gradually getting softer',              category:'dynamic' },
+      { id:'diminuendo',   term:'Diminuendo (dim.)',   meaning:'Gradually getting softer',                  category:'dynamic' },
+      { id:'legato',       term:'Legato',              meaning:'Smooth and connected',                      category:'articulation' },
+      { id:'staccato',     term:'Staccato',            meaning:'Short and detached',                       category:'articulation' },
+    ],
+    2: [
+      { id:'lento',        term:'Lento',               meaning:'Slow',                                      category:'tempo' },
+      { id:'largo',        term:'Largo',               meaning:'Broad and very slow',                       category:'tempo' },
+      { id:'allegretto',   term:'Allegretto',          meaning:'Fairly fast (slightly slower than Allegro)', category:'tempo' },
+      { id:'vivace',       term:'Vivace',              meaning:'Lively and fast',                           category:'tempo' },
+      { id:'vivo',         term:'Vivo',                meaning:'Lively',                                    category:'tempo' },
+      { id:'allargando',   term:'Allargando (allarg.)', meaning:'Broadening (slower and louder)',           category:'tempo' },
+      { id:'piumosso',     term:'Più mosso',           meaning:'More movement (faster)',                    category:'tempo' },
+      { id:'menomosso',    term:'Meno mosso',          meaning:'Less movement (slower)',                    category:'tempo' },
+      { id:'pianissimo',   term:'Pianissimo (pp)',      meaning:'Very soft / very quiet',                   category:'dynamic' },
+      { id:'fortissimo',   term:'Fortissimo (ff)',      meaning:'Very loud',                                category:'dynamic' },
+      { id:'mezzopiano',   term:'Mezzo piano (mp)',     meaning:'Moderately soft',                          category:'dynamic' },
+      { id:'mezzoforte',   term:'Mezzo forte (mf)',     meaning:'Moderately loud',                         category:'dynamic' },
+      { id:'maestoso',     term:'Maestoso',            meaning:'Majestic, stately',                        category:'expression' },
+      { id:'sostenuto',    term:'Sostenuto',           meaning:'Sustained',                                category:'expression' },
+      { id:'sempre',       term:'Sempre',              meaning:'Always',                                    category:'expression' },
+      { id:'poco',         term:'Poco',                meaning:'A little',                                  category:'expression' },
+      { id:'molto',        term:'Molto',               meaning:'Much, very',                               category:'expression' },
+      { id:'senza',        term:'Senza',               meaning:'Without',                                  category:'expression' },
+      { id:'cantabile',    term:'Cantabile',           meaning:'In a singing style',                       category:'expression' },
+      { id:'leggiero',     term:'Leggiero',            meaning:'Light, nimble',                            category:'expression' },
+      { id:'espressivo',   term:'Espressivo (espress.)', meaning:'With expression',                        category:'expression' },
+      { id:'dalsegno',     term:'Dal Segno (D.S.)',    meaning:'Repeat from the sign (𝄋)',                 category:'direction' },
+      { id:'dacapo',       term:'Da Capo al Fine (D.C. al Fine)', meaning:'Repeat from the beginning to Fine', category:'direction' },
+      { id:'mezzostaccato',term:'Mezzo staccato (portato)', meaning:'Half detached; gently pulsed',        category:'articulation' },
+    ],
+    3: [
+      { id:'largamente',   term:'Largamente',          meaning:'Broadly',                                  category:'tempo' },
+      { id:'larghetto',    term:'Larghetto',           meaning:'Fairly slow (not as slow as Largo)',       category:'tempo' },
+      { id:'prestissimo',  term:'Prestissimo',         meaning:'As fast as possible',                     category:'tempo' },
+      { id:'conmoto',      term:'Con moto',            meaning:'With movement',                            category:'tempo' },
+      { id:'calando',      term:'Calando',             meaning:'Getting softer and slower',                category:'tempo' },
+      { id:'morendo',      term:'Morendo',             meaning:'Dying away (slower and softer)',           category:'tempo' },
+      { id:'fortepiano',   term:'Forte-piano (fp)',    meaning:'Loud then immediately soft',              category:'dynamic' },
+      { id:'sforzando',    term:'Sforzando (sfz / sf)', meaning:'Strongly accented',                      category:'dynamic' },
+      { id:'agitato',      term:'Agitato',             meaning:'Agitated',                                category:'expression' },
+      { id:'animato',      term:'Animato',             meaning:'Animated, lively',                        category:'expression' },
+      { id:'tranquillo',   term:'Tranquillo',          meaning:'Calm, quiet',                             category:'expression' },
+      { id:'conanima',     term:'Con anima',           meaning:'With soul / feeling',                     category:'expression' },
+      { id:'conbrio',      term:'Con brio',            meaning:'With vigour',                             category:'expression' },
+      { id:'congrazia',    term:'Con grazia',          meaning:'With grace',                              category:'expression' },
+      { id:'conforza',     term:'Con forza',           meaning:'With force',                              category:'expression' },
+      { id:'dolce',        term:'Dolce',               meaning:'Sweetly, softly',                         category:'expression' },
+      { id:'risoluto',     term:'Risoluto',            meaning:'Boldly, resolutely',                      category:'expression' },
+      { id:'benmarcato',   term:'Ben marcato',         meaning:'Well marked, clearly accented',           category:'expression' },
+      { id:'subito',       term:'Subito (sub.)',       meaning:'Suddenly',                                category:'expression' },
+      { id:'attacca',      term:'Attacca',             meaning:'Continue immediately without a break',    category:'direction' },
+      { id:'maindroite',   term:'Main droite (m.d.)',  meaning:'Right hand',                              category:'direction' },
+      { id:'maingauche',   term:'Main gauche (m.g.)', meaning:'Left hand',                               category:'direction' },
+      { id:'adlibitum',    term:'Ad libitum (ad lib.)', meaning:"At the performer's discretion",         category:'direction' },
+      { id:'unacorda',     term:'Una corda (u.c.)',    meaning:'Use the soft pedal (left pedal)',         category:'pedal' },
+      { id:'trecorde',     term:'Tre corde (t.c.)',    meaning:'Release the soft pedal',                  category:'pedal' },
+      { id:'opus',         term:'Opus (op.)',          meaning:'Work number (e.g. Op. 9)',                category:'notation' },
+      { id:'loco',         term:'Loco',                meaning:'Play at written pitch (after 8va)',       category:'notation' },
+    ]
+  },
+
+  /* ---- Time Signatures ---- */
+  timeSignatures: {
+    1: [
+      { sig:'2/4', beats:2, unit:'crotchet', feel:'simple duple' },
+      { sig:'3/4', beats:3, unit:'crotchet', feel:'simple triple' },
+      { sig:'4/4', beats:4, unit:'crotchet', feel:'simple quadruple' },
+    ],
+    2: [
+      { sig:'2/4', beats:2, unit:'crotchet',  feel:'simple duple' },
+      { sig:'3/4', beats:3, unit:'crotchet',  feel:'simple triple' },
+      { sig:'4/4', beats:4, unit:'crotchet',  feel:'simple quadruple' },
+      { sig:'6/8', beats:2, unit:'dotted crotchet', feel:'compound duple' },
+    ],
+    3: [
+      { sig:'2/4', beats:2, unit:'crotchet',         feel:'simple duple' },
+      { sig:'3/4', beats:3, unit:'crotchet',         feel:'simple triple' },
+      { sig:'4/4', beats:4, unit:'crotchet',         feel:'simple quadruple' },
+      { sig:'2/2', beats:2, unit:'minim',            feel:'simple duple (cut time)' },
+      { sig:'6/8', beats:2, unit:'dotted crotchet',  feel:'compound duple' },
+      { sig:'9/8', beats:3, unit:'dotted crotchet',  feel:'compound triple' },
+    ]
+  },
+
+  /* ---- Note Values (used in note-values.html) ---- */
+  noteValues: [
+    { id:'semibreve',     name:'Semibreve',       abcDur:4,  beatsIn44:4,   hasRest:true  },
+    { id:'minim',         name:'Minim',           abcDur:2,  beatsIn44:2,   hasRest:true  },
+    { id:'crotchet',      name:'Crotchet',        abcDur:1,  beatsIn44:1,   hasRest:true  },
+    { id:'quaver',        name:'Quaver',          abcDur:0.5,beatsIn44:0.5, hasRest:true  },
+    { id:'semiquaver',    name:'Semiquaver',      abcDur:0.25,beatsIn44:0.25,hasRest:true },
+    { id:'dotted-minim',  name:'Dotted minim',    abcDur:3,  beatsIn44:3,   hasRest:false },
+    { id:'dotted-crotchet',name:'Dotted crotchet',abcDur:1.5,beatsIn44:1.5, hasRest:false },
+    { id:'dotted-quaver', name:'Dotted quaver',   abcDur:0.75,beatsIn44:0.75,hasRest:false},
+  ],
+
+  /* ---- Helper: get all terms up to and including grade g ---- */
+  getAllTermsForGrade: function(g) {
+    var out = [];
+    for (var gr = 1; gr <= g; gr++) {
+      if (this.terms[gr]) out = out.concat(this.terms[gr]);
+    }
+    return out;
+  },
+
+  /* ---- Helper: get Grade 2 intervals (Grade 3 uses same list) ---- */
+  getIntervals: function(g) {
+    return this.intervals[g <= 1 ? 1 : 2];
+  },
+
+  /* ---- Helper: get scales up to and including grade g ---- */
+  getScales: function(g) {
+    return this.scales[Math.min(g, 3)] || this.scales[3];
+  }
+};
 
 /* ============ Encouraging Messages ============ */
 const CORRECT_MESSAGES = [
@@ -53,11 +377,9 @@ const WRONG_MESSAGES = [
 let _correctIdx = 0;
 let _wrongIdx = 0;
 
-/* Replace {name} with the stored player name, or strip it gracefully */
 function formatMsg(msg) {
   var name = getPlayerName();
   if (name) return msg.replace(/\{name\}/g, name);
-  // Remove ", {name}" or "{name} " patterns so messages still read naturally
   return msg.replace(/,\s*\{name\}/g, '').replace(/\{name\}\s*/g, '');
 }
 
@@ -97,12 +419,7 @@ function initSampler(onReady) {
     if (typeof onReady === 'function') onReady();
   }
 
-  // Create sampler immediately — no tap required.
-  // ensureAudio() (called before every triggerAttackRelease) resumes the
-  // AudioContext on the first real user gesture (Play button, answer tap etc.).
-  if (overlay) {
-    overlay.style.display = 'flex';
-  }
+  if (overlay) overlay.style.display = 'flex';
 
   try {
     var base = "https://tonejs.github.io/audio/salamander/";
@@ -126,7 +443,6 @@ function initSampler(onReady) {
     return;
   }
 
-  // Hard fallback: unblock after 5 seconds no matter what
   setTimeout(finish, 5000);
 }
 
@@ -171,41 +487,19 @@ async function playScale(notes, bpm) {
   await playMelodic(ascending.concat(descending), "4n", bpm);
 }
 
-/* Play an array of [note, durationSeconds] pairs (used in form-detective) */
+/* Play an array of [note, durationSeconds] pairs */
 async function playNotePairs(pairs) {
   if (!sampler) return;
   await ensureAudio();
   let t = Tone.now() + 0.05;
   pairs.forEach(function(pair) {
-    const note = pair[0];
-    const dur  = pair[1];
-    sampler.triggerAttackRelease(note, dur, t);
-    t += dur;
+    sampler.triggerAttackRelease(pair[0], pair[1], t);
+    t += pair[1];
   });
-}
-
-/* ============ Exam Board ============ */
-var EXAM_BOARDS = {
-  ameb:  { label: 'AMEB',  name: 'AMEB Theory of Music',          region: 'Australia/NZ' },
-  abrsm: { label: 'ABRSM', name: 'ABRSM Music Theory',            region: 'UK / International', soon: true },
-  rcm:   { label: 'RCM',   name: 'Royal Conservatory of Music',   region: 'Canada/US',          soon: true },
-  trinity:{ label: 'Trinity', name: 'Trinity College London',     region: 'UK / International', soon: true }
-};
-
-function getExamBoard() {
-  return localStorage.getItem('mm-exam-board') || 'ameb';
-}
-function setExamBoard(b) {
-  localStorage.setItem('mm-exam-board', b);
-}
-function getExamBoardLabel() {
-  var b = EXAM_BOARDS[getExamBoard()];
-  return b ? b.label : 'AMEB';
 }
 
 /* ============ Player Name ============ */
 function getPlayerName() {
-  /* Prefer Supabase profile name → localStorage → email username → empty */
   if (typeof mmGetProfile === 'function') {
     var profile = mmGetProfile();
     if (profile && profile.name) return profile.name;
@@ -215,7 +509,6 @@ function getPlayerName() {
     if (user && user.email) {
       var stored = localStorage.getItem('player-name');
       if (stored) return stored;
-      /* Derive from email if nothing stored */
       return user.email.split('@')[0];
     }
   }
@@ -225,33 +518,25 @@ function setPlayerName(n) {
   localStorage.setItem('player-name', n.trim().slice(0, 20));
 }
 
-/* ============ Access ============ */
+/* ============ Access / Grade Gate ============ */
 function isUnlocked() {
   return localStorage.getItem('mm-unlocked') === 'true';
 }
 
 function hasFullAccess() {
-  /* Prefer Supabase profile if available, fall back to localStorage cache */
   if (typeof mmHasFullAccess === 'function') return mmHasFullAccess();
   return isUnlocked();
 }
 
-/* ── Stripe ── */
 var STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04';
 
-/* Gate payment behind sign-in. Call this from any "Unlock" button. */
 function gotoPayment() {
   if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
     window.location.href = STRIPE_PAYMENT_LINK;
   } else {
-    /* Always require sign-in before payment */
     if (typeof showAuthModal === 'function') {
-      showAuthModal({
-        allowGuest: false,
-        onSuccess: function() { window.location.href = STRIPE_PAYMENT_LINK; }
-      });
+      showAuthModal({ allowGuest: false, onSuccess: function() { window.location.href = STRIPE_PAYMENT_LINK; } });
     }
-    /* If auth modal unavailable, do nothing — never redirect to payment unauthenticated */
   }
 }
 
@@ -268,11 +553,11 @@ function showUpgradeModal() {
       '<h2 style="margin:0 0 6px;color:#333;font-size:1.45rem;">Unlock Grade 2 &amp; 3</h2>' +
       '<p style="color:#777;font-size:0.92rem;margin:0 0 18px;line-height:1.5;">All modules · All exam content · Yours forever</p>' +
       '<ul style="text-align:left;padding:0 0 0 4px;margin:0 0 20px;list-style:none;font-size:0.9rem;color:#555;">' +
-        '<li style="padding:4px 0;">✅ Intervals, cadences &amp; inversions</li>' +
+        '<li style="padding:4px 0;">✅ 14 scales + key signatures</li>' +
+        '<li style="padding:4px 0;">✅ All 12 intervals with full names</li>' +
+        '<li style="padding:4px 0;">✅ Triads, inversions &amp; all cadence types</li>' +
         '<li style="padding:4px 0;">✅ Compound time signatures</li>' +
-        '<li style="padding:4px 0;">✅ All 12 practice modules unlocked</li>' +
-        '<li style="padding:4px 0;">✅ Full exam practice tests</li>' +
-        '<li style="padding:4px 0;">✅ Bilingual English &amp; Chinese</li>' +
+        '<li style="padding:4px 0;">✅ 68 terms + mock exam (100+ questions)</li>' +
       '</ul>' +
       '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\';gotoPayment();" style="display:block;width:100%;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:16px;padding:16px;font-size:1.1rem;font-weight:800;border:none;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 16px rgba(255,143,171,0.35);">Unlock Full Access — $14.99 AUD 🚀</button>' +
       '<p style="font-size:0.75rem;color:#bbb;margin:0 0 14px;">One-time payment · Secure checkout via Stripe</p>' +
@@ -288,16 +573,16 @@ function showUpgradeModal() {
 function getGrade() {
   var g = parseInt(localStorage.getItem('cc-grade') || '1');
   if (g > 1 && !hasFullAccess()) { setGrade(1); return 1; }
-  return g;
+  return Math.min(Math.max(g, 1), 3);
 }
 function setGrade(g) {
-  localStorage.setItem('cc-grade', String(g));
+  localStorage.setItem('cc-grade', String(Math.min(Math.max(g, 1), 3)));
 }
+
 function buildGradeSelector(containerId, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
 
-  /* Active grades */
   [1, 2, 3].forEach(function(g) {
     var locked = g > 1 && !hasFullAccess();
     var btn = document.createElement('button');
@@ -310,16 +595,6 @@ function buildGradeSelector(containerId, onChange) {
       btn.classList.add('active');
       if (onChange) onChange(g);
     };
-    container.appendChild(btn);
-  });
-
-  /* Coming soon grades */
-  [4, 5].forEach(function(g) {
-    var btn = document.createElement('button');
-    btn.className = 'mode-btn coming-soon';
-    btn.disabled = true;
-    btn.title = 'Grade ' + g + ' is coming soon!';
-    btn.innerHTML = '🔜 Grade ' + g + ' <span style="font-size:0.65rem;background:rgba(0,0,0,0.08);border-radius:6px;padding:1px 5px;margin-left:2px;font-weight:700;vertical-align:middle;">soon</span>';
     container.appendChild(btn);
   });
 }
@@ -406,7 +681,7 @@ function triggerStarburst(anchorEl) {
 
 function addShake(el) {
   el.classList.remove('shake');
-  void el.offsetWidth; // reflow
+  void el.offsetWidth;
   el.classList.add('shake');
   el.addEventListener('animationend', function() {
     el.classList.remove('shake');
@@ -516,11 +791,11 @@ function buildKeyboard(containerId, options) {
   var wrap = document.createElement('div');
   wrap.className = 'piano-inner';
 
-  var lastMidi   = endMidi;
-  var lastOctN   = Math.floor(lastMidi / 12) - startOctBase;
-  var lastX      = (CHROMA_X[lastMidi % 12] + lastOctN * 7) * W - CHROMA_X[startMidi % 12] * W;
+  var lastMidi    = endMidi;
+  var lastOctN    = Math.floor(lastMidi / 12) - startOctBase;
+  var lastX       = (CHROMA_X[lastMidi % 12] + lastOctN * 7) * W - CHROMA_X[startMidi % 12] * W;
   var lastIsBlack = CHROMA_IS_BLACK[lastMidi % 12];
-  var totalWidth = lastX + (lastIsBlack ? blackWidth : whiteWidth) + 4;
+  var totalWidth  = lastX + (lastIsBlack ? blackWidth : whiteWidth) + 4;
 
   wrap.style.cssText = 'position:relative;width:' + totalWidth + 'px;height:' + (whiteHeight + 10) + 'px;display:inline-block;';
   whites.forEach(function(el) { wrap.appendChild(el); });
@@ -547,8 +822,6 @@ function clearPianoHighlights() {
 
 /* ============================================================
    CONCEPT MASTERY TRACKING
-   Tracks per-concept accuracy across all modules.
-   Key format: "module:concept"  e.g. "interval-quiz:P5"
    ============================================================ */
 function getMasteryData() {
   try { return JSON.parse(localStorage.getItem('mm-mastery') || '{}'); } catch(e) { return {}; }
@@ -558,7 +831,6 @@ function saveMasteryData(d) {
 }
 
 function trackAnswer(module, concept, isCorrect) {
-  /* localStorage — primary, synchronous */
   var d = getMasteryData();
   var key = module + ':' + concept;
   if (!d[key]) d[key] = { correct: 0, wrong: 0, lastSeen: 0 };
@@ -566,11 +838,9 @@ function trackAnswer(module, concept, isCorrect) {
   else           d[key].wrong++;
   d[key].lastSeen = Date.now();
   saveMasteryData(d);
-  /* Supabase — secondary, fire-and-forget (only if signed in) */
   if (typeof mmSyncProgress === 'function') mmSyncProgress(module, concept, isCorrect);
 }
 
-/* Returns [{key, module, concept, accuracy, total}] sorted worst first */
 function getWeakConcepts(n) {
   var d = getMasteryData();
   var rows = Object.keys(d).map(function(k) {
@@ -584,15 +854,11 @@ function getWeakConcepts(n) {
   return rows.slice(0, n || 5);
 }
 
-/* Returns concepts for a specific module, sorted worst first */
 function getWeakConceptsForModule(module, n) {
   return getWeakConcepts(100).filter(function(r) { return r.module === module; }).slice(0, n || 5);
 }
 
-/* Weighted random pick — weaker concepts appear more often */
 function weightedPickConcept(pool) {
-  // pool: [{concept, accuracy, ...}] or any array
-  // Each item gets weight = 1 + (1 - accuracy) * 3 so weak items are ~4x more likely
   var weights = pool.map(function(p) { return 1 + (1 - (p.accuracy || 0.5)) * 3; });
   var total = weights.reduce(function(a, b) { return a + b; }, 0);
   var r = Math.random() * total;
@@ -606,8 +872,6 @@ function weightedPickConcept(pool) {
 
 /* ============================================================
    SESSION SUMMARY MODAL
-   Call showSessionSummary({module, correct, total, onContinue})
-   after a practice run. Shows accuracy, weak spots, next step.
    ============================================================ */
 function showSessionSummary(opts) {
   opts = opts || {};
@@ -618,13 +882,11 @@ function showSessionSummary(opts) {
   var pct = total > 0 ? Math.round(correct / total * 100) : 0;
 
   var star = pct >= 90 ? '🌟🌟🌟' : pct >= 70 ? '🌟🌟' : '🌟';
-  var headline = pct >= 90 ? 'Outstanding session!' :
-                 pct >= 70 ? 'Great work!' : 'Keep practising!';
-  var sub = pct >= 90 ? 'You\'re really getting it!' :
-            pct >= 70 ? 'You\'re making solid progress.' :
+  var headline = pct >= 90 ? 'Outstanding session!' : pct >= 70 ? 'Great work!' : 'Keep practising!';
+  var sub = pct >= 90 ? "You're really getting it!" :
+            pct >= 70 ? "You're making solid progress." :
             'Every expert was once a beginner.';
 
-  /* Weak concepts for this module */
   var weak = getWeakConceptsForModule(module, 3);
   var weakHtml = '';
   if (weak.length) {
@@ -639,25 +901,24 @@ function showSessionSummary(opts) {
             '<span>' + w.concept + '</span><span>' + pctW + '%</span>' +
           '</div>' +
           '<div style="background:#f0f0f0;border-radius:6px;height:7px;">' +
-            '<div style="background:' + barColor + ';width:' + pctW + '%;height:100%;border-radius:6px;transition:width 0.6s;"></div>' +
+            '<div style="background:' + barColor + ';width:' + pctW + '%;height:100%;border-radius:6px;"></div>' +
           '</div>' +
         '</div>';
     });
     weakHtml += '</div>';
   }
 
-  /* Module link map for "what to practice next" */
   var NEXT = {
-    'note-namer':      { label: 'Interval Quiz',    href: '/interval-quiz' },
-    'interval-quiz':   { label: 'Aural Training',   href: '/aural-training' },
-    'aural-training':  { label: 'Chord Game',        href: '/chord-game' },
-    'scale-builder':   { label: 'Interval Quiz',    href: '/interval-quiz' },
-    'chord-game':      { label: 'Form Detective',   href: '/form-detective' },
-    'rhythm-tapper':   { label: 'Barline Quiz',     href: '/barline-quiz' },
-    'terms-flashcards':{ label: 'Daily Challenge',  href: '/daily-challenge' },
-    'barline-quiz':    { label: 'Rhythm Tapper',    href: '/rhythm-tapper' },
-    'form-detective':  { label: 'Mock Test',        href: '/mock-test' },
-    'aural-training':  { label: 'Interval Quiz',    href: '/interval-quiz' }
+    'note-namer':      { label:'Scale Builder',   href:'scale-builder.html' },
+    'scale-builder':   { label:'Key Signatures',  href:'key-signatures.html' },
+    'key-signatures':  { label:'Interval Quiz',   href:'interval-quiz.html' },
+    'note-values':     { label:'Rhythm Trainer',  href:'rhythm-trainer.html' },
+    'interval-quiz':   { label:'Aural Training',  href:'aural-training.html' },
+    'aural-training':  { label:'Chord Game',       href:'chord-game.html' },
+    'chord-game':      { label:'Form Detective',  href:'form-detective.html' },
+    'rhythm-trainer':  { label:'Note Values',     href:'note-values.html' },
+    'terms-flashcards':{ label:'Mock Exam',       href:'mock-exam.html' },
+    'form-detective':  { label:'Mock Exam',       href:'mock-exam.html' },
   };
   var next = NEXT[module];
   var nextHtml = next
@@ -679,13 +940,12 @@ function showSessionSummary(opts) {
         '<span style="font-size:2rem;font-weight:900;color:#7B52C9;">' + correct + '</span>' +
         '<span style="color:#aaa;font-size:1rem;"> / ' + total + ' correct</span>' +
         '<div style="background:#e8e0ff;border-radius:8px;height:10px;margin-top:10px;">' +
-          '<div style="background:linear-gradient(90deg,#9b7ee8,#FF8FAB);width:' + pct + '%;height:100%;border-radius:8px;transition:width 0.8s;"></div>' +
+          '<div style="background:linear-gradient(90deg,#9b7ee8,#FF8FAB);width:' + pct + '%;height:100%;border-radius:8px;"></div>' +
         '</div>' +
       '</div>' +
-      weakHtml +
-      nextHtml +
+      weakHtml + nextHtml +
       '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;">Keep practising 🎵</button>' +
-      '<a href="/" style="display:block;text-align:center;margin-top:10px;color:#aaa;font-size:0.85rem;text-decoration:none;">← Back to home</a>' +
+      '<a href="index.html" style="display:block;text-align:center;margin-top:10px;color:#aaa;font-size:0.85rem;text-decoration:none;">← Back to home</a>' +
     '</div>';
 
   if (onContinue) window._summaryOnContinue = onContinue;
@@ -694,7 +954,6 @@ function showSessionSummary(opts) {
 
 /* ============================================================
    SESSION MILESTONE TRACKER
-   Attach to a SessionScore to auto-show summary every N questions
    ============================================================ */
 function attachMilestoneTracker(sessionScore, everyN) {
   everyN = everyN || 10;
@@ -704,11 +963,13 @@ function attachMilestoneTracker(sessionScore, everyN) {
     orig_update();
     if (sessionScore.total > 0 && sessionScore.total % everyN === 0 && sessionScore.total !== lastMilestone) {
       lastMilestone = sessionScore.total;
-      showSessionSummary({
-        module: sessionScore.module,
-        correct: sessionScore.correct,
-        total: sessionScore.total
-      });
+      showSessionSummary({ module: sessionScore.module, correct: sessionScore.correct, total: sessionScore.total });
     }
   };
+}
+
+/* ============ i18n shims (if i18n.js not loaded) ============ */
+function getCurrentLang() {
+  if (typeof _getCurrentLang === 'function') return _getCurrentLang();
+  return localStorage.getItem('mm-lang') || 'en';
 }

@@ -739,3 +739,214 @@ body {
 }
 
 @keyframes fadeIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+
+/* ============ Hint Box ============ */
+.hint-box {
+  background: linear-gradient(135deg, #fff9e6, #fff3b0);
+  border: 2px solid #ffe066;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  color: #7a6200;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+.hint-box strong { font-weight: 800; }
+
+/* ============ Learn / Theory Reference Cards ============ */
+.learn-section { margin: 24px 0; }
+.learn-section h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.learn-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.learn-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 10px; color: var(--text); }
+.learn-card p  { font-size: 0.9rem; color: var(--text-light); line-height: 1.6; margin-bottom: 6px; }
+.learn-card table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.learn-card th { background: #f5f5f5; padding: 8px 10px; text-align: left; font-weight: 700; }
+.learn-card td { padding: 7px 10px; border-top: 1px solid #f0f0f0; }
+.learn-card tr:hover td { background: #fafafa; }
+
+/* ============ Exam CTA Banner ============ */
+.exam-banner {
+  background: linear-gradient(135deg, #7B52C9, #B09FE0);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  color: white;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 4px 20px rgba(123,82,201,0.3);
+}
+.exam-banner h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 4px; }
+.exam-banner p  { font-size: 0.9rem; opacity: 0.88; margin-bottom: 14px; }
+.exam-banner .btn {
+  background: white;
+  color: #7B52C9;
+  font-weight: 800;
+}
+.exam-banner .btn:hover { background: #f5f0ff; }
+
+/* ============ Mock Exam: Review Panel ============ */
+.review-list { margin: 16px 0; }
+.review-item {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+  border-left: 4px solid #f44336;
+}
+.review-item.correct { border-left-color: #4caf50; }
+.review-item .review-q { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+.review-item .review-your { font-size: 0.88rem; color: #c62828; }
+.review-item .review-correct { font-size: 0.88rem; color: #2e7d32; font-weight: 700; }
+.review-item.correct .review-your { color: #2e7d32; }
+
+/* ============ Step Progress Indicator ============ */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  margin: 14px 0;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #ddd;
+  transition: background 0.2s, transform 0.15s;
+}
+.step-dot.done    { background: #4caf50; }
+.step-dot.current { background: #FF8FAB; transform: scale(1.3); }
+.step-dot.wrong   { background: #f44336; }
+
+/* ============ Interval / Note display ============ */
+.interval-display {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+}
+.note-badge {
+  background: var(--white);
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 1.3rem;
+  font-weight: 900;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.interval-arrow { font-size: 1.4rem; color: #aaa; }
+
+/* ============ Aural / Play Button ============ */
+.play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #7B52C9, #C4B5F5);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 16px 32px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(123,82,201,0.3);
+  font-family: var(--font);
+  margin: 12px auto;
+}
+.play-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(123,82,201,0.4); }
+.play-btn:active { transform: scale(0.96); }
+.play-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* ============ Auth Banner (header) ============ */
+.auth-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+}
+.auth-bar .user-name {
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+/* ============ Grade Badge ============ */
+.grade-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #7B52C9, #C4B5F5);
+  color: white;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.grade-badge.grade-1 { background: linear-gradient(135deg, #FF8FAB, #FFD4A3); }
+.grade-badge.grade-2 { background: linear-gradient(135deg, #3a7bd5, #80C4F0); }
+.grade-badge.grade-3 { background: linear-gradient(135deg, #7B52C9, #C4B5F5); }
+
+/* ============ Correct/Wrong overlay flash ============ */
+@keyframes flash-correct { 0%,100%{background:transparent;} 40%{background:rgba(76,175,80,0.12);} }
+@keyframes flash-wrong   { 0%,100%{background:transparent;} 40%{background:rgba(244,67,54,0.10);} }
+.flash-correct { animation: flash-correct 0.5s ease; }
+.flash-wrong   { animation: flash-wrong   0.5s ease; }
+
+/* ============ Terms category chips ============ */
+.cat-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cat-tempo       { background: #fce4ec; color: #c62828; }
+.cat-dynamic     { background: #e8f5e9; color: #2e7d32; }
+.cat-articulation{ background: #e3f2fd; color: #1565c0; }
+.cat-expression  { background: #f3e5f5; color: #6a1b9a; }
+.cat-direction   { background: #fff3e0; color: #e65100; }
+.cat-pedal       { background: #e0f2f1; color: #00695c; }
+.cat-notation    { background: #f5f5f5; color: #424242; }
+
+/* ============ Starburst line-height fix ============ */
+.starburst { line-height: 1; }
+
+/* ============ Key signature display ============ */
+.key-sig-display {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow);
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 10px auto;
+}
+.key-sig-accidentals { font-size: 1.6rem; letter-spacing: 2px; }
+
+/* ============ Responsive extras ============ */
+@media (max-width: 600px) {
+  .options-grid { grid-template-columns: 1fr; }
+  .play-btn { padding: 14px 24px; font-size: 1rem; }
+  .exam-banner { padding: 16px; }
+  .learn-card table { font-size: 0.82rem; }
+}
+

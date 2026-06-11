@@ -3,79 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🎹 Music Maestro</title>
+  <title>Music Maestro — AMEB Piano Theory</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Music Maestro — AMEB Piano Theory Grades 1–3" />
+  <meta property="og:description" content="Interactive music theory + exam preparation for AMEB Piano Grades 1–3. 12 modules, real piano audio. Grade 1 free forever." />
+  <meta property="og:image" content="https://music.vensoai.com/icon-512.png" />
+  <meta property="og:url" content="https://music.vensoai.com/" />
+  <meta name="twitter:card" content="summary" />
   <style>
-    /* ── Nav bar (Epic-style: white, clean, rainbow underline from style.css) ── */
-    .page-header { background: #fff; }
-    .page-header h1 { color: #1a2233; }
+    .main-content { max-width: 960px; }
 
-    /* ── Top info bar ── */
+    /* Info bar */
     .info-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
-      background: #fff;
-      border-bottom: 1px solid #e8ecf4;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      padding: 8px 20px; background: #fff; border-bottom: 1px solid #e8ecf4;
+      font-size: 0.88rem; color: var(--text-light);
     }
     .info-bar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .welcome-pill { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+    .welcome-pill strong { color: var(--text); }
 
-    /* Player greeting */
-    .welcome-pill {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.88rem; color: #5a6480; font-weight: 600;
+    /* Grade selector bar */
+    .grade-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 10px 20px; background: #f7f8fc; border-bottom: 1px solid #e8ecf4;
+      font-size: 0.88rem;
     }
-    .welcome-pill strong { color: #1a2233; }
-    .icon-btn { background:none; border:none; cursor:pointer; font-size:1rem; color:#ccc; padding:0 2px; }
-    .icon-btn:hover { color: #FF8FAB; }
+    .grade-bar-label { color: #888; font-weight: 700; }
 
-    /* Exam board selector */
-    .exam-bar {
-      display: flex; align-items: center; gap: 6px;
-      padding: 6px 20px; background: #f7f8fc;
-      border-bottom: 1px solid #e8ecf4;
-      flex-wrap: wrap; font-size: 0.82rem; color: #888;
+    /* Upgrade banner */
+    .upgrade-banner {
+      background: linear-gradient(90deg, #FF8FAB, #FFB74D);
+      padding: 12px 20px; text-align: center; display: none;
     }
-    .exam-btn {
-      padding: 4px 12px; border-radius: 16px; border: 2px solid #dde1ef;
-      background: white; cursor: pointer; font-size: 0.8rem; font-weight: 700;
-      color: #888; transition: all 0.15s;
+    .upgrade-banner span { color: white; font-weight: 700; font-size: 0.95rem; }
+    .upgrade-banner a { color: white; font-weight: 900; text-decoration: underline; cursor: pointer; font-size: 0.95rem; }
+
+    /* Section header */
+    .section-header {
+      font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #aaa; margin: 20px 0 10px; padding: 0 4px;
     }
-    .exam-btn.active { border-color: #FF8FAB; background: #FF8FAB; color: white; }
-    .exam-btn:disabled { opacity: 0.4; cursor: default; }
-    .soon-tag {
-      font-size: 0.62rem; background: #eee; color: #aaa;
-      border-radius: 8px; padding: 1px 5px; margin-left: 3px;
-      vertical-align: middle;
+
+    /* Onboarding modal */
+    .onboard-overlay {
+      position: fixed; inset: 0; background: rgba(10,15,30,0.65);
+      z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
+    .onboard-box {
+      background: white; border-radius: 28px; padding: 36px 28px;
+      max-width: 420px; width: 100%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .onboard-box h2 { margin: 0 0 10px; font-size: 1.6rem; font-weight: 900; }
+    .onboard-box p  { color: #5a6480; margin: 0 0 14px; line-height: 1.6; font-size: 0.95rem; }
+    .onboard-features { text-align: left; margin: 16px 0; list-style: none; padding: 0; }
+    .onboard-features li { padding: 5px 0; color: #444; font-size: 0.95rem; font-weight: 600; }
 
     /* Weak area banner */
     .weak-banner {
-      margin: 12px 20px 0;
-      padding: 12px 16px;
-      background: #fff;
-      border-radius: 16px;
-      border-left: 4px solid #FFB74D;
-      font-size: 0.88rem; color: #555;
-      display: none;
+      margin: 10px 0 0; padding: 12px 16px;
+      background: #fff; border-radius: 16px; border-left: 4px solid #FFB74D;
+      font-size: 0.88rem; color: #555; display: none;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-    .weak-banner strong { color: #E65100; }
-    .weak-banner a { color: #E65100; font-weight: 700; text-decoration: none; }
-    .weak-banner a:hover { text-decoration: underline; }
 
     /* Badges */
     .badges-section {
-      margin: 14px 20px 0;
-      padding: 14px 16px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin: 14px 0 0; padding: 14px 16px;
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-    .badges-title { font-size: 0.78rem; color: #aaa; margin-bottom: 8px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+    .badges-title { font-size: 0.72rem; color: #aaa; margin-bottom: 8px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
     .badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .badge-chip {
       display: flex; align-items: center; gap: 5px;
@@ -84,37 +84,23 @@
       background: #f0f2f7; color: #aaa;
     }
     .badge-chip.earned { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
-    .badge-icon { font-size: 1rem; }
 
-    /* Onboarding modal */
-    .onboard-overlay {
-      position: fixed; inset: 0; background: rgba(10,15,30,0.6);
-      z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+    /* Footer links */
+    .footer-links {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+      padding: 16px 0 8px; font-size: 0.8rem;
     }
-    .onboard-box {
-      background: white; border-radius: 28px; padding: 36px 28px;
-      max-width: 420px; width: 100%; text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    .footer-links a { color: #aaa; text-decoration: none; }
+    .footer-links a:hover { color: #888; text-decoration: underline; }
+
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: #ccc; padding: 0 2px; }
+    .icon-btn:hover { color: #FF8FAB; }
+    .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-height: unset; border-radius: 12px; }
+
+    @media (max-width: 480px) {
+      .grade-bar { padding: 8px 12px; }
     }
-    .onboard-box h2 { margin: 0 0 10px; font-size: 1.6rem; font-weight: 900; color: #1a2233; }
-    .onboard-box p  { color: #5a6480; margin: 0 0 14px; line-height: 1.6; }
-    .onboard-features { text-align: left; margin: 16px 0; list-style: none; padding: 0; }
-    .onboard-features li { padding: 5px 0; color: #444; font-size: 0.95rem; font-weight: 600; }
-
-    .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-width: unset; border-radius: 12px; }
-
-    /* Main content width */
-    .main-content { max-width: 900px; }
   </style>
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Music Maestro — Interactive Music Theory for Grade 1–3" />
-  <meta property="og:description" content="Make AMEB, ABRSM and RCM exam prep fun. 12 interactive modules, real piano audio, bilingual English &amp; Chinese. Grade 1 free forever." />
-  <meta property="og:image" content="https://music.vensoai.com/icon-512.png" />
-  <meta property="og:url" content="https://music.vensoai.com/" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Music Maestro — Music Theory Practice" />
-  <meta name="twitter:description" content="12 interactive modules, real piano audio. Grade 1 free forever." />
-  <meta name="twitter:image" content="https://music.vensoai.com/icon-512.png" />
 </head>
 <body>
 
@@ -123,19 +109,20 @@
     <div class="onboard-box">
       <div style="font-size:3rem;margin-bottom:8px;">🎹</div>
       <h2>Welcome to Music Maestro!</h2>
-      <p>Interactive music theory practice for Grade 1–3 students, aligned with major international exam boards.</p>
+      <p>Interactive music theory + exam prep for <strong>AMEB Piano Grades 1–3</strong>. Practice on tablet or desktop, any time.</p>
       <ul class="onboard-features">
-        <li>🎵 10 practice modules — notes, scales, chords & more</li>
-        <li>🎧 Hear real piano audio as you learn</li>
-        <li>📝 Exam-style mock tests (AMEB, ABRSM, RCM)</li>
-        <li>🌍 English &amp; Chinese interface</li>
-        <li>📱 Works on tablet, phone &amp; desktop</li>
+        <li>🎵 12 practice modules — aligned to AMEB 2026 syllabus</li>
+        <li>🎧 Hear real Steinway piano audio as you learn</li>
+        <li>📝 Mock exam with 100+ questions per grade</li>
+        <li>🌍 English, Chinese &amp; Spanish interface</li>
+        <li>📱 Optimised for tablet, phone &amp; desktop</li>
       </ul>
-      <p style="font-size:0.85rem;color:#999;">Grade 1 is always free · Grade 2–3 from $14.99 AUD</p>
-      <button class="btn btn-pink" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Let's start! 🚀</button>
+      <p style="font-size:0.85rem;color:#999;margin-bottom:16px;">Grade 1 is always free · Grade 2–3 unlocks for $14.99 AUD</p>
+      <button class="btn btn-primary" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Let's start! 🚀</button>
     </div>
   </div>
 
+  <!-- Page header -->
   <header class="page-header">
     <h1 data-i18n="app-title">🎹 Music Maestro</h1>
     <select id="lang-select" class="lang-btn" onchange="setLanguage(this.value)" title="Language / 语言 / Idioma">
@@ -143,61 +130,72 @@
       <option value="zh">🌐 中文</option>
       <option value="es">🌐 Español</option>
     </select>
-    <!-- Account button — in nav -->
     <button id="account-btn" onclick="onAccountBtnClick(this)"
             style="background:none;border:2px solid #FFB7C5;border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:800;color:#FF8FAB;cursor:pointer;white-space:nowrap;">
       Sign in
     </button>
-    <button class="icon-btn" onclick="showResetConfirm()" title="Reset all data" style="font-size:0.95rem;color:#ccc;">⚙️</button>
+    <button class="icon-btn" onclick="showResetConfirm()" title="Settings / Reset data">⚙️</button>
   </header>
 
   <!-- Info bar: greeting -->
   <div class="info-bar">
-    <div id="player-greeting" class="welcome-pill">
-      <span>👋 Hi, <strong id="greeting-name">Guest</strong>!</span>
+    <div class="welcome-pill">
+      👋 Hi, <strong id="greeting-name">there</strong>!
+    </div>
+    <div class="info-bar-right">
+      <span id="access-badge" style="display:none;"></span>
     </div>
   </div>
 
-  <!-- Exam board selector -->
-  <div class="exam-bar">
-    <span>Exam board:</span>
-    <button class="exam-btn active" id="eb-ameb"    onclick="chooseBoard('ameb')">AMEB</button>
-    <button class="exam-btn" id="eb-abrsm" disabled>ABRSM <span class="soon-tag">soon</span></button>
-    <button class="exam-btn" id="eb-rcm"   disabled>RCM <span class="soon-tag">soon</span></button>
-    <button class="exam-btn" id="eb-trinity" disabled>Trinity <span class="soon-tag">soon</span></button>
+  <!-- Grade selector bar -->
+  <div class="grade-bar">
+    <span class="grade-bar-label" data-i18n="grade-selector-label">Your Grade:</span>
+    <div class="mode-toggle" id="grade-toggle" style="margin:0;"></div>
   </div>
 
-  <!-- Upgrade banner (shown when not unlocked) -->
-  <div id="upgrade-banner" style="display:none;background:linear-gradient(90deg,#FF8FAB,#FFB74D);padding:14px 20px;text-align:center;">
-    <span style="color:white;font-weight:700;font-size:0.95rem;">🎹 Enjoying Music Maestro? </span>
-    <a href="javascript:void(0)" onclick="gotoPayment()" style="color:white;font-weight:900;text-decoration:underline;font-size:0.95rem;cursor:pointer;">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
+  <!-- Upgrade banner -->
+  <div class="upgrade-banner" id="upgrade-banner">
+    <span>🎹 Enjoying Music Maestro? </span>
+    <a onclick="gotoPayment()">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
   </div>
 
-  <!-- Weak area recommendation -->
-  <div class="weak-banner" id="weak-banner"></div>
-
+  <!-- Main content -->
   <main class="main-content">
-    <div class="hero">
-      <p class="tagline" data-i18n="app-tagline">Welcome! Let's learn music theory! 🌟</p>
+    <div style="padding: 0 0 8px;">
+      <p class="tagline" data-i18n="app-tagline" style="text-align:center;color:var(--text-light);font-size:0.92rem;padding:12px 0 0;"></p>
     </div>
 
+    <!-- Weak area recommendation -->
+    <div class="weak-banner" id="weak-banner"></div>
+
+    <!-- Module cards grid -->
+    <div class="section-header">PRACTICE MODULES</div>
     <div class="cards-grid" id="cards-grid"></div>
 
+    <!-- Exam banner -->
+    <div class="exam-banner" style="margin-top:8px;" id="exam-banner">
+      <h2>📝 Mock Exam</h2>
+      <p>20-question timed sessions drawn from a bank of 100+ questions per grade — just like the real AMEB theory test.</p>
+      <a href="mock-exam.html" class="btn" style="display:inline-block;margin:0 auto;">Start Practice Exam →</a>
+    </div>
+
     <!-- Badges -->
-    <div class="badges-section" id="badges-section" style="display:none;">
+    <div class="badges-section" id="badges-section" style="display:none;margin-top:14px;">
       <div class="badges-title">🏅 ACHIEVEMENTS</div>
       <div class="badges-row" id="badges-row"></div>
     </div>
 
+    <!-- Total stars -->
     <div class="total-stars" id="total-stars"></div>
 
-    <!-- Share + Privacy footer -->
-    <div style="text-align:center;padding:16px 16px 8px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn btn-secondary" style="font-size:0.85rem;padding:8px 18px;" onclick="shareApp()">🔗 Share Music Maestro</button>
-      <a href="privacy" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">Privacy</a>
-      <a href="terms" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">Terms</a>
-      <a href="landing" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">About</a>
-      <a href="teachers" style="font-size:0.8rem;color:#aaa;text-decoration:none;align-self:center;">For Teachers</a>
+    <!-- Footer -->
+    <div class="footer-links">
+      <button class="btn btn-secondary btn-sm" onclick="shareApp()">🔗 Share</button>
+      <a href="learn.html">Theory Guide</a>
+      <a href="teachers.html">For Teachers</a>
+      <a href="landing.html">About</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
     </div>
   </main>
 
@@ -206,157 +204,133 @@
   <script src="supabase.js"></script>
   <script src="game.js"></script>
   <script>
-    /* ─── Module definitions ─── */
-    const MODULES = [
-      { id:'learn',           titleKey:'mod-learn',           descKey:'desc-learn',           emoji:'📖', accent:'mint2',    href:'learn.html',           noScore:true },
-      { id:'daily-challenge', titleKey:'mod-daily-challenge', descKey:'desc-daily-challenge', emoji:'📅', accent:'orange',   href:'daily-challenge.html', noScore:true },
-      { id:'note-namer',      titleKey:'mod-note-namer',      descKey:'desc-note-namer',      emoji:'🎵', accent:'pink',     href:'note-namer.html' },
-      { id:'aural-training',  titleKey:'mod-aural-training',  descKey:'desc-aural-training',  emoji:'🎧', accent:'teal',     href:'aural-training.html' },
-      { id:'scale-builder',   titleKey:'mod-scale-builder',   descKey:'desc-scale-builder',   emoji:'🎼', accent:'mint',     href:'scale-builder.html' },
-      { id:'interval-quiz',   titleKey:'mod-interval-quiz',   descKey:'desc-interval-quiz',   emoji:'🎶', accent:'lavender', href:'interval-quiz.html' },
-      { id:'chord-game',      titleKey:'mod-chord-game',      descKey:'desc-chord-game',      emoji:'🎸', accent:'yellow',   href:'chord-game.html' },
-      { id:'rhythm-tapper',   titleKey:'mod-rhythm-tapper',   descKey:'desc-rhythm-tapper',   emoji:'🥁', accent:'coral',    href:'rhythm-tapper.html' },
-      { id:'terms-flashcards',titleKey:'mod-terms-flashcards',descKey:'desc-terms-flashcards',emoji:'📚', accent:'sky',      href:'terms-flashcards.html' },
-      { id:'form-detective',  titleKey:'mod-form-detective',  descKey:'desc-form-detective',  emoji:'🔍', accent:'purple',   href:'form-detective.html' },
-      { id:'guitar-chords',   titleKey:'mod-guitar-chords',   descKey:'desc-guitar-chords',   emoji:'🎸', accent:'brown',    href:'guitar-chords.html' },
-      { id:'barline-quiz',    titleKey:'mod-barline-quiz',    descKey:'desc-barline-quiz',    emoji:'📏', accent:'purple',   href:'barline-quiz.html' },
-      { id:'mock-test',       titleKey:'mod-mock-test',       descKey:'desc-mock-test',       emoji:'📝', accent:'grape',    href:'mock-test.html' }
+    /* ─── Module definitions (12 modules, v5.0) ─── */
+    var MODULES = [
+      { id:'note-namer',       titleKey:'mod-note-namer',       descKey:'desc-note-namer',       emoji:'🎵', accent:'pink',     href:'note-namer.html',       grade:1 },
+      { id:'scale-builder',    titleKey:'mod-scale-builder',    descKey:'desc-scale-builder',    emoji:'🎼', accent:'mint',     href:'scale-builder.html',    grade:1 },
+      { id:'key-signatures',   titleKey:'mod-key-signatures',   descKey:'desc-key-signatures',   emoji:'🔑', accent:'teal',     href:'key-signatures.html',   grade:1 },
+      { id:'note-values',      titleKey:'mod-note-values',      descKey:'desc-note-values',      emoji:'♩',  accent:'coral',    href:'note-values.html',      grade:1 },
+      { id:'interval-quiz',    titleKey:'mod-interval-quiz',    descKey:'desc-interval-quiz',    emoji:'🎶', accent:'lavender', href:'interval-quiz.html',    grade:1 },
+      { id:'chord-game',       titleKey:'mod-chord-game',       descKey:'desc-chord-game',       emoji:'🎸', accent:'yellow',   href:'chord-game.html',       grade:1 },
+      { id:'rhythm-trainer',   titleKey:'mod-rhythm-trainer',   descKey:'desc-rhythm-trainer',   emoji:'🥁', accent:'orange',   href:'rhythm-trainer.html',   grade:1 },
+      { id:'terms-flashcards', titleKey:'mod-terms-flashcards', descKey:'desc-terms-flashcards', emoji:'📚', accent:'sky',      href:'terms-flashcards.html', grade:1 },
+      { id:'aural-training',   titleKey:'mod-aural-training',   descKey:'desc-aural-training',   emoji:'🎧', accent:'mint2',    href:'aural-training.html',   grade:1 },
+      { id:'form-detective',   titleKey:'mod-form-detective',   descKey:'desc-form-detective',   emoji:'🔍', accent:'purple',   href:'form-detective.html',   grade:2 },
+      { id:'learn',            titleKey:'mod-learn',            descKey:'desc-learn',            emoji:'📖', accent:'grape',    href:'learn.html',            grade:1, noScore:true },
     ];
 
-    const SCORED = ['note-namer','aural-training','scale-builder','interval-quiz','chord-game','rhythm-tapper','terms-flashcards','form-detective','guitar-chords','barline-quiz'];
+    var SCORED = MODULES.filter(function(m){ return !m.noScore; }).map(function(m){ return m.id; });
 
-    /* ─── Build cards ─── */
+    /* ─── Build module cards grid ─── */
     function buildCards() {
       var grid = document.getElementById('cards-grid');
+      grid.innerHTML = '';
       var totalScore = 0;
+      var currentGrade = getGrade();
+
       MODULES.forEach(function(mod) {
         var data = getModuleData(mod.id);
         var score = data.highScore || 0;
-        if (SCORED.indexOf(mod.id) !== -1) totalScore += score;
+        if (!mod.noScore) totalScore += score;
+
+        var locked = mod.grade > 1 && !hasFullAccess();
 
         var card = document.createElement('a');
         card.className = 'module-card';
-        card.href = mod.href;
+        card.href = locked ? 'javascript:void(0)' : mod.href;
         card.dataset.accent = mod.accent;
-        var title = t(mod.titleKey);
-        var desc  = t(mod.descKey);
+        if (locked) card.onclick = function(e){ e.preventDefault(); showUpgradeModal(); };
+
+        var gradeBadge = mod.grade > 1
+          ? '<span class="grade-badge grade-' + mod.grade + '" style="font-size:0.62rem;padding:2px 8px;margin-top:2px;display:inline-block;">Grade ' + mod.grade + '+</span>'
+          : '';
+        var lockIcon = locked ? '<div style="position:absolute;top:8px;right:8px;font-size:1rem;opacity:0.7;">🔒</div>' : '';
+
         card.innerHTML =
-          '<div class="card-band"><span class="card-icon">' + mod.emoji + '</span></div>' +
+          '<div class="card-band"><span class="card-icon">' + mod.emoji + '</span>' + lockIcon + '</div>' +
           '<div class="card-body">' +
-            '<div class="card-title" data-i18n="' + mod.titleKey + '">' + title + '</div>' +
-            '<div class="card-desc"  data-i18n="' + mod.descKey  + '">' + desc  + '</div>' +
-            (mod.noScore ? '' : '<div class="card-score">Best: ' + score + ' ✨</div>') +
+            '<div class="card-title">' + t(mod.titleKey) + '</div>' +
+            '<div class="card-desc">'  + t(mod.descKey)  + '</div>' +
+            (mod.noScore
+              ? gradeBadge
+              : '<div class="card-score">Best: ' + score + ' ✨ ' + gradeBadge + '</div>'
+            ) +
           '</div>';
         grid.appendChild(card);
       });
 
+      /* Update total stars */
       var starsEl = document.getElementById('total-stars');
       var starStr = '';
       for (var i = 0; i < Math.min(totalScore, 20); i++) starStr += '⭐';
       starsEl.innerHTML =
-        '<div style="margin-bottom:6px;font-size:0.95rem;color:#888;font-weight:700;" data-i18n="overall-progress">' +
+        '<div style="margin-bottom:6px;font-size:0.9rem;color:#888;font-weight:700;">' +
           t('overall-progress') + ': ' + totalScore + '</div>' +
-        '<div style="font-size:1.3rem;line-height:1.8;">' +
-          (starStr || '🎵 Start playing to earn stars!') + '</div>';
+        '<div style="font-size:1.2rem;line-height:1.8;">' +
+          (starStr || '🎵 Start a module to earn stars!') + '</div>';
     }
 
-    /* ─── Player greeting (no name form — derive from auth) ─── */
+    /* ─── Grade selector ─── */
+    buildGradeSelector('grade-toggle', function(g) {
+      buildCards();
+    });
+
+    /* ─── Greeting ─── */
     function updateGreeting() {
-      var name = getPlayerName() || 'Guest';
-      document.getElementById('greeting-name').textContent = name;
-    }
+      var name = getPlayerName();
+      document.getElementById('greeting-name').textContent = name || 'there';
 
-    /* ─── Exam board ─── */
-    function chooseBoard(b) {
-      setExamBoard(b);
-      document.querySelectorAll('.exam-btn').forEach(function(btn) { btn.classList.remove('active'); });
-      var btn = document.getElementById('eb-' + b);
-      if (btn) btn.classList.add('active');
-    }
-    function initExamBoard() {
-      var b = getExamBoard();
-      document.querySelectorAll('.exam-btn').forEach(function(btn) { btn.classList.remove('active'); });
-      var btn = document.getElementById('eb-' + b);
-      if (btn) btn.classList.add('active');
+      var badge = document.getElementById('access-badge');
+      if (hasFullAccess()) {
+        badge.style.display = 'inline-block';
+        badge.innerHTML = '<span class="grade-badge" style="font-size:0.72rem;padding:3px 10px;">Full Access ✓</span>';
+      } else {
+        badge.style.display = 'none';
+      }
     }
 
     /* ─── Weak area tracker ─── */
-    var MODULE_HREFS = {
-      'note-namer':'/note-namer','interval-quiz':'/interval-quiz','aural-training':'/aural-training',
-      'scale-builder':'/scale-builder','chord-game':'/chord-game','rhythm-tapper':'/rhythm-tapper',
-      'terms-flashcards':'/terms-flashcards','form-detective':'/form-detective',
-      'barline-quiz':'/barline-quiz','guitar-chords':'/guitar-chords'
-    };
     var MODULE_LABELS = {
-      'note-namer':'Note Namer','interval-quiz':'Interval Quiz','aural-training':'Aural Training',
-      'scale-builder':'Scale Builder','chord-game':'Chord Game','rhythm-tapper':'Rhythm Tapper',
-      'terms-flashcards':'Terms Flashcards','form-detective':'Form Detective',
-      'barline-quiz':'Barline Quiz','guitar-chords':'Guitar Chords'
+      'note-namer':'Note Namer', 'scale-builder':'Scale Builder',
+      'key-signatures':'Key Signatures', 'note-values':'Note Values',
+      'interval-quiz':'Interval Quiz', 'chord-game':'Chord Game',
+      'rhythm-trainer':'Rhythm Trainer', 'terms-flashcards':'Terms Flashcards',
+      'aural-training':'Aural Training', 'form-detective':'Form Detective'
     };
 
     function initWeakArea() {
       var banner = document.getElementById('weak-banner');
-      /* Try concept-level mastery first */
       var weak = getWeakConcepts(3);
-      if (weak.length >= 1) {
-        var html = '<strong>💡 Focus areas — based on your answers:</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">';
-        weak.forEach(function(w) {
-          var pct = Math.round(w.accuracy * 100);
-          var color = pct >= 70 ? '#4CAF50' : pct >= 40 ? '#FFB74D' : '#FF6B6B';
-          var href = MODULE_HREFS[w.module] || '/';
-          var modLabel = MODULE_LABELS[w.module] || w.module;
-          html += '<div style="background:white;border-radius:10px;padding:8px 12px;">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-              '<span style="font-size:0.9rem;font-weight:600;color:#444;">' + w.concept + ' <span style="font-weight:400;color:#aaa;font-size:0.8rem;">(' + modLabel + ')</span></span>' +
-              '<a href="' + href + '" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Practise →</a>' +
-            '</div>' +
-            '<div style="background:#f0f0f0;border-radius:4px;height:6px;">' +
-              '<div style="background:' + color + ';width:' + pct + '%;height:100%;border-radius:4px;"></div>' +
-            '</div>' +
-          '</div>';
-        });
-        html += '</div>';
-        banner.innerHTML = html;
-        banner.style.display = 'block';
-        return;
-      }
-
-      /* Fallback: module-level scoring */
-      var scored = [
-        { id:'note-namer', label:'Note Namer', href:'/note-namer', max:20 },
-        { id:'aural-training', label:'Aural Training', href:'/aural-training', max:20 },
-        { id:'scale-builder', label:'Scale Builder', href:'/scale-builder', max:15 },
-        { id:'interval-quiz', label:'Interval Quiz', href:'/interval-quiz', max:20 },
-        { id:'chord-game', label:'Chord Game', href:'/chord-game', max:20 },
-        { id:'rhythm-tapper', label:'Rhythm Tapper', href:'/rhythm-tapper', max:15 },
-        { id:'terms-flashcards', label:'Terms Flashcards', href:'/terms-flashcards', max:20 },
-        { id:'form-detective', label:'Form Detective', href:'/form-detective', max:15 },
-        { id:'barline-quiz', label:'Barline Quiz', href:'/barline-quiz', max:20 }
-      ];
-      var played = scored.filter(function(m) { return (getModuleData(m.id).highScore||0) > 0; });
-      if (played.length < 2) return;
-      var worst = played.reduce(function(a, m) {
-        var pct = (getModuleData(m.id).highScore||0) / m.max;
-        return pct < a.pct ? { m:m, pct:pct } : a;
-      }, { m:played[0], pct:1 });
-      var pct = Math.round(worst.pct * 100);
-      banner.innerHTML = '💡 <strong>Focus area:</strong> Your lowest score is in <a href="' +
-        worst.m.href + '" style="color:#FF8FAB;font-weight:700;">' + worst.m.label + '</a> (' + pct + '%). Practise it!';
+      if (weak.length < 1) return;
+      var html = '<strong>💡 Your focus areas (based on your answers):</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">';
+      weak.forEach(function(w) {
+        var pct = Math.round(w.accuracy * 100);
+        var color = pct >= 70 ? '#4CAF50' : pct >= 40 ? '#FFB74D' : '#FF6B6B';
+        var href = w.module + '.html';
+        var modLabel = MODULE_LABELS[w.module] || w.module;
+        html += '<div style="background:white;border-radius:10px;padding:8px 12px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+            '<span style="font-size:0.9rem;font-weight:600;color:#444;">' + w.concept +
+              ' <span style="font-weight:400;color:#aaa;font-size:0.8rem;">(' + modLabel + ')</span></span>' +
+            '<a href="' + href + '" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Practise →</a>' +
+          '</div>' +
+          '<div style="background:#f0f0f0;border-radius:4px;height:6px;">' +
+            '<div style="background:' + color + ';width:' + pct + '%;height:100%;border-radius:4px;"></div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+      banner.innerHTML = html;
       banner.style.display = 'block';
     }
 
     /* ─── Badges ─── */
     var BADGE_DEFS = [
-      { id:'first-note',  icon:'🎵', label:'First Note',    desc:'Play any module',         check: function() { return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
-      { id:'perfect-10',  icon:'💯', label:'Perfect 10',    desc:'Score 10+ in any module', check: function() { return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>=10; }); } },
-      { id:'all-modules', icon:'🏆', label:'Completionist', desc:'Play all 9 modules',      check: function() { return SCORED.every(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
-      { id:'streak-5',    icon:'🔥', label:'On Fire',       desc:'5-answer streak',         check: function() { return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=5; }); } },
-      { id:'streak-10',   icon:'⭐', label:'Superstar',     desc:'10-answer streak',        check: function() { return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=10; }); } },
-      { id:'daily-1',     icon:'📅', label:'Daily Player',  desc:'Complete a daily challenge', check: function() {
-        var keys = Object.keys(localStorage).filter(function(k){ return k.startsWith('mm-daily-'); });
-        return keys.some(function(k){ try{ return JSON.parse(localStorage.getItem(k)).completed; }catch(e){ return false; } });
-      }},
-      { id:'polyglot',    icon:'🌍', label:'Bilingual',     desc:'Switch to Chinese',       check: function() { return localStorage.getItem('cc-lang') === 'zh'; } }
+      { id:'first-note',  icon:'🎵', label:'First Note',    check: function(){ return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
+      { id:'perfect-10',  icon:'💯', label:'Perfect 10',    check: function(){ return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>=10; }); } },
+      { id:'all-modules', icon:'🏆', label:'Completionist', check: function(){ return SCORED.every(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
+      { id:'streak-5',    icon:'🔥', label:'On Fire',       check: function(){ return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=5; }); } },
+      { id:'streak-10',   icon:'⭐', label:'Superstar',     check: function(){ return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=10; }); } },
     ];
 
     function initBadges() {
@@ -369,8 +343,7 @@
         if (ok) earned++;
         var chip = document.createElement('div');
         chip.className = 'badge-chip' + (ok ? ' earned' : '');
-        chip.title = b.desc;
-        chip.innerHTML = '<span class="badge-icon">' + b.icon + '</span>' + b.label;
+        chip.innerHTML = '<span style="font-size:1rem;">' + b.icon + '</span>' + b.label;
         row.appendChild(chip);
       });
       if (earned > 0) section.style.display = 'block';
@@ -390,9 +363,9 @@
     /* ─── Account button ─── */
     function onAccountBtnClick(btn) {
       if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
-        showAccountMenu(btn);
+        if (typeof showAccountMenu === 'function') showAccountMenu(btn);
       } else {
-        showAuthModal({ allowGuest: true });
+        if (typeof showAuthModal === 'function') showAuthModal({ allowGuest: true });
       }
     }
 
@@ -400,70 +373,62 @@
       var btn = document.getElementById('account-btn');
       if (!btn) return;
       if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
-        var profile = mmGetProfile();
-        var user    = mmGetUser();
+        var profile = typeof mmGetProfile === 'function' ? mmGetProfile() : null;
+        var user    = typeof mmGetUser    === 'function' ? mmGetUser()    : null;
         var label   = (profile && profile.name) || (user && user.email && user.email.split('@')[0]) || '👤 Account';
         btn.textContent = label;
         btn.style.borderColor = '#4CAF50';
         btn.style.color       = '#2e7d32';
-        /* Refresh upgrade banner */
-        var banner = document.getElementById('upgrade-banner');
-        if (banner) banner.style.display = hasFullAccess() ? 'none' : 'block';
       } else {
         btn.textContent = 'Sign in';
         btn.style.borderColor = '#FFB7C5';
         btn.style.color       = '#FF8FAB';
       }
+      document.getElementById('upgrade-banner').style.display = hasFullAccess() ? 'none' : 'block';
     }
 
-    /* React to Supabase auth changes */
     window.addEventListener('mm-auth-changed', function() {
       updateAccountBtn();
       updateGreeting();
+      buildCards();
     });
 
-    /* ─── Init all ─── */
-    buildCards();
-    updateGreeting();
-    initExamBoard();
-    initWeakArea();
-    initBadges();
-    initOnboard();
-    updateAccountBtn();
-    /* Show upgrade banner if not unlocked */
-    if (!isUnlocked()) {
-      document.getElementById('upgrade-banner').style.display = 'block';
-    }
-
-    /* If coming from landing page with unlock intent, trigger payment flow */
-    if (new URLSearchParams(location.search).get('unlock') === '1') {
-      history.replaceState(null, '', '/');
-      setTimeout(gotoPayment, 400);
-    }
-
-    /* ---- Reset data ---- */
+    /* ─── Reset data ─── */
     function showResetConfirm() {
-      if (!confirm('Reset ALL progress data?\n\nThis will clear scores, streaks, flashcard history, and your name.\n\nThis cannot be undone.')) return;
-      var keep = ['mm-unlocked', 'mm-exam-board', 'cc-lang', 'mm-onboarded'];
+      if (!confirm('Reset ALL progress data?\n\nThis will clear all scores, streaks, flashcard history, and your name.\n\nThis cannot be undone.')) return;
+      var keep = ['mm-unlocked', 'mm-lang', 'cc-lang', 'mm-onboarded', 'cc-grade'];
       Object.keys(localStorage).forEach(function(k) {
         if (keep.indexOf(k) === -1) localStorage.removeItem(k);
       });
       location.reload();
     }
 
-    /* ---- Share ---- */
+    /* ─── Share ─── */
     function shareApp() {
-      var url = window.location.origin;
-      var text = 'Check out Music Maestro — interactive music theory practice for Grade 1-3 students! 🎹';
+      var url = 'https://music.vensoai.com';
+      var text = 'Check out Music Maestro — interactive AMEB piano theory prep for Grades 1–3! 🎹';
       if (navigator.share) {
         navigator.share({ title: 'Music Maestro', text: text, url: url }).catch(function(){});
       } else {
         navigator.clipboard.writeText(url).then(function() {
-          alert('Link copied to clipboard! Share it with friends 🎵');
+          alert('Link copied! Share it with a student or teacher 🎵');
         }).catch(function() {
           prompt('Copy this link:', url);
         });
       }
+    }
+
+    /* ─── Init ─── */
+    buildCards();
+    updateGreeting();
+    initWeakArea();
+    initBadges();
+    initOnboard();
+    updateAccountBtn();
+
+    if (new URLSearchParams(location.search).get('unlock') === '1') {
+      history.replaceState(null, '', '/');
+      setTimeout(gotoPayment, 400);
     }
   </script>
 </body>

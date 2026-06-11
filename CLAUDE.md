@@ -1,4 +1,4 @@
-# CLAUDE.md — CC's Music Game
+# CLAUDE.md — CC Music Game (v5.0)
 
 Context for Claude Code sessions working on this project.
 
@@ -6,25 +6,29 @@ Context for Claude Code sessions working on this project.
 
 ## Project purpose
 
-A web-based music theory learning game for **CC** (real name **Xi**), a child learning piano at **AMEB Grade 2–3** level. The goal is to make AMEB exam preparation fun and interactive. CC plays near an iPad, so the game must work well on tablet (landscape) as well as desktop.
+A commercial web-based **music theory learning + AMEB exam preparation platform**, targeting **AMEB Piano (classical) Syllabus 2026, Grades 1–3**. Grade 1 is free; Grades 2–3 require a one-time $14.99 AUD payment via Stripe. Hosted at `music.vensoai.com`.
+
+The product approach is: **teach → practice → exam prep**. Every module has an educational component, a game/practice mode, and feeds into the mock exam question bank.
 
 ---
 
 ## Tech stack
 
-| Tool | Why |
+| Tool | Purpose |
 |---|---|
-| Pure HTML/CSS/JS | No build step — easy to deploy anywhere, CC's parent can edit it |
-| Tone.js | High-quality piano audio using Salamander Grand Piano samples |
-| Tonal.js | Music theory helpers (scale notes, interval distances, note transposition) |
-| abcjs | Renders sheet music notation from ABC strings |
-| Cloudflare Pages | Free static hosting, auto-deploys on git push |
+| Pure HTML/CSS/JS | No build step — deployed as static files |
+| Tone.js v14.8.32 | Piano audio via Salamander Grand Piano samples |
+| Tonal.js | Music theory helpers (scales, intervals, note math) |
+| abcjs | Renders sheet music from ABC notation strings |
+| Cloudflare Pages | Auto-deploys on `git push` to `main` |
+| Supabase v2 JS SDK | Auth (sign-in/up/out), profile, progress sync |
+| Stripe | One-time payment link, $14.99 AUD |
 
-**No npm, no bundlers, no framework.** All scripts are loaded from CDN.
+**No npm, no bundlers, no framework.** All scripts loaded from CDN.
 
 ---
 
-## CDN script tags (exact URLs — do not change)
+## CDN script tags (exact — do not change)
 
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
@@ -33,26 +37,61 @@ A web-based music theory learning game for **CC** (real name **Xi**), a child le
 <script src="game.js"></script>
 ```
 
-Every HTML page (except index.html, which can optionally omit abcjs) must include all four tags in `<head>`.
+Every HTML page (except `index.html`, which may optionally omit abcjs) must include all four tags in `<head>`, preceded by `<link rel="stylesheet" href="style.css">`.
 
 ---
 
 ## File structure
 
 ```
-index.html            Main menu — 7 module cards + per-module high scores
-style.css             Shared styles (colours, buttons, keyboard, flashcard, animations)
-game.js               Shared utilities (sampler, score, animations, piano keyboard builder)
-note-namer.html       Identify notes on treble/bass clef
-scale-builder.html    Build major & harmonic minor scales on on-screen piano
-interval-quiz.html    Name diatonic intervals
-chord-game.html       Identify triads & cadences
-rhythm-tapper.html    Tap along to rhythm patterns
-terms-flashcards.html Italian/French terms flashcards with spaced repetition
-form-detective.html   Identify Binary/Ternary form, cadence types, time signatures
-.gitignore
-README.md
-CLAUDE.md             (this file)
+index.html              Home page — hero + grade selector + 12 module cards + exam CTA
+style.css               Shared styles (design system, components, responsive)
+game.js                 Shared utilities + SYLLABUS data object (see below)
+i18n.js                 Translation strings — English / Chinese / Spanish
+supabase.js             Supabase auth helpers (do not modify unless auth breaks)
+
+note-namer.html         Identify notes on treble/bass clef staff
+scale-builder.html      Build major & harmonic minor scales on piano keyboard
+key-signatures.html     Identify key signatures (sharps/flats → key name) [NEW]
+note-values.html        Identify note/rest values in beats [NEW]
+interval-quiz.html      Name diatonic intervals (visual + aural modes)
+chord-game.html         Identify triads, inversions, cadence types
+rhythm-trainer.html     Tap along to rhythms + identify time signatures
+terms-flashcards.html   Italian/French terms — SRS spaced repetition
+aural-training.html     Ear training — intervals, pitch direction, sing-back
+form-detective.html     Binary/Ternary form, cadence types, time signatures
+learn.html              Theory reference — all testable content per grade
+mock-exam.html          Mock exam — 20-question sessions drawn from 100-question banks
+
+landing.html            Public landing page (auth gate)
+reset-password.html     Password reset flow
+teachers.html           For Teachers page
+privacy.html            Privacy policy
+terms.html              Terms of service
+404.html                Not found page
+sw.js                   Service worker (PWA offline support)
+CLAUDE.md               This file
+```
+
+---
+
+## SYLLABUS data object (game.js)
+
+`SYLLABUS` is the single source of truth for all curriculum content. All modules read from it.
+
+```javascript
+SYLLABUS.scales[grade]           // Array of scale objects {name, key, type, notes[]}
+SYLLABUS.keySignatures[grade]    // Array {key, relativeMinor, sharps, flats, accidentals[]}
+SYLLABUS.intervals[1]            // Grade 1 interval list (number-only answers)
+SYLLABUS.intervals[2]            // Grades 2-3 interval list (quality+number answers)
+SYLLABUS.getIntervals(grade)     // Returns intervals[1] for grade 1, intervals[2] for 2-3
+SYLLABUS.intervalRoots[grade]    // Root notes available for interval exercises
+SYLLABUS.chords[grade]           // { triads[], cadences[] }
+SYLLABUS.terms[grade]            // Terms introduced in that grade only (not cumulative)
+SYLLABUS.getAllTermsForGrade(g)  // Returns all terms from grades 1 through g (cumulative)
+SYLLABUS.timeSignatures[grade]   // Array {sig, beats, unit, feel}
+SYLLABUS.noteValues              // Array {id, name, abcDur, beatsIn44, hasRest}
+SYLLABUS.getScales(grade)        // Returns scales for that grade (cumulative up to grade 3)
 ```
 
 ---
@@ -60,228 +99,269 @@ CLAUDE.md             (this file)
 ## Piano sampler (game.js: initSampler)
 
 ```javascript
-sampler = new Tone.Sampler({
-  urls: {
-    "A0":"A0.mp3","C1":"C1.mp3","Ds1":"Ds1.mp3","Fs1":"Fs1.mp3",
-    // ... all 30 sample keys listed in game.js ...
-    "A7":"A7.mp3","C8":"C8.mp3"
-  },
-  baseUrl: "https://tonejs.github.io/audio/salamander/",
-  onload: function() { samplerReady = true; hideLoadingOverlay(); onReady(); }
-}).toDestination();
+initSampler(onReady)
 ```
 
-`initSampler(callback)` is called at `DOMContentLoaded` in every game page. It shows `#loading-overlay` while samples fetch, hides it when done, then calls the callback to enable play buttons.
-
-A 15-second fallback timeout hides the overlay even if samples haven't fully loaded.
+Shows `#loading-overlay`, creates Tone.Sampler with Salamander samples, hides overlay and calls `onReady()` when done. Includes 5-second fallback timeout. Call inside `DOMContentLoaded`.
 
 ---
 
 ## Audio gotchas
 
-1. **User gesture required**: Browsers block AudioContext until a user interaction. Always call `await Tone.start()` (via `ensureAudio()`) before any `sampler.triggerAttackRelease()`. The `ensureAudio()` helper in game.js does this.
-
-2. **Tone.loaded() vs onload**: game.js uses both `onload` callback and `Tone.loaded().then(...)` to be safe.
-
-3. **Delay before triggering**: Add a small offset (`Tone.now() + 0.05`) to avoid clicks at audio start.
+1. **User gesture required**: Always call `await ensureAudio()` before any `sampler.triggerAttackRelease()`.
+2. **Delay before triggering**: Use `Tone.now() + 0.05` to avoid audio clicks.
+3. **iPad Safari**: User must tap something before any sound plays.
 
 ---
 
 ## Cloudflare Pages deployment
 
-**GitHub repo**: `cc-music-game` | **Branch**: `main`
+**GitHub repo**: `fungungun/cc-music-game` | **Branch**: `main`
+**Live URL**: `music.vensoai.com` (custom domain on Cloudflare Pages)
 
-**One-time Cloudflare setup** (already done):
-1. pages.cloudflare.com → Create a project → Connect to Git → select `cc-music-game`
-2. Framework preset: **None** | Build command: _(leave blank)_ | Output directory: `/` (root)
-3. Save and Deploy
+```bash
+git add -p                         # stage specific changes
+git commit -m "vX.Y: describe"
+git push                           # auto-deploys within ~60s
+```
 
-**Every `git push` to `main` auto-deploys** within ~60 seconds.
-
-Live URL: `https://cc-music-game.pages.dev`
-
-**All file links must be relative** (e.g. `href="style.css"`, `src="game.js"`). Never use absolute filesystem paths. Cloudflare serves from the repo root.
+**All links must be relative** — `href="style.css"`, never `/style.css` or absolute paths.
 
 ---
 
 ## localStorage keys
 
-| Key | Module | Contents |
+| Key | Contents |
+|---|---|
+| `cc-note-namer` | `{ highScore, streak }` |
+| `cc-scale-builder` | `{ highScore, streak }` |
+| `cc-key-signatures` | `{ highScore, streak }` |
+| `cc-note-values` | `{ highScore, streak }` |
+| `cc-interval-quiz` | `{ highScore, streak }` |
+| `cc-chord-game` | `{ highScore, streak }` |
+| `cc-rhythm-trainer` | `{ highScore, streak }` |
+| `cc-terms-flashcards` | `{ highScore, streak }` |
+| `cc-aural-training` | `{ highScore, streak }` |
+| `cc-form-detective` | `{ highScore, streak }` |
+| `cc-terms-srs` | `{ [termId]: { nextDue, interval, reps } }` |
+| `mm-mastery` | `{ [module:concept]: { correct, wrong, lastSeen } }` |
+| `cc-grade` | `"1"` / `"2"` / `"3"` |
+| `mm-unlocked` | `"true"` (fallback when Supabase unavailable) |
+| `player-name` | Display name |
+| `mm-lang` | `"en"` / `"zh"` / `"es"` |
+
+`getModuleData(module)` / `saveModuleData(module, data)` handle per-module reads/writes.
+
+---
+
+## Design system (style.css)
+
+**Font**: Nunito (Google Fonts, 400-900 weights)
+**Minimum font size**: 16px (18px default)
+**Background**: `#EFF2F7`
+
+**CSS colour variables:**
+```css
+--pink:    #FFB7C5  --mint:    #C7F2E3  --lavender: #E0D4F7
+--yellow:  #FFF3B0  --coral:   #FFD4A3  --sky:      #D4EEFF
+--purple:  #F0D4FF  --white:   #FFFFFF  --offwhite: #F9F9F9
+--text:    #1a2233  --text-light: #5a6480
+```
+
+**Module accent colours** (used as `data-accent` on `.module-card`):
+
+| Module | Accent | Band gradient |
 |---|---|---|
-| `cc-note-namer` | Note Namer | `{ highScore, streak }` |
-| `cc-scale-builder` | Scale Builder | `{ highScore, streak }` |
-| `cc-interval-quiz` | Interval Quiz | `{ highScore, streak }` |
-| `cc-chord-game` | Chord Game | `{ highScore, streak }` |
-| `cc-rhythm-tapper` | Rhythm Tapper | `{ highScore, streak }` |
-| `cc-terms-flashcards` | Flashcards | `{ highScore, streak }` |
-| `cc-form-detective` | Form Detective | `{ highScore, streak }` |
-| `cc-terms-srs` | Flashcards SRS | `{ [termId]: { nextDue, interval, reps } }` |
+| Note Namer | `pink` | `#FF8FAB → #FFB7C5` |
+| Scale Builder | `mint` | `#2E8B6E → #7FD9B5` |
+| Key Signatures | `teal` | `#0097A7 → #80DEEA` |
+| Note Values | `coral` | `#E07B20 → #FFD4A3` |
+| Interval Quiz | `lavender` | `#7B52C9 → #C4B5F5` |
+| Chord Game | `yellow` | `#D4A017 → #FFE066` |
+| Rhythm Trainer | `orange` | `#F57C00 → #FFCC80` |
+| Terms Flashcards | `sky` | `#3a7bd5 → #80C4F0` |
+| Aural Training | `mint2` | `#00897B → #80CBC4` |
+| Form Detective | `purple` | `#8B2FC9 → #D4AAFF` |
+| Learn | `grape` | `#6d3fc9 → #C4AAFF` |
+| Mock Exam | `brown` | `#bf7a30 → #FFD4A3` |
 
-`getModuleData(module)` and `saveModuleData(module, data)` in game.js handle all reads/writes.
-
-localStorage is per-origin — works fine at `cc-music-game.pages.dev` but not across different domains.
-
----
-
-## Design rules
-
-**Colours (CSS variables in style.css):**
-- Pink: `#FFB7C5` / darker `#FF8FAB`
-- Yellow: `#FFF3B0` / darker `#FFE066`
-- Mint: `#C7F2E3` / darker `#7FD9B5`
-- Lavender: `#E0D4F7` / darker `#B09FE0`
-- Coral: `#FFD4A3` / darker `#FFA858`
-- Sky blue: `#D4EEFF` / darker `#80C4F0`
-- Purple: `#F0D4FF` / darker `#D090F0`
-- Correct: `#4CAF50` | Wrong: `#FF6B6B`
-
-**Module accent colours (header backgrounds):**
-1. Note Namer → Pink gradient (`#FF8FAB` → `#FFB7C5`)
-2. Scale Builder → Mint gradient (`#2E8B6E` → `#C7F2E3`)
-3. Interval Quiz → Lavender gradient (`#7B52C9` → `#E0D4F7`)
-4. Chord Game → Yellow gradient (`#B8860B` → `#FFF3B0`)
-5. Rhythm Tapper → Coral gradient (`#E07B20` → `#FFD4A3`)
-6. Terms Flashcards → Sky gradient (`#5B9BD5` → `#D4EEFF`)
-7. Form Detective → Purple gradient (`#8B2FC9` → `#F0D4FF`)
-
-**Typography:** minimum 18px throughout; `font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif`
-
-**Buttons:** large, rounded (`border-radius: 20px`), hover lift effect, `min 14px padding`
-
-**Emoji:** used liberally — 🎹 🎵 🎶 🌟 ⭐ on buttons and headings
+**Key component classes:**
+- `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-mint`, `.btn-lavender`, etc.
+- `.answer-btn` with `.correct-ans` / `.wrong-ans`
+- `.option-btn` with `.correct-opt` / `.wrong-opt` (mock exam style)
+- `.mode-btn` / `.mode-toggle` — tab/toggle pills
+- `.staff-container` — white card for abcjs staff rendering
+- `.flashcard-area` / `.flashcard-inner` / `.flashcard-face` — 3D flip card
+- `.question-card` / `.question-text` / `.options-grid` — mock exam layout
+- `.play-btn` — purple gradient, audio play trigger
+- `.hint-box` — yellow hint callout
+- `.learn-card` — theory reference card (used in learn.html)
+- `.exam-banner` — purple CTA banner (used on index.html)
+- `.review-item` — wrong answer review in mock exam
+- `.progress-steps` / `.step-dot` — step indicator row
+- `.cat-chip` — terms category badge (`.cat-tempo`, `.cat-dynamic`, etc.)
+- `.grade-badge` / `.grade-badge.grade-1/2/3`
 
 ---
 
-## Encouraging messages (in game.js)
+## Grade gating
 
-**Correct — rotate randomly:**
-- "Amazing work, CC! 🌟"
-- "You're a music star, CC! 🎵"
-- "Brilliant, CC! Keep going! ✨"
-- "That's right, CC! You're so clever! 🎹"
-- "Woohoo CC! Your piano teacher would be proud! 🏆"
-- "Correct! CC is on fire today! 🔥"
-- "Yes yes yes! You got it CC! 🎉"
-- "CC you're amazing at this! 💫"
-- "Perfect, CC! You're going to ace your AMEB exam! 🎓"
-- "Superstar CC strikes again! ⭐"
+```javascript
+getGrade()           // Returns 1-3; falls back to 1 if Grade 2+ without access
+hasFullAccess()      // true if Supabase profile shows paid, or localStorage mm-unlocked
+showUpgradeModal()   // Shows inline upgrade modal with Stripe link
+gotoPayment()        // Requires sign-in first, then redirects to Stripe
+```
 
-**Wrong — gentle, never discouraging:**
-- "Almost CC! Give it another try 💪"
-- "Not quite, CC — you've got this! 🌈"
-- "Oops! Try again CC, I believe in you! 🎵"
-- "Nearly there CC! Have another go 😊"
-- "Don't give up CC, you're learning! 🌟"
-
----
-
-## AMEB curriculum scope
-
-### Keys covered
-**Major scales:** C, G, F, D, A, E, B♭, E♭, A♭  
-**Harmonic minor:** A, E, D, G, C
-
-### Intervals (interval-quiz.html)
-P1, M2, m3, M3, P4, d5/A4, P5, m6, M6, m7, M7, P8  
-Root notes: C4, D4, E4, F4, G4, A4
-
-### Chords (chord-game.html)
-- Major triads root position: C, G, F, D, A
-- Minor triads root position: A, D, E
-- Major triads 1st inversion: C, G, F
-- Cadences: Perfect (V→I) and Plagal (IV→I) in C, G, F major
-
-### Time signatures (rhythm-tapper.html, form-detective.html)
-2/4, 3/4, 4/4, 2/2, 6/8, 9/8 (simple duple, triple, quadruple; compound duple, triple)
-
-### Music terms (terms-flashcards.html)
-All Grade 1 + 2 + 3 terms — see the `ALL_TERMS` array in `terms-flashcards.html` for the complete list (66 terms total).
+`STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04'`
 
 ---
 
 ## ABC notation quick reference
 
-| Scientific pitch | ABC notation |
-|---|---|
-| C2 | `C,` |
-| C3 | `C` (uppercase, no comma) |
-| C4 (middle C) | `c` (lowercase) |
-| C5 | `c'` |
-| C6 | `c''` |
-| F#4 | `^f` |
-| Bb4 | `_b` |
-| Chord C4-E4-G4 | `[ceg]` |
-| Whole note (L:1/4) | `c4` |
-| Bass clef | `K:C clef=bass` |
+| Scientific pitch | ABC | Notes |
+|---|---|---|
+| C4 (middle C) | `c` | lowercase = octave 4 |
+| C5 | `c'` | prime = +1 octave |
+| C3 | `C` | uppercase = octave 3 |
+| C2 | `C,` | comma = octave 2 |
+| F#4 | `^f` | `^` = sharp |
+| Bb4 | `_b` | `_` = flat |
+| Chord C4-E4-G4 | `[ceg]` | |
+| Whole note (L:1/4) | `c4` | duration multiplier |
+| Bass clef | `K:C clef=bass` | |
 
-The `toneToAbc(noteName)` function in game.js converts Tone.js note names (e.g. `"F#4"`) to ABC notation characters (e.g. `"^f"`).
+`toneToAbc(noteName)` converts Tone.js note names to ABC.
+`abcSingleNote(abcNote, clef)` builds a minimal single-note ABC string.
+`renderAbc(divId, abcStr, extraOpts)` wraps ABCJS with default options (scale 2.2).
 
-The `renderAbc(divId, abcStr, extraOpts)` wrapper calls `ABCJS.renderAbc` with consistent default options (scale 2.2, etc.).
-
-**The target div must exist in the DOM before calling renderAbc.** Always call it inside `DOMContentLoaded` or after the element is created.
+**The target div must exist in the DOM before calling `renderAbc`.**
 
 ---
 
 ## Piano keyboard (game.js: buildKeyboard)
 
-`buildKeyboard(containerId, options)` creates a CSS piano keyboard inside `document.getElementById(containerId)`. Options:
-
 ```javascript
-{
-  startMidi: 48,   // C3 = MIDI 48
-  endMidi: 84,     // C6 = MIDI 84
+buildKeyboard(containerId, {
+  startMidi: 48, endMidi: 84,   // C3-C6
   onKeyClick: function(toneNote, midiNum, element) {},
-  whiteWidth: 36,  // px
-  blackWidth: 22,
-  whiteHeight: 120,
-  blackHeight: 75,
-}
+  whiteWidth: 36, blackWidth: 22,
+  whiteHeight: 120, blackHeight: 75,
+})
+highlightPianoKeys(noteNames, className)   // 'active' | 'correct' | 'wrong-key' | 'scale-hint'
+clearPianoHighlights()
 ```
 
-Helper functions:
-- `highlightPianoKeys(noteNames, className)` — adds CSS class to matching keys (by `data-note`)
-- `clearPianoHighlights()` — removes `active`, `correct`, `wrong-key`, `scale-hint` from all keys
+Container must have `overflow-x: auto` (class `.keyboard-scroll`) for small screens.
 
-CSS classes for key states: `.active` (mint), `.correct` (green), `.wrong-key` (red), `.scale-hint` (mint, lighter)
+---
 
-The keyboard container must have `overflow-x: auto` (class `.keyboard-scroll`) for small screens.
+## Concept mastery tracking
+
+```javascript
+trackAnswer(module, concept, isCorrect)    // Persists to mm-mastery in localStorage
+getWeakConcepts(n)                         // Returns n lowest-accuracy concepts (global)
+getWeakConceptsForModule(module, n)        // Filtered to one module
+weightedPickConcept(pool)                  // Picks from pool weighted by weakness
+```
+
+---
+
+## Encouraging messages
+
+`randomCorrect()` / `randomWrong()` — rotate through 10 correct + 5 wrong messages. Use `{name}` placeholder (resolved via `getPlayerName()`). Respect current language if `TRANSLATIONS` is loaded.
+
+---
+
+## AMEB curriculum scope (v5.0)
+
+### Grade 1 (Free)
+- **Scales:** C, G, F major; A, D, E harmonic minor
+- **Key signatures:** C (0), G (1#), F (1b)
+- **Intervals:** P1, M2, M3, P4, P5, P8 — answered by number only
+- **Chords:** C, G, F major root position; Perfect (V-I) + Plagal (IV-I) in C
+- **Time sigs:** 2/4, 3/4, 4/4
+- **Note values:** semibreve, minim, crotchet, quaver, semiquaver + rests
+- **Terms:** 17 terms (Adagio, Andante, Moderato, Allegro, Presto, accel., rall., rit., riten., a tempo, f, p, cresc., decresc., dim., legato, staccato)
+- **Aural:** higher/lower pitch; clap beats; sing back 5-6 note phrase
+- **GK:** name notes/rests/signs/terms; title; key/tonality
+
+### Grade 2 (Paid)
+- **All Grade 1 content, plus:**
+- **Scales:** + D, A, Bb, Eb major; + G, C harmonic minor (12 total)
+- **Key signatures:** + D (2#), A (3#), Bb (2b), Eb (3b)
+- **Intervals:** All 12 — full quality + number names (M2, m3, P4, d5, etc.)
+- **Chords:** + D, A major; A, D, E minor root position; + cadences in G and F major
+- **Time sigs:** + 6/8 (compound duple); dotted minim, dotted crotchet
+- **Terms:** + 24 terms (Lento, Largo, Allegretto, Vivace, pp, ff, mp, mf, Maestoso, Cantabile, etc.)
+- **Aural:** rhythm in duple/triple; melodic sing-back; M3 or P5 higher/lower
+- **GK:** + identify key changes
+
+### Grade 3 (Paid)
+- **All Grade 1-2 content, plus:**
+- **Scales:** + E, Ab major; completing 5 harmonic minors (14 scales total)
+- **Key signatures:** + E (4#), B (5#), Ab (4b)
+- **Intervals:** Same 12 — answered as "2nd/3rd of scale" (keynote given)
+- **Chords:** + 1st inversions of C, G, F major + A, D, E minor; + Imperfect (I-V) + Interrupted (V-VI) cadences
+- **Time sigs:** + 2/2 (cut time), 9/8
+- **Terms:** + 27 terms (Agitato, Tranquillo, Dolce, Sfz, Attacca, Una corda, Tre corde, etc.)
+- **Form:** Binary (AB), Ternary (ABA)
+- **GK:** + key changes; form identification
+
+---
+
+## Mock Exam architecture (mock-exam.html)
+
+- **3 grade banks**: Grade 1 (~60 Qs), Grade 2 (~80 Qs), Grade 3 (~100 Qs)
+- **Session**: 20 randomly sampled questions per run (reshuffled each attempt)
+- **12 question types**: note naming, key sig ID, interval visual, interval aural, note/rest value, scale notes, chord ID, cadence ID, term definition, rhythm/time sig, form ID (G2+), key change ID (G2+)
+- **Score descriptor**: <50% Satisfactory, 50-64% Credit, 65-79% Honours, 80%+ High Distinction
+- **Wrong answer review**: shown at end of session
 
 ---
 
 ## How to add a new module
 
-1. Create `module-name.html` copying the header/progress/loading structure from an existing module
+1. Copy header/loading structure from `note-namer.html`
 2. Include all 4 CDN `<script>` tags + `<link rel="stylesheet" href="style.css">`
 3. Add `#loading-overlay` div
-4. Add header with `.back-btn` → `index.html`, score display, and progress bar elements
-5. Call `initSampler(() => { /* enable UI */ })` in `DOMContentLoaded`
-6. Create a `new SessionScore('module-name')` instance
+4. Header: `.back-btn` to `index.html`, score display, progress bar
+5. `initSampler(() => { /* enable UI */ })` inside `DOMContentLoaded`
+6. `new SessionScore('module-key')` — key matches localStorage `cc-{key}`
 7. Call `score.onCorrect()` / `score.onWrong()` on each answer
-8. Call `triggerStarburst(element)` on correct answers
-9. Call `addShake(element)` on wrong answers
-10. Add the module card to `index.html` (`.module-card` with link + icon + description)
-11. Add the localStorage key to this CLAUDE.md
+8. Call `trackAnswer(module, concept, isCorrect)` for mastery tracking
+9. Call `triggerStarburst(element)` on correct, `addShake(element)` on wrong
+10. Add module card to `index.html`
+11. Add localStorage key to this CLAUDE.md
 
 ---
 
-## How to redeploy
+## Version bumping rule
 
-```bash
-# In /Users/a55/Documents/music_game/
-git add .
-git commit -m "describe what you changed"
-git push
-```
-
-Cloudflare Pages auto-deploys within ~60 seconds. No other steps needed.
+**Bump `APP_VERSION` in `game.js` with every single commit** — no exceptions.
+Format: `"vX.Y · YYYY-MM-DD"`
 
 ---
 
 ## Known gotchas
 
-- **`Tone.start()` must be called from a user gesture.** The `ensureAudio()` helper does this. Never call `sampler.triggerAttackRelease()` without first calling `await ensureAudio()`.
-- **`ABCJS.renderAbc()` target div must exist in DOM.** If the div is conditionally rendered, always call renderAbc after the div is in the DOM (e.g. inside a function called after state changes, not at script parse time).
-- **Cloudflare Pages serves from root.** All links must be relative — `href="style.css"` not `href="/style.css"` or absolute paths.
-- **localStorage is per-origin.** Scores saved at `cc-music-game.pages.dev` won't appear if you open the files locally via `file://`. Use a local HTTP server (e.g. `python3 -m http.server`) for local development.
-- **Tone.js `onload` vs `Tone.loaded()`.** Use both (as game.js does) for reliability — some browser environments handle one better than the other.
-- **iPad Safari AudioContext.** The user must tap something before any sound plays. The loading overlay acts as the first interaction barrier on most pages.
+- **`Tone.start()` must be called from a user gesture.** `ensureAudio()` does this. Never skip it.
+- **`ABCJS.renderAbc()` target div must exist in DOM.** Always call after the element is created.
+- **Cloudflare Pages serves from root.** Links must be relative — `href="style.css"` not `/style.css`.
+- **localStorage is per-origin.** Scores at `music.vensoai.com` won't appear locally via `file://`. Use `python3 -m http.server` for local dev.
+- **Grade 2+ access gate.** Always call `hasFullAccess()` before showing Grade 2/3 content. If false, call `showUpgradeModal()`.
+- **SYLLABUS intervals[grade].** Grade 3 uses the same interval list as Grade 2. Use `SYLLABUS.getIntervals(grade)` to get the right list.
+
+---
+
+## Build status (as of v5.0)
+
+| Phase | Status | Files |
+|---|---|---|
+| Phase 1 — Foundation | Done | `game.js`, `style.css`, `CLAUDE.md` |
+| Phase 2 — Home + Auth | Next | `index.html`, `i18n.js` |
+| Phase 3 — Basic Modules | Pending | `note-namer.html`, `scale-builder.html`, `key-signatures.html`, `note-values.html` |
+| Phase 4 — Advanced Modules | Pending | `interval-quiz.html`, `chord-game.html`, `rhythm-trainer.html`, `terms-flashcards.html` |
+| Phase 5 — Specialist | Pending | `aural-training.html`, `form-detective.html`, `learn.html` |
+| Phase 6 — Mock Exam | Pending | `mock-exam.html` |
+| Phase 7 — Polish + Deploy | Pending | All files |
