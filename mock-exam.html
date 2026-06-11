@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📝 Mock Exam — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #6A1A9A, #F0D4FF); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    .start-screen { text-align:center; padding:28px 16px 32px; max-width:560px; margin:0 auto; }
+    .start-title { font-size:1.7rem; font-weight:900; color:#4A1070; margin-bottom:6px; }
+    .start-sub { font-size:0.95rem; color:#666; margin-bottom:20px; }
+    .exam-rules { background:#F9F0FF; border-radius:16px; padding:14px 18px; text-align:left; margin:16px 0; list-style:none; }
+    .exam-rules li { font-size:0.9rem; color:#555; margin:5px 0; padding-left:4px; }
+
+    .q-header { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#F9F0FF; border-bottom:2px solid #E0D0F0; }
+    .q-progress-text { font-size:0.9rem; font-weight:700; color:#6A1A9A; white-space:nowrap; }
+    .q-bar-wrap { flex:1; height:8px; background:#E0D0F0; border-radius:4px; overflow:hidden; }
+    .q-bar-fill { height:100%; background:linear-gradient(90deg,#8B2FC9,#B060F0); border-radius:4px; transition:width 0.3s; }
+    .q-score-chip { background:#8B2FC9; color:white; border-radius:12px; padding:3px 12px; font-size:0.85rem; font-weight:800; white-space:nowrap; }
+
+    .q-card { background:white; border-radius:20px; padding:20px 16px; margin:10px 12px; box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+    .q-type-chip { display:inline-block; background:#F0D4FF; color:#6A1A9A; border-radius:12px; padding:3px 12px; font-size:0.82rem; font-weight:800; margin-bottom:10px; }
+    .q-text { font-size:1.05rem; font-weight:700; margin-bottom:12px; line-height:1.4; }
+    .q-staff-box { background:#FAFAFA; border:1px solid #eee; border-radius:12px; padding:8px 4px; text-align:center; margin:10px 0; min-height:70px; }
+
+    .choices-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:12px 0; }
+    .choices-grid.single-col { grid-template-columns:1fr; }
+    .choice-btn { padding:13px 8px; border-radius:14px; border:2px solid #ddd; background:white; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.15s; font-family:inherit; text-align:center; line-height:1.3; }
+    .choice-btn:hover:not(:disabled) { background:#F0D4FF; border-color:#8B2FC9; transform:translateY(-1px); }
+    .choice-btn.correct-ans { background:#c8f7dc; border-color:#4caf50; }
+    .choice-btn.wrong-ans { background:#fdd; border-color:#f44336; }
+    .choice-btn:disabled { cursor:default; }
+    .choice-btn.locked { opacity:0.45; cursor:not-allowed; }
+
+    .q-feedback { text-align:center; font-size:1.05rem; font-weight:700; min-height:32px; padding:6px; }
+    .q-feedback.correct { color:#4CAF50; }
+    .q-feedback.wrong { color:#FF6B6B; }
+
+    .q-explanation { background:#F9F0FF; border-radius:10px; padding:9px 13px; font-size:0.87rem; color:#555; margin:7px 0; display:none; line-height:1.5; }
+
+    .next-q-btn { width:100%; background:linear-gradient(90deg,#8B2FC9,#B060F0); color:white; border:none; border-radius:14px; padding:13px; font-size:0.95rem; font-weight:800; cursor:pointer; font-family:inherit; margin-top:8px; display:none; }
+    .next-q-btn:hover { opacity:0.9; }
+
+    .play-aural-btn { display:block; width:76px; height:76px; border-radius:50%; background:linear-gradient(135deg,#8B2FC9,#B060F0); color:white; border:none; font-size:1.9rem; cursor:pointer; margin:8px auto; box-shadow:0 4px 14px rgba(139,47,201,0.4); transition:transform 0.1s; }
+    .play-aural-btn:hover { transform:scale(1.07); }
+    .play-aural-hint { font-size:0.82rem; color:#888; text-align:center; margin-bottom:8px; }
+
+    /* Results */
+    .results-screen { text-align:center; padding:20px 14px 32px; max-width:560px; margin:0 auto; }
+    .score-circle { width:130px; height:130px; border-radius:50%; margin:16px auto; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:2.2rem; font-weight:900; box-shadow:0 6px 24px rgba(0,0,0,0.15); }
+    .score-hd     { background:linear-gradient(135deg,#FFD700,#FFA000); color:#5A3200; }
+    .score-dist   { background:linear-gradient(135deg,#B3E0FF,#4AAFF0); color:#003070; }
+    .score-credit { background:linear-gradient(135deg,#C8F7DC,#4CAF50); color:#1B5E20; }
+    .score-pass   { background:linear-gradient(135deg,#FFE0B2,#FF8C00); color:#5A2A00; }
+    .score-fail   { background:linear-gradient(135deg,#FFCDD2,#F44336); color:#7B0000; }
+    .score-descriptor { font-size:1.35rem; font-weight:900; margin:6px 0; }
+    .score-subtitle { font-size:0.92rem; color:#666; margin-bottom:20px; }
+
+    .tally-chips { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:6px 0 16px; }
+    .tally-chip { border-radius:12px; padding:5px 14px; font-size:0.88rem; font-weight:700; }
+    .tally-correct { background:#E8F5E9; color:#1B5E20; }
+    .tally-wrong   { background:#FFEBEE; color:#B71C1C; }
+
+    .review-section { text-align:left; background:white; border-radius:16px; padding:14px 16px; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+    .review-title { font-size:0.95rem; font-weight:900; color:#6A1A9A; margin-bottom:10px; }
+    .review-item { padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:0.84rem; }
+    .review-item:last-child { border-bottom:none; }
+    .review-q { color:#555; margin-bottom:3px; }
+    .review-wrong { color:#FF6B6B; font-weight:700; }
+    .review-correct { color:#4CAF50; font-weight:700; }
+
+    .retake-btn { background:linear-gradient(90deg,#8B2FC9,#B060F0); color:white; border:none; border-radius:20px; padding:15px 30px; font-size:1rem; font-weight:800; cursor:pointer; margin:8px; font-family:inherit; }
+    .home-btn { background:white; color:#8B2FC9; border:2px solid #8B2FC9; border-radius:20px; padding:13px 26px; font-size:0.95rem; font-weight:800; cursor:pointer; margin:8px; font-family:inherit; }
+
+    @media (max-width:380px) {
+      .choices-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading piano sounds... 🎹</p>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn">←</a>
+  <h1 class="page-title">📝 Mock Exam</h1>
+  <div id="header-score" class="score-display" style="display:none;">
+    <span id="header-score-text">0/0</span>
+  </div>
+</header>
+
+<!-- ═══ START SCREEN ═══ -->
+<div id="screen-start">
+  <div class="start-screen">
+    <div class="start-title">AMEB Piano Mock Exam 🎓</div>
+    <div class="start-sub">20 questions from the Grade exam syllabus</div>
+
+    <div class="mode-toggle" id="grade-selector" style="justify-content:center;margin:16px 0;"></div>
+
+    <ul class="exam-rules">
+      <li>📋 20 questions drawn at random from your grade's syllabus</li>
+      <li>🎵 Topics: notes, key signatures, intervals, note values, terms &amp; cadences</li>
+      <li>🔊 Cadence questions require audio — turn on sound!</li>
+      <li>🏆 HD ≥85% · Distinction ≥75% · Credit ≥65% · Pass ≥50%</li>
+    </ul>
+
+    <button class="btn btn-primary" id="start-btn" onclick="startExam()"
+      style="font-size:1.1rem;padding:16px 38px;margin-top:6px;" disabled>
+      🚀 Start Exam
+    </button>
+  </div>
+</div>
+
+<!-- ═══ QUESTION SCREEN ═══ -->
+<div id="screen-question" style="display:none;">
+  <div class="q-header">
+    <span class="q-progress-text">Q&nbsp;<span id="q-num">1</span>/20</span>
+    <div class="q-bar-wrap"><div class="q-bar-fill" id="q-bar" style="width:0%"></div></div>
+    <div class="q-score-chip">✓&nbsp;<span id="q-correct-count">0</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-type-chip" id="q-chip">Note Naming</div>
+    <div class="q-text" id="q-text"></div>
+
+    <div id="q-staff-box" class="q-staff-box" style="display:none;">
+      <div id="q-staff"></div>
+    </div>
+
+    <div id="q-aural-box" style="display:none;">
+      <button class="play-aural-btn" id="q-play-btn" onclick="playAural()">▶</button>
+      <div class="play-aural-hint">Tap ▶ to listen, then choose your answer</div>
+    </div>
+
+    <div class="choices-grid" id="q-choices"></div>
+
+    <div class="q-feedback" id="q-feedback"></div>
+    <div class="q-explanation" id="q-explanation"></div>
+    <button class="next-q-btn" id="q-next-btn" onclick="advanceQuestion()">Next →</button>
+  </div>
+</div>
+
+<!-- ═══ RESULTS SCREEN ═══ -->
+<div id="screen-results" style="display:none;">
+  <div class="results-screen">
+    <div style="font-size:1.4rem;font-weight:900;color:#4A1070;margin-bottom:2px;">Exam Complete! 🎓</div>
+    <div id="results-label" style="font-size:0.88rem;color:#888;margin-bottom:12px;"></div>
+
+    <div class="score-circle" id="score-circle"><span id="score-pct">0%</span></div>
+    <div class="score-descriptor" id="score-descriptor"></div>
+    <div class="score-subtitle" id="score-subtitle"></div>
+
+    <div class="tally-chips">
+      <div class="tally-chip tally-correct">✓ <span id="final-correct">0</span> correct</div>
+      <div class="tally-chip tally-wrong">✗ <span id="final-wrong">0</span> wrong</div>
+    </div>
+
+    <div class="review-section" id="review-section" style="display:none;">
+      <div class="review-title">❌ Review these items:</div>
+      <div id="review-list"></div>
+    </div>
+
+    <button class="retake-btn" onclick="retakeExam()">🔄 Try Again</button>
+    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.js"></script>
+<script src="game.js"></script>
+<script>
+/* ============================================================
+   Mock Exam — dynamically generates 20 questions per session
+   ============================================================ */
+
+/* ── Utility ─────────────────────────────────── */
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) { return arr.slice().sort(function() { return Math.random() - 0.5; }); }
+function pickN(arr, n) { return shuffle(arr).slice(0, n); }
+function without(val, arr) { return arr.filter(function(v) { return v !== val; }); }
+function choices4(correct, pool, n) {
+  n = n || 3;
+  var wrongs = pickN(without(correct, pool), n);
+  return shuffle([correct].concat(wrongs));
+}
+function toTonalIv(id) { return id.slice(1) + id[0]; }
+
+/* ── Note name data ───────────────────────────── */
+var TREBLE = [
+  {note:'C4',abc:'c',   L:'C'}, {note:'D4',abc:'d',   L:'D'},
+  {note:'E4',abc:'e',   L:'E'}, {note:'F4',abc:'f',   L:'F'},
+  {note:'G4',abc:'g',   L:'G'}, {note:'A4',abc:'a',   L:'A'},
+  {note:'B4',abc:'b',   L:'B'}, {note:'C5',abc:"c'",  L:'C'},
+  {note:'D5',abc:"d'",  L:'D'}, {note:'E5',abc:"e'",  L:'E'},
+];
+var BASS = [
+  {note:'G2',abc:'G,', L:'G'}, {note:'A2',abc:'A,', L:'A'},
+  {note:'B2',abc:'B,', L:'B'}, {note:'C3',abc:'C',  L:'C'},
+  {note:'D3',abc:'D',  L:'D'}, {note:'E3',abc:'E',  L:'E'},
+  {note:'F3',abc:'F',  L:'F'}, {note:'G3',abc:'G',  L:'G'},
+  {note:'A3',abc:'A',  L:'A'}, {note:'B3',abc:'B',  L:'B'},
+];
+var LETTERS = ['A','B','C','D','E','F','G'];
+
+/* ── Question generators ─────────────────────── */
+
+function genNoteNaming() {
+  var clef = Math.random() < 0.5 ? 'treble' : 'bass';
+  var set  = clef === 'treble' ? TREBLE : BASS;
+  var n    = pick(set);
+  var key  = clef === 'bass' ? 'K:C clef=bass\n' : 'K:C\n';
+  var abc  = 'X:1\nT:\nM:4/4\nL:1/4\n' + key + n.abc + '4|]';
+  return {
+    chip:'🎵 Note Naming',
+    text:'What is the name of this note?',
+    abcStr:abc,
+    answer:n.L,
+    choices:choices4(n.L, LETTERS),
+    explanation:'The note is <strong>' + n.L + '</strong> — shown in the ' + clef + ' clef.',
+    concept:'note-' + n.L,
+  };
+}
+
+function genKeySig(grade) {
+  var pool = SYLLABUS.keySignatures[Math.min(grade, 3)];
+  var ks   = pick(pool);
+  var sigTxt = ks.sharps > 0 ? ks.sharps + ' sharp' + (ks.sharps > 1 ? 's' : '') :
+               ks.flats  > 0 ? ks.flats  + ' flat'  + (ks.flats  > 1 ? 's' : '') :
+               'no sharps or flats';
+  var allKeys = SYLLABUS.keySignatures[3].map(function(k){ return k.key; });
+  return {
+    chip:'🔑 Key Signatures',
+    text:'Which major key has <strong>' + sigTxt + '</strong>?',
+    answer:ks.key,
+    choices:choices4(ks.key, allKeys),
+    explanation:'<strong>' + ks.key + '</strong> has ' + sigTxt + '. Relative minor: ' + ks.relativeMinor + '.',
+    concept:'key-' + ks.key,
+  };
+}
+
+function genKeySigReverse(grade) {
+  var pool = SYLLABUS.keySignatures[Math.min(grade, 3)];
+  var ks   = pick(pool);
+  function sigLabel(k) {
+    if (k.sharps > 0) return k.sharps + ' sharp' + (k.sharps > 1 ? 's' : '');
+    if (k.flats  > 0) return k.flats  + ' flat'  + (k.flats  > 1 ? 's' : '');
+    return 'no sharps or flats';
+  }
+  var correct  = sigLabel(ks);
+  var allSigs  = SYLLABUS.keySignatures[3].map(sigLabel);
+  return {
+    chip:'🔑 Key Signatures',
+    text:'How many sharps or flats does <strong>' + ks.key + '</strong> have?',
+    answer:correct,
+    choices:choices4(correct, allSigs),
+    explanation:'<strong>' + ks.key + '</strong> has ' + correct + '.',
+    concept:'key-rev-' + ks.key,
+  };
+}
+
+function genInterval(grade) {
+  var ivs  = SYLLABUS.getIntervals(grade);
+  var iv   = pick(ivs);
+  var root = pick(SYLLABUS.intervalRoots[Math.min(grade, 3)]);
+  var upper;
+  try {
+    upper = Tonal.Note.transpose(root, toTonalIv(iv.id));
+    if (!upper || Tonal.Note.get(upper).empty) upper = Tonal.Note.fromMidi(Tonal.Note.midi(root) + iv.semitones);
+  } catch(e) {
+    upper = Tonal.Note.fromMidi(Tonal.Note.midi(root) + iv.semitones);
+  }
+  var abc1 = toneToAbc(root);
+  var abc2 = toneToAbc(upper);
+  var abc  = 'X:1\nT:\nM:4/4\nL:1/4\nK:C\n[' + abc1 + abc2 + ']4|]';
+  var label = grade === 1 ? iv.shortName : iv.name;
+  var allLabels = ivs.map(function(i){ return grade === 1 ? i.shortName : i.name; });
+  return {
+    chip:'🎶 Intervals',
+    text: grade === 1 ? 'Name the interval (number only)' : 'Name this interval',
+    abcStr:abc,
+    answer:label,
+    choices:choices4(label, allLabels),
+    explanation:'This is a <strong>' + iv.name + '</strong> (' + iv.semitones + ' semitones). ' + (iv.song ? '🎵 Think: ' + iv.song : ''),
+    concept:'interval-' + iv.id,
+  };
+}
+
+function genNoteValue(grade) {
+  var vals = SYLLABUS.noteValues.slice();
+  if (grade < 2) vals = vals.filter(function(v){ return v.id.indexOf('dotted') < 0; });
+  if (grade < 3) vals = vals.filter(function(v){ return v.id !== 'dotted-quaver'; });
+  var nv = pick(vals);
+  function label(v) {
+    if (v.beatsIn44 === 4)   return '4 beats';
+    if (v.beatsIn44 === 3)   return '3 beats';
+    if (v.beatsIn44 === 2)   return '2 beats';
+    if (v.beatsIn44 === 1.5) return '1½ beats';
+    if (v.beatsIn44 === 1)   return '1 beat';
+    if (v.beatsIn44 === 0.75)return '¾ beat';
+    if (v.beatsIn44 === 0.5) return '½ beat';
+    if (v.beatsIn44 === 0.25)return '¼ beat';
+    return v.beatsIn44 + ' beats';
+  }
+  var correct = label(nv);
+  var allLabels = vals.map(label);
+  return {
+    chip:'🎼 Note Values',
+    text:'How many beats does a <strong>' + nv.name + '</strong> get in 4/4 time?',
+    answer:correct,
+    choices:choices4(correct, allLabels),
+    explanation:'A <strong>' + nv.name + '</strong> gets <strong>' + correct + '</strong> in 4/4 time.',
+    concept:'value-' + nv.id,
+  };
+}
+
+function genTermMeaning(grade) {
+  var terms = SYLLABUS.getAllTermsForGrade(grade);
+  var t = pick(terms);
+  var allMeanings = terms.map(function(x){ return x.meaning; });
+  return {
+    chip:'📚 Music Terms',
+    text:'What does <strong>' + t.term + '</strong> mean?',
+    answer:t.meaning,
+    choices:choices4(t.meaning, allMeanings),
+    explanation:'<strong>' + t.term + '</strong> means: <em>' + t.meaning + '</em>.',
+    concept:'term-' + t.id,
+  };
+}
+
+function genTermReverse(grade) {
+  var terms = SYLLABUS.getAllTermsForGrade(grade);
+  var t = pick(terms);
+  var allTermNames = terms.map(function(x){ return x.term; });
+  return {
+    chip:'📚 Music Terms',
+    text:'Which term means: <em>"' + t.meaning + '"</em>?',
+    answer:t.term,
+    choices:choices4(t.term, allTermNames),
+    explanation:'"' + t.meaning + '" is <strong>' + t.term + '</strong>.',
+    concept:'term-rev-' + t.id,
+  };
+}
+
+function genCadence(grade) {
+  var cadences = SYLLABUS.chords[Math.min(grade, 3)].cadences;
+  var c = pick(cadences);
+  /* Unique cadence names for this grade */
+  var seen = {}, allNames = [];
+  cadences.forEach(function(cd) { if (!seen[cd.name]) { seen[cd.name]=true; allNames.push(cd.name); } });
+  var choices = choices4(c.name, allNames, Math.min(3, allNames.length - 1));
+  return {
+    chip:'🎵 Cadences',
+    text:'Listen and identify the cadence type (' + c.label + ')',
+    aural:true,
+    answer:c.name,
+    choices:choices,
+    explanation:'This is a <strong>' + c.name + '</strong>.',
+    concept:'cadence-' + c.type + '-' + c.key,
+    playChords:c.chords,
+  };
+}
+
+/* ── Question type weights ────────────────────── */
+var Q_TYPES = [
+  { fn: genNoteNaming,    wt: 4, minGrade: 1 },
+  { fn: genKeySig,        wt: 3, minGrade: 1, usesGrade: true },
+  { fn: genKeySigReverse, wt: 2, minGrade: 1, usesGrade: true },
+  { fn: genInterval,      wt: 4, minGrade: 1, usesGrade: true },
+  { fn: genNoteValue,     wt: 3, minGrade: 1, usesGrade: true },
+  { fn: genTermMeaning,   wt: 3, minGrade: 1, usesGrade: true },
+  { fn: genTermReverse,   wt: 2, minGrade: 1, usesGrade: true },
+  { fn: genCadence,       wt: 2, minGrade: 1, usesGrade: true },
+];
+
+function buildPool(grade, count) {
+  var pool = [];
+  var maxAttempts = count * 15;
+  var attempts = 0;
+  while (pool.length < count && attempts < maxAttempts) {
+    attempts++;
+    var validTypes = Q_TYPES.filter(function(t){ return grade >= t.minGrade; });
+    var total = validTypes.reduce(function(s,t){ return s+t.wt; }, 0);
+    var r = Math.random() * total;
+    var cum = 0;
+    var chosen = validTypes[validTypes.length-1];
+    for (var i=0; i<validTypes.length; i++) {
+      cum += validTypes[i].wt;
+      if (r < cum) { chosen = validTypes[i]; break; }
+    }
+    try {
+      var q = chosen.usesGrade ? chosen.fn(grade) : chosen.fn();
+      if (q) pool.push(q);
+    } catch(e) { /* skip */ }
+  }
+  return pool.slice(0, count);
+}
+
+/* ── Session ─────────────────────────────────── */
+var session = { grade:1, questions:[], current:0, correct:0, wrong:0, wrongList:[], answered:false, advancing:false };
+
+function startExam() {
+  session.grade    = getGrade();
+  session.questions= buildPool(session.grade, 20);
+  session.current  = 0;
+  session.correct  = 0;
+  session.wrong    = 0;
+  session.wrongList= [];
+  session.answered = false;
+  session.advancing= false;
+
+  document.getElementById('screen-start').style.display   = 'none';
+  document.getElementById('screen-results').style.display = 'none';
+  document.getElementById('screen-question').style.display= 'block';
+  document.getElementById('header-score').style.display   = 'flex';
+
+  showQuestion(0);
+}
+
+function showQuestion(idx) {
+  var q = session.questions[idx];
+  session.answered  = false;
+  session.advancing = false;
+
+  document.getElementById('q-num').textContent         = idx + 1;
+  document.getElementById('q-bar').style.width         = (idx / 20 * 100) + '%';
+  document.getElementById('q-correct-count').textContent = session.correct;
+  document.getElementById('header-score-text').textContent = session.correct + '/' + idx;
+  document.getElementById('q-chip').textContent        = q.chip;
+  document.getElementById('q-text').innerHTML          = q.text;
+
+  /* Staff */
+  var staffBox = document.getElementById('q-staff-box');
+  if (q.abcStr) {
+    staffBox.style.display = 'block';
+    setTimeout(function(){ renderAbc('q-staff', q.abcStr, {scale:2.2, staffwidth:260}); }, 10);
+  } else {
+    staffBox.style.display = 'none';
+    document.getElementById('q-staff').innerHTML = '';
+  }
+
+  /* Aural */
+  var auralBox = document.getElementById('q-aural-box');
+  if (q.aural) {
+    auralBox.style.display = 'block';
+    var pb = document.getElementById('q-play-btn');
+    pb.textContent = '▶'; pb.disabled = false;
+  } else {
+    auralBox.style.display = 'none';
+  }
+
+  /* Choices */
+  var grid = document.getElementById('q-choices');
+  grid.innerHTML = '';
+  grid.className = 'choices-grid' + (q.choices.length <= 2 ? ' single-col' : '');
+  q.choices.forEach(function(ch) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn' + (q.aural ? ' locked' : '');
+    btn.innerHTML = ch;
+    if (q.aural) btn.disabled = true;
+    btn.onclick = function(){ checkAnswer(ch, btn, q); };
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('q-feedback').textContent   = '';
+  document.getElementById('q-feedback').className     = 'q-feedback';
+  document.getElementById('q-explanation').style.display = 'none';
+  document.getElementById('q-next-btn').style.display = 'none';
+}
+
+function checkAnswer(chosen, btn, q) {
+  if (session.answered) return;
+  session.answered = true;
+
+  var allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(function(b){ b.disabled = true; b.classList.remove('locked'); });
+
+  var isOk = (chosen === q.answer);
+  if (isOk) {
+    btn.classList.add('correct-ans');
+    session.correct++;
+    document.getElementById('q-feedback').textContent = randomCorrect();
+    document.getElementById('q-feedback').className   = 'q-feedback correct';
+    triggerStarburst(btn);
+    trackAnswer('mock-exam', q.concept, true);
+  } else {
+    btn.classList.add('wrong-ans');
+    allBtns.forEach(function(b){ if (b.innerHTML === q.answer) b.classList.add('correct-ans'); });
+    session.wrong++;
+    session.wrongList.push({ text:q.text, wrong:chosen, right:q.answer });
+    addShake(btn);
+    document.getElementById('q-feedback').textContent = randomWrong();
+    document.getElementById('q-feedback').className   = 'q-feedback wrong';
+    trackAnswer('mock-exam', q.concept, false);
+  }
+
+  var expEl = document.getElementById('q-explanation');
+  expEl.innerHTML = q.explanation;
+  expEl.style.display = 'block';
+
+  var nextBtn = document.getElementById('q-next-btn');
+  nextBtn.textContent = session.current < 19 ? 'Next Question →' : 'See Results 🎓';
+  nextBtn.style.display = 'block';
+  document.getElementById('q-correct-count').textContent = session.correct;
+  document.getElementById('header-score-text').textContent = session.correct + '/' + (session.current + 1);
+
+  if (isOk) {
+    setTimeout(function(){ if (!session.advancing) advanceQuestion(); }, 1800);
+  }
+}
+
+function advanceQuestion() {
+  if (session.advancing) return;
+  session.advancing = true;
+  document.getElementById('q-next-btn').style.display = 'none';
+
+  if (session.current < 19) {
+    session.current++;
+    showQuestion(session.current);
+  } else {
+    showResults();
+  }
+}
+
+function playAural() {
+  var q = session.questions[session.current];
+  if (!q || !q.playChords) return;
+  ensureAudio().then(function() {
+    var btn = document.getElementById('q-play-btn');
+    btn.disabled = true; btn.textContent = '♪';
+    var t = Tone.now() + 0.05;
+    q.playChords.forEach(function(chord, i) {
+      sampler.triggerAttackRelease(chord, '2n', t + i * 1.3);
+    });
+    var dur = (q.playChords.length * 1.3 + 1.0) * 1000;
+    setTimeout(function() {
+      btn.textContent = '▶'; btn.disabled = false;
+      /* Unlock choices after first play */
+      document.querySelectorAll('.choice-btn').forEach(function(b){
+        b.disabled = false; b.classList.remove('locked');
+      });
+    }, dur);
+  });
+}
+
+/* ── Results ─────────────────────────────────── */
+function showResults() {
+  document.getElementById('screen-question').style.display = 'none';
+  document.getElementById('screen-results').style.display  = 'block';
+  document.getElementById('header-score').style.display    = 'none';
+
+  var pct = Math.round(session.correct / 20 * 100);
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('results-label').textContent =
+    'Grade ' + session.grade + ' — ' + session.correct + '/20 correct';
+  document.getElementById('final-correct').textContent = session.correct;
+  document.getElementById('final-wrong').textContent   = session.wrong;
+
+  var desc, sub, cls;
+  if      (pct >= 85) { desc='High Distinction'; sub='Outstanding! 🏆';              cls='score-hd'; }
+  else if (pct >= 75) { desc='Distinction';       sub='Excellent work! ⭐';           cls='score-dist'; }
+  else if (pct >= 65) { desc='Credit';            sub='Great effort — keep it up! 👍'; cls='score-credit'; }
+  else if (pct >= 50) { desc='Pass';              sub='Passed! Review the items below. 💪'; cls='score-pass'; }
+  else                { desc='Not Yet Passing';   sub='Keep practicing — you can do it! 🌟'; cls='score-fail'; }
+
+  document.getElementById('score-circle').className    = 'score-circle ' + cls;
+  document.getElementById('score-descriptor').textContent = desc;
+  document.getElementById('score-subtitle').textContent   = sub;
+
+  var list = document.getElementById('review-list');
+  list.innerHTML = '';
+  if (session.wrongList.length) {
+    document.getElementById('review-section').style.display = 'block';
+    session.wrongList.forEach(function(item) {
+      var d = document.createElement('div');
+      d.className = 'review-item';
+      d.innerHTML =
+        '<div class="review-q">' + item.text + '</div>' +
+        '<div class="review-wrong">Your answer: ' + item.wrong + '</div>' +
+        '<div class="review-correct">Correct: ' + item.right + '</div>';
+      list.appendChild(d);
+    });
+  } else {
+    document.getElementById('review-section').style.display = 'none';
+  }
+
+  /* Save for mastery tracking */
+  var sc = new SessionScore('mock-exam');
+  for (var i=0; i<session.correct; i++) sc.onCorrect();
+  for (var j=0; j<session.wrong;   j++) sc.onWrong();
+}
+
+function retakeExam() {
+  document.getElementById('screen-results').style.display = 'none';
+  document.getElementById('screen-start').style.display   = 'block';
+}
+
+/* ── Init ────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  buildGradeSelector('grade-selector', function() {});
+  initSampler(function() {
+    document.getElementById('start-btn').disabled = false;
+  });
+});
+</script>
+</body>
+</html>
