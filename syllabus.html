@@ -29,11 +29,11 @@
     .cov-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F5F5F5; }
     .cov-row:last-child { border-bottom: none; padding-bottom: 0; }
 
-    .cov-status { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin-top: 1px; }
-    .s-full    { background: #E8F5E9; }
-    .s-partial { background: #FFF8E1; }
-    .s-gap     { background: #FFEBEE; }
-    .s-voice   { background: #F3E5F5; }
+    .cov-status { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; margin-top: 4px; }
+    .s-full    { background: #22C55E; }
+    .s-partial { background: #F59E0B; }
+    .s-gap     { background: #EF4444; }
+    .s-voice   { background: #A78BFA; }
 
     .cov-body { flex: 1; min-width: 0; }
     .cov-topic { font-size: 0.875rem; font-weight: 700; color: var(--text); line-height: 1.45; }
@@ -71,7 +71,7 @@
   <header class="page-header">
     <a href="index.html" class="back-btn" aria-label="Back to menu">←</a>
     <div style="flex:1;">
-      <h1>📋 AMEB Syllabus</h1>
+      <h1>AMEB Syllabus</h1>
       <div class="subtitle">Piano 2026 · Section III Coverage</div>
     </div>
   </header>
@@ -84,10 +84,10 @@
     </div>
 
     <div class="legend">
-      <div class="legend-item"><span class="cov-status s-full">✅</span> Fully covered</div>
-      <div class="legend-item"><span class="cov-status s-partial">⚠️</span> Partly covered</div>
-      <div class="legend-item"><span class="cov-status s-gap">❌</span> Not yet in app</div>
-      <div class="legend-item"><span class="cov-status s-voice">🎤</span> Requires voice/teacher</div>
+      <div class="legend-item"><span class="cov-status s-full"></span> Fully covered</div>
+      <div class="legend-item"><span class="cov-status s-partial"></span> Partially covered</div>
+      <div class="legend-item"><span class="cov-status s-gap"></span> Not in app</div>
+      <div class="legend-item"><span class="cov-status s-voice"></span> Requires voice/teacher</div>
     </div>
 
     <!-- Grade tabs -->

@@ -3,13 +3,46 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v5.5 · 2026-06-11";
+const APP_VERSION = "v5.6 · 2026-06-11";
+
+/* AMEB Section III context per module page */
+const AMEB_PAGE_TAGS = {
+  'note-namer':       { section: 'Notes on Staff',       desc: 'Identify notes on treble and bass clef — AMEB Section III' },
+  'scale-builder':    { section: 'Scales',               desc: 'Major and harmonic minor scale notes — AMEB Section III' },
+  'key-signatures':   { section: 'Key Signatures',       desc: 'Match key signatures to major keys and relative minors — AMEB Section III' },
+  'note-values':      { section: 'Note Values',          desc: 'State note and rest values in beats — AMEB Section III' },
+  'interval-quiz':    { section: 'Intervals',            desc: 'Grade 1: number only · Grade 2–3: full quality and number — AMEB Section III' },
+  'chord-game':       { section: 'Chords and Cadences',  desc: 'Identify triads, inversions and cadence types — AMEB Section III' },
+  'rhythm-trainer':   { section: 'Time Signatures',      desc: 'Identify time signatures and duple/triple/compound metre — AMEB Section III' },
+  'terms-flashcards': { section: 'Music Terms',          desc: 'Italian and French performance directions — AMEB Section III' },
+  'aural-training':   { section: 'Aural Tests',          desc: 'Pitch direction and intervals by ear — AMEB Section III' },
+  'form-detective':   { section: 'Musical Form',         desc: 'Binary (AB) and Ternary (ABA) form — AMEB Grade 2–3, Section III' },
+  'mock-exam':        { section: 'Mock Examination',     desc: '20 questions across all AMEB Piano Section III topics' },
+};
 
 document.addEventListener('DOMContentLoaded', function() {
   var footer = document.createElement('div');
   footer.style.cssText = 'text-align:center;font-size:11px;color:#bbb;padding:12px 0 20px;';
   footer.textContent = APP_VERSION;
   document.body.appendChild(footer);
+
+  /* Auto-inject AMEB context tag on module pages */
+  var pageKey = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
+  var tagData = AMEB_PAGE_TAGS[pageKey];
+  if (tagData) {
+    var mainEl = document.querySelector('.main-content');
+    if (mainEl) {
+      var tagEl = document.createElement('div');
+      tagEl.className = 'ameb-page-tag';
+      tagEl.innerHTML =
+        '<span class="ameb-tag-label">AMEB Piano 2026</span>' +
+        '<span class="ameb-tag-sep">·</span>' +
+        '<span class="ameb-tag-section">Section III: ' + tagData.section + '</span>' +
+        '<span class="ameb-tag-desc">' + tagData.desc + '</span>' +
+        '<a href="syllabus.html" class="ameb-tag-link">Full syllabus</a>';
+      mainEl.insertBefore(tagEl, mainEl.firstChild);
+    }
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
@@ -354,24 +387,24 @@ const SYLLABUS = {
 
 /* ============ Encouraging Messages ============ */
 const CORRECT_MESSAGES = [
-  "Amazing work, {name}! 🌟",
-  "You're a music star, {name}! 🎵",
-  "Brilliant, {name}! Keep going! ✨",
-  "That's right, {name}! You're so clever! 🎹",
-  "Woohoo {name}! Your music teacher would be proud! 🏆",
-  "Correct! {name} is on fire today! 🔥",
-  "Yes yes yes! You got it, {name}! 🎉",
-  "{name} you're amazing at this! 💫",
-  "Perfect, {name}! You're going to ace that exam! 🎓",
-  "Superstar {name} strikes again! ⭐"
+  "Correct, {name}.",
+  "Well done, {name}.",
+  "That's right, {name}.",
+  "Exactly — good work, {name}.",
+  "Correct.",
+  "Well done.",
+  "Right answer, {name}.",
+  "Good, {name}.",
+  "Nicely done, {name}.",
+  "Spot on."
 ];
 
 const WRONG_MESSAGES = [
-  "Almost, {name}! Give it another try 💪",
-  "Not quite, {name} — you've got this! 🌈",
-  "Oops! Try again, {name}, I believe in you! 🎵",
-  "Nearly there, {name}! Have another go 😊",
-  "Don't give up, {name}, you're learning! 🌟"
+  "Not quite — try again.",
+  "Almost — check the answer below.",
+  "Not this time. See the correct answer.",
+  "Have another look.",
+  "Incorrect — the right answer is shown."
 ];
 
 let _correctIdx = 0;

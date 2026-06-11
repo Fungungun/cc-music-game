@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📝 Mock Exam — Music Maestro</title>
+  <title>Mock Exam — Music Maestro</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -91,7 +91,7 @@
 
 <header class="page-header">
   <a href="index.html" class="back-btn">←</a>
-  <h1 class="page-title">📝 Mock Exam</h1>
+  <h1 class="page-title">Mock Exam</h1>
   <div id="header-score" class="score-display" style="display:none;">
     <span id="header-score-text">0/0</span>
   </div>
@@ -106,15 +106,15 @@
     <div class="mode-toggle" id="grade-selector" style="justify-content:center;margin:16px 0;"></div>
 
     <ul class="exam-rules">
-      <li>📋 20 questions drawn at random from your grade's syllabus</li>
-      <li>🎵 Topics: notes, key signatures, intervals, note values, terms &amp; cadences</li>
-      <li>🔊 Cadence questions require audio — turn on sound!</li>
-      <li>🏆 HD ≥85% · Distinction ≥75% · Credit ≥65% · Pass ≥50%</li>
+      <li>20 questions drawn at random from your grade's syllabus</li>
+      <li>Topics: notes, key signatures, intervals, note values, terms and cadences</li>
+      <li>Cadence questions require audio — turn on sound before starting</li>
+      <li>HD ≥85% · Distinction ≥75% · Credit ≥65% · Pass ≥50%</li>
     </ul>
 
     <button class="btn btn-primary" id="start-btn" onclick="startExam()"
       style="font-size:1.1rem;padding:16px 38px;margin-top:6px;" disabled>
-      🚀 Start Exam
+      Start Exam
     </button>
   </div>
 </div>
@@ -223,7 +223,7 @@ function genNoteNaming() {
   var key  = clef === 'bass' ? 'K:C clef=bass\n' : 'K:C\n';
   var abc  = 'X:1\nT:\nM:4/4\nL:1/4\n' + key + n.abc + '4|]';
   return {
-    chip:'🎵 Note Naming',
+    chip:'Note Naming',
     text:'What is the name of this note?',
     abcStr:abc,
     answer:n.L,
@@ -241,7 +241,7 @@ function genKeySig(grade) {
                'no sharps or flats';
   var allKeys = SYLLABUS.keySignatures[3].map(function(k){ return k.key; });
   return {
-    chip:'🔑 Key Signatures',
+    chip:'Key Signatures',
     text:'Which major key has <strong>' + sigTxt + '</strong>?',
     answer:ks.key,
     choices:choices4(ks.key, allKeys),
@@ -261,7 +261,7 @@ function genKeySigReverse(grade) {
   var correct  = sigLabel(ks);
   var allSigs  = SYLLABUS.keySignatures[3].map(sigLabel);
   return {
-    chip:'🔑 Key Signatures',
+    chip:'Key Signatures',
     text:'How many sharps or flats does <strong>' + ks.key + '</strong> have?',
     answer:correct,
     choices:choices4(correct, allSigs),
@@ -287,7 +287,7 @@ function genInterval(grade) {
   var label = grade === 1 ? iv.shortName : iv.name;
   var allLabels = ivs.map(function(i){ return grade === 1 ? i.shortName : i.name; });
   return {
-    chip:'🎶 Intervals',
+    chip:'Intervals',
     text: grade === 1 ? 'Name the interval (number only)' : 'Name this interval',
     abcStr:abc,
     answer:label,
@@ -316,7 +316,7 @@ function genNoteValue(grade) {
   var correct = label(nv);
   var allLabels = vals.map(label);
   return {
-    chip:'🎼 Note Values',
+    chip:'Note Values',
     text:'How many beats does a <strong>' + nv.name + '</strong> get in 4/4 time?',
     answer:correct,
     choices:choices4(correct, allLabels),
@@ -330,7 +330,7 @@ function genTermMeaning(grade) {
   var t = pick(terms);
   var allMeanings = terms.map(function(x){ return x.meaning; });
   return {
-    chip:'📚 Music Terms',
+    chip:'Music Terms',
     text:'What does <strong>' + t.term + '</strong> mean?',
     answer:t.meaning,
     choices:choices4(t.meaning, allMeanings),
@@ -344,7 +344,7 @@ function genTermReverse(grade) {
   var t = pick(terms);
   var allTermNames = terms.map(function(x){ return x.term; });
   return {
-    chip:'📚 Music Terms',
+    chip:'Music Terms',
     text:'Which term means: <em>"' + t.meaning + '"</em>?',
     answer:t.term,
     choices:choices4(t.term, allTermNames),
@@ -358,7 +358,7 @@ function genRelativeMinor(grade) {
   var ks   = pick(pool);
   var allMinors = SYLLABUS.keySignatures[3].map(function(k){ return k.relativeMinor; });
   return {
-    chip:'🔑 Key Signatures',
+    chip:'Key Signatures',
     text:'What is the relative minor of <strong>' + ks.key + '</strong>?',
     answer:ks.relativeMinor,
     choices:choices4(ks.relativeMinor, allMinors),
@@ -375,7 +375,7 @@ function genCadence(grade) {
   cadences.forEach(function(cd) { if (!seen[cd.name]) { seen[cd.name]=true; allNames.push(cd.name); } });
   var choices = choices4(c.name, allNames, Math.min(3, allNames.length - 1));
   return {
-    chip:'🎵 Cadences',
+    chip:'Cadences',
     text:'Listen and identify the cadence type (' + c.label + ')',
     aural:true,
     answer:c.name,

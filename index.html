@@ -107,18 +107,16 @@
   <!-- Onboarding modal (first visit only) -->
   <div class="onboard-overlay" id="onboard-overlay" style="display:none;">
     <div class="onboard-box">
-      <div style="font-size:3rem;margin-bottom:8px;">🎹</div>
-      <h2>Welcome to Music Maestro!</h2>
+      <h2 style="font-size:1.4rem;">Music Maestro</h2>
       <p>Interactive music theory + exam prep for <strong>AMEB Piano Grades 1–3</strong>. Practice on tablet or desktop, any time.</p>
       <ul class="onboard-features">
-        <li>🎵 12 practice modules — aligned to AMEB 2026 syllabus</li>
-        <li>🎧 Hear real Steinway piano audio as you learn</li>
-        <li>📝 Mock exam with 100+ questions per grade</li>
-        <li>🌍 English, Chinese &amp; Spanish interface</li>
-        <li>📱 Optimised for tablet, phone &amp; desktop</li>
+        <li>12 practice modules aligned to AMEB Piano 2026</li>
+        <li>Real Steinway piano audio on every question</li>
+        <li>Mock exam with 100+ questions per grade</li>
+        <li>English, Chinese and Spanish interface</li>
       </ul>
       <p style="font-size:0.85rem;color:#999;margin-bottom:16px;">Grade 1 is always free · Grade 2–3 unlocks for $14.99 AUD</p>
-      <button class="btn btn-primary" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Let's start! 🚀</button>
+      <button class="btn btn-primary" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Get started</button>
     </div>
   </div>
 
@@ -140,7 +138,7 @@
   <!-- Info bar: greeting -->
   <div class="info-bar">
     <div class="welcome-pill">
-      👋 Hi, <strong id="greeting-name">there</strong>!
+      Hi, <strong id="greeting-name">there</strong>
     </div>
     <div class="info-bar-right">
       <span id="access-badge" style="display:none;"></span>
@@ -208,17 +206,17 @@
   <script>
     /* ─── Module definitions (12 modules, v5.0) ─── */
     var MODULES = [
-      { id:'note-namer',       titleKey:'mod-note-namer',       descKey:'desc-note-namer',       emoji:'🎵', accent:'pink',     href:'note-namer.html',       grade:1 },
-      { id:'scale-builder',    titleKey:'mod-scale-builder',    descKey:'desc-scale-builder',    emoji:'🎼', accent:'mint',     href:'scale-builder.html',    grade:1 },
-      { id:'key-signatures',   titleKey:'mod-key-signatures',   descKey:'desc-key-signatures',   emoji:'🔑', accent:'teal',     href:'key-signatures.html',   grade:1 },
-      { id:'note-values',      titleKey:'mod-note-values',      descKey:'desc-note-values',      emoji:'♩',  accent:'coral',    href:'note-values.html',      grade:1 },
-      { id:'interval-quiz',    titleKey:'mod-interval-quiz',    descKey:'desc-interval-quiz',    emoji:'🎶', accent:'lavender', href:'interval-quiz.html',    grade:1 },
-      { id:'chord-game',       titleKey:'mod-chord-game',       descKey:'desc-chord-game',       emoji:'🎸', accent:'yellow',   href:'chord-game.html',       grade:1 },
-      { id:'rhythm-trainer',   titleKey:'mod-rhythm-trainer',   descKey:'desc-rhythm-trainer',   emoji:'🥁', accent:'orange',   href:'rhythm-trainer.html',   grade:1 },
-      { id:'terms-flashcards', titleKey:'mod-terms-flashcards', descKey:'desc-terms-flashcards', emoji:'📚', accent:'sky',      href:'terms-flashcards.html', grade:1 },
-      { id:'aural-training',   titleKey:'mod-aural-training',   descKey:'desc-aural-training',   emoji:'🎧', accent:'mint2',    href:'aural-training.html',   grade:1 },
-      { id:'form-detective',   titleKey:'mod-form-detective',   descKey:'desc-form-detective',   emoji:'🔍', accent:'purple',   href:'form-detective.html',   grade:2 },
-      { id:'learn',            titleKey:'mod-learn',            descKey:'desc-learn',            emoji:'📖', accent:'grape',    href:'learn.html',            grade:1, noScore:true },
+      { id:'note-namer',       titleKey:'mod-note-namer',       descKey:'desc-note-namer',       abbr:'NN',  accent:'pink',     href:'note-namer.html',       grade:1 },
+      { id:'scale-builder',    titleKey:'mod-scale-builder',    descKey:'desc-scale-builder',    abbr:'♯♭', accent:'mint',     href:'scale-builder.html',    grade:1 },
+      { id:'key-signatures',   titleKey:'mod-key-signatures',   descKey:'desc-key-signatures',   abbr:'KS',  accent:'teal',     href:'key-signatures.html',   grade:1 },
+      { id:'note-values',      titleKey:'mod-note-values',      descKey:'desc-note-values',      abbr:'♩♪', accent:'coral',    href:'note-values.html',      grade:1 },
+      { id:'interval-quiz',    titleKey:'mod-interval-quiz',    descKey:'desc-interval-quiz',    abbr:'P5',  accent:'lavender', href:'interval-quiz.html',    grade:1 },
+      { id:'chord-game',       titleKey:'mod-chord-game',       descKey:'desc-chord-game',       abbr:'I–V', accent:'yellow',   href:'chord-game.html',       grade:1 },
+      { id:'rhythm-trainer',   titleKey:'mod-rhythm-trainer',   descKey:'desc-rhythm-trainer',   abbr:'4/4', accent:'orange',   href:'rhythm-trainer.html',   grade:1 },
+      { id:'terms-flashcards', titleKey:'mod-terms-flashcards', descKey:'desc-terms-flashcards', abbr:'ff',  accent:'sky',      href:'terms-flashcards.html', grade:1 },
+      { id:'aural-training',   titleKey:'mod-aural-training',   descKey:'desc-aural-training',   abbr:'♫',  accent:'mint2',    href:'aural-training.html',   grade:1 },
+      { id:'form-detective',   titleKey:'mod-form-detective',   descKey:'desc-form-detective',   abbr:'ABA', accent:'purple',   href:'form-detective.html',   grade:2 },
+      { id:'learn',            titleKey:'mod-learn',            descKey:'desc-learn',            abbr:'ref', accent:'grape',    href:'learn.html',            grade:1, noScore:true },
     ];
 
     var SCORED = MODULES.filter(function(m){ return !m.noScore; }).map(function(m){ return m.id; });
@@ -249,13 +247,13 @@
         var lockIcon = locked ? '<div style="position:absolute;top:8px;right:8px;font-size:1rem;opacity:0.7;">🔒</div>' : '';
 
         card.innerHTML =
-          '<div class="card-band"><span class="card-icon">' + mod.emoji + '</span>' + lockIcon + '</div>' +
+          '<div class="card-band"><span class="card-icon">' + mod.abbr + '</span>' + lockIcon + '</div>' +
           '<div class="card-body">' +
             '<div class="card-title">' + t(mod.titleKey) + '</div>' +
             '<div class="card-desc">'  + t(mod.descKey)  + '</div>' +
             (mod.noScore
               ? gradeBadge
-              : '<div class="card-score">Best: ' + score + ' ✨ ' + gradeBadge + '</div>'
+              : '<div class="card-score">Best: ' + score + (gradeBadge ? '&nbsp;&nbsp;' + gradeBadge : '') + '</div>'
             ) +
           '</div>';
         grid.appendChild(card);
