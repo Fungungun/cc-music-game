@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v5.6 · 2026-06-11";
+const APP_VERSION = "v5.7 · 2026-06-14";
 
 /* AMEB Section III context per module page */
 const AMEB_PAGE_TAGS = {
@@ -18,6 +18,7 @@ const AMEB_PAGE_TAGS = {
   'aural-training':   { section: 'Aural Tests',          desc: 'Pitch direction and intervals by ear — AMEB Section III' },
   'form-detective':   { section: 'Musical Form',         desc: 'Binary (AB) and Ternary (ABA) form — AMEB Grade 2–3, Section III' },
   'mock-exam':        { section: 'Mock Examination',     desc: '20 questions across all AMEB Piano Section III topics' },
+  'course':           { section: 'Theory Lessons',       desc: 'Structured lessons covering all AMEB Piano 2026 Section III topics — Grades 1–3' },
 };
 
 document.addEventListener('DOMContentLoaded', function() {
