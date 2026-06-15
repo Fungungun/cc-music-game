@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Theory Lessons — AMEB Piano 2026</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Purple identity — course pages */
+    .page-header { background: linear-gradient(90deg, #5B21B6, #7C3AED); }
+    .page-header::after { display: none; }
+    .page-header h1 { color: white; }
+    .page-header .subtitle { color: rgba(255,255,255,0.82); }
+    .back-btn { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.35); color: white; }
+    .back-btn:hover { background: rgba(255,255,255,0.35); transform: scale(1.08); }
+    /* Wider canvas for sidebar + content */
+    .main-content { max-width: 1120px; }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
@@ -14,19 +25,21 @@
 <body>
 <div class="page-wrap">
 
-  <header class="game-header">
-    <a href="index.html" class="back-btn">← Home</a>
-    <div class="header-center">
-      <span class="header-title">Theory Lessons</span>
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Home">←</a>
+    <div style="flex:1;">
+      <h1>Theory Lessons</h1>
+      <div class="subtitle">AMEB Piano 2026 — Grades 1, 2 &amp; 3</div>
     </div>
-    <div id="auth-area" class="auth-area"></div>
+    <span aria-hidden="true" style="width:44px;"></span>
   </header>
 
   <main class="main-content" id="main-content">
     <!-- .ameb-page-tag auto-injected by game.js -->
 
-    <!-- Mobile lesson picker -->
+    <!-- Mobile lesson picker (hidden on desktop, shown ≤780px) -->
     <div class="course-mobile-nav" id="course-mobile-nav">
+      <div class="course-sidebar-title">Theory Lessons</div>
       <div class="course-grade-tabs-mobile">
         <button class="course-grade-tab active" data-grade="1" onclick="switchGrade(1)">Grade 1</button>
         <button class="course-grade-tab" data-grade="2" onclick="switchGrade(2)">Grade 2</button>
@@ -39,10 +52,13 @@
 
       <!-- Sidebar -->
       <nav class="course-sidebar" id="course-sidebar" aria-label="Lessons">
-        <div class="course-grade-tabs">
-          <button class="course-grade-tab active" data-grade="1" onclick="switchGrade(1)">Grade 1</button>
-          <button class="course-grade-tab" data-grade="2" onclick="switchGrade(2)">Grade 2</button>
-          <button class="course-grade-tab" data-grade="3" onclick="switchGrade(3)">Grade 3</button>
+        <div class="course-sidebar-hd">
+          <div class="course-sidebar-title">Theory Lessons</div>
+          <div class="course-grade-tabs">
+            <button class="course-grade-tab active" data-grade="1" onclick="switchGrade(1)">Grade 1</button>
+            <button class="course-grade-tab" data-grade="2" onclick="switchGrade(2)">Grade 2</button>
+            <button class="course-grade-tab" data-grade="3" onclick="switchGrade(3)">Grade 3</button>
+          </div>
         </div>
         <ul class="course-lesson-list" id="lesson-list" role="list"></ul>
       </nav>
@@ -117,16 +133,25 @@ function buildLessonList(grade) {
   var list = document.getElementById('lesson-list');
   list.innerHTML = '';
   var forGrade = LESSONS.filter(function(l) { return l.grade === grade; });
+  var currentTopic = null;
   forGrade.forEach(function(lesson, i) {
     var locked = lesson.grade > 1 && !hasFullAccess();
+
+    if (lesson.topic !== currentTopic) {
+      currentTopic = lesson.topic;
+      var topicLi = document.createElement('li');
+      topicLi.className = 'course-topic-header';
+      topicLi.textContent = lesson.topic;
+      list.appendChild(topicLi);
+    }
+
     var li = document.createElement('li');
     li.className = 'course-lesson-item' +
       (lesson.id === currentLessonId ? ' active' : '') +
       (locked ? ' locked' : '');
-    var num = i + 1;
     var a = document.createElement('a');
     a.href = locked ? 'javascript:void(0)' : ('#' + lesson.id);
-    a.textContent = num + '. ' + lesson.title;
+    a.textContent = (i + 1) + '. ' + lesson.title;
     if (locked) {
       a.addEventListener('click', function(e) {
         e.preventDefault();
