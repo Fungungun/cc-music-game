@@ -7,6 +7,8 @@ ameb_section: Intervals
 practice_module: interval-quiz.html
 practice_label: Interval Quiz
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Intervals — name all intervals from unison to octave above a given note, using full quality and number names (e.g., major 3rd, perfect 5th, minor 7th)."
+youtube_id: "V7wGIxpW5rM"
+youtube_title: "Intervals Explained — Major, Minor, Perfect, Diminished"
 ---
 
 # Intervals — Quality and Number (Grade 2)

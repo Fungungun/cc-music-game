@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III: Cadences — identify all four cadence types (Perfect, Plagal, Imperfect, Interrupted) in the keys of C, G and F major."
+youtube_id: "3aRBWDHE4g8"
+youtube_title: "Cadences — All 4 Types Explained (Perfect, Plagal, Imperfect, Interrupted)"
 ---
 
 # All Four Cadences (Grade 3)

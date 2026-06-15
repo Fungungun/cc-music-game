@@ -7,6 +7,8 @@ ameb_section: Notes on Staff
 practice_module: note-namer.html
 practice_label: Note Namer
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Name any note on the bass clef staff, including the first ledger line above and below; locate middle C on both clefs."
+youtube_id: "gOHmlWucG-k"
+youtube_title: "Bass Clef Lines and Spaces — How to Read Music"
 ---
 
 # Note Names on the Bass Clef

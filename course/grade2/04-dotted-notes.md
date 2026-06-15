@@ -7,6 +7,8 @@ ameb_section: Note Values
 practice_module: note-values.html
 practice_label: Note Values
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Note Values — state the value of dotted minim and dotted crotchet; understand ties and how dots affect note duration."
+youtube_id: "haEOZBByeNw"
+youtube_title: "Dotted Notes: Dotted Minim and Dotted Crotchet"
 ---
 
 # Dotted Notes and Ties

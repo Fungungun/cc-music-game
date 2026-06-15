@@ -7,6 +7,8 @@ ameb_section: Scales
 practice_module: scale-builder.html
 practice_label: Scale Builder
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Scales — write or name the notes of A harmonic minor, D harmonic minor and E harmonic minor scales ascending and descending."
+youtube_id: "E-vPQQYrxRc"
+youtube_title: "The Harmonic Minor Scale: A Beginners Lesson"
 ---
 
 # Harmonic Minor Scales

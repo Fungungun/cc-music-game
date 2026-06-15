@@ -7,6 +7,8 @@ ameb_section: Intervals
 practice_module: interval-quiz.html
 practice_label: Interval Quiz
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Intervals — name any interval from unison to octave above a given note by number only (e.g., '3rd', '5th')."
+youtube_id: "pSm5P-jyiMk"
+youtube_title: "Intervals — Three Minute Music Theory"
 ---
 
 # Intervals (Grade 1)

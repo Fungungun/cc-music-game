@@ -263,8 +263,22 @@ async function loadLesson() {
     var raw = await res.text();
     var parsed = parseFrontmatter(raw);
 
+    // Inject YouTube video embed (if frontmatter has youtube_id)
+    var videoHtml = '';
+    if (parsed.meta.youtube_id) {
+      var ytTitle = parsed.meta.youtube_title || 'Tutorial video';
+      videoHtml =
+        '<div class="lesson-video">' +
+          '<iframe src="https://www.youtube.com/embed/' + parsed.meta.youtube_id +
+            '?rel=0&modestbranding=1" ' +
+            'title="' + ytTitle + '" ' +
+            'allowfullscreen loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>' +
+        '</div>';
+    }
+
     // Render markdown body
-    document.getElementById('lesson-content').innerHTML = marked.parse(parsed.body);
+    var contentEl = document.getElementById('lesson-content');
+    contentEl.innerHTML = videoHtml + marked.parse(parsed.body);
     renderAbcBlocks();
 
     // Lesson meta (grade badge + section label)

@@ -7,6 +7,8 @@ ameb_section: Time Signatures
 practice_module: rhythm-trainer.html
 practice_label: Rhythm Trainer
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Time Signatures — identify 6/8 as compound duple time; understand the difference between simple and compound time."
+youtube_id: "UqJxXH2voMI"
+youtube_title: "Simple Time vs Compound Time — 6/8 Explained"
 ---
 
 # Compound Time — 6/8

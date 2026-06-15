@@ -7,6 +7,8 @@ ameb_section: Scales
 practice_module: scale-builder.html
 practice_label: Scale Builder
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Scales — write or name the notes of C major, G major and F major scales ascending and descending."
+youtube_id: "Er_54wStpBs"
+youtube_title: "Whole Steps, Half Steps and the Major Scale Formula"
 ---
 
 # Major Scales

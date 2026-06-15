@@ -7,6 +7,8 @@ ameb_section: Notes on Staff
 practice_module: note-namer.html
 practice_label: Note Namer
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Identify treble and bass clef staves; understand how position on the staff indicates pitch."
+youtube_id: "rpYRUQvArEY"
+youtube_title: "Lesson 1: Staff, Notes and Treble Clef (Khan Academy)"
 ---
 
 # The Music Staff and Clefs

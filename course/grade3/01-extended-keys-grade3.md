@@ -7,6 +7,8 @@ ameb_section: Key Signatures
 practice_module: key-signatures.html
 practice_label: Key Signatures
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III: Key Signatures — identify key signatures up to 5 sharps and 4 flats; Scales — E major, B major (5 sharps), Ab major (4 flats)."
+youtube_id: "AJuUmJfzTgE"
+youtube_title: "Major Keys and Key Signatures — Circle of Fifths Order"
 ---
 
 # Extended Key Signatures and Scales (Grade 3)

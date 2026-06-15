@@ -7,6 +7,8 @@ ameb_section: Music Terms
 practice_module: terms-flashcards.html
 practice_label: Terms Flashcards
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Define the meaning of Italian/French terms as listed for Grade 2 (in addition to all Grade 1 terms)."
+youtube_id: "UEcI_1kdMnE"
+youtube_title: "Musical Dynamics: pp, p, mp, mf, f, ff, cresc. and dim."
 ---
 
 # Music Terms (Grade 2)

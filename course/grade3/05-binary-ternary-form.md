@@ -7,6 +7,8 @@ ameb_section: Musical Form
 practice_module: form-detective.html
 practice_label: Form Detective
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III (General Knowledge): Identify Binary (AB) and Ternary (ABA) form in a piece performed by the candidate or presented by the examiner."
+youtube_id: "HIGwaAY3YSQ"
+youtube_title: "Music Theory: Binary and Ternary Forms"
 ---
 
 # Musical Form — Binary and Ternary

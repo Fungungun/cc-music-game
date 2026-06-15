@@ -7,6 +7,8 @@ ameb_section: Music Terms
 practice_module: terms-flashcards.html
 practice_label: Terms Flashcards
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III: Define the meaning of Italian/French terms as listed for Grade 3 (in addition to all Grade 1 and Grade 2 terms)."
+youtube_id: "ELBv1pF6wXQ"
+youtube_title: "ABRSM Grade 3 Chapter 8 — Terms and Signs (Sharon Bill)"
 ---
 
 # Music Terms (Grade 3)

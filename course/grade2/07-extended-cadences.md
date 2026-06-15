@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Cadences — identify Perfect and Plagal cadences in the keys of C major, G major and F major."
+youtube_id: "1lTY7w9NOYY"
+youtube_title: "AMEB Ask Andrew — Plagal Cadences"
 ---
 
 # Cadences in G Major and F Major (Grade 2)

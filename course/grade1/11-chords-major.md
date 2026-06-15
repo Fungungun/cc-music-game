@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Chords — identify C major, G major and F major triads in root position; name the notes of each chord."
+youtube_id: "P28KMjSNQYg"
+youtube_title: "Master Major and Minor Triads (Beginner Guide)"
 ---
 
 # Major Triads

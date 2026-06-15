@@ -7,6 +7,8 @@ ameb_section: Scales
 practice_module: scale-builder.html
 practice_label: Scale Builder
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Scales — D, A, Bb, Eb major; G, C harmonic minor (ascending and descending, from memory)."
+youtube_id: "qPQFbZIHtUI"
+youtube_title: "ABRSM Grade 2 — Major Keys of A, Bb and Eb (Sharon Bill)"
 ---
 
 # Extended Scales (Grade 2)

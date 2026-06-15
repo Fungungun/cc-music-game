@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III: Chords — identify first inversion triads of C, G, F major and A, D, E minor; distinguish root position from first inversion."
+youtube_id: "lCI_H3otxIs"
+youtube_title: "Intro to Chords in Inversion — Music Theory"
 ---
 
 # Chord Inversions (Grade 3)

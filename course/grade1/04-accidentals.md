@@ -7,6 +7,8 @@ ameb_section: Notes on Staff
 practice_module: note-namer.html
 practice_label: Note Namer
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Identify and define sharp, flat and natural signs; state that each raises or lowers a note by one semitone; understand the rule that accidentals last for the bar."
+youtube_id: "lpCJhz3rgGc"
+youtube_title: "Accidentals: Sharps, Flats and Naturals — Music Theory"
 ---
 
 # Accidentals — Sharps, Flats and Naturals

@@ -7,6 +7,8 @@ ameb_section: Notes on Staff
 practice_module: note-namer.html
 practice_label: Note Namer
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Name any note on the treble clef staff, including the first ledger line above and below."
+youtube_id: "C2NLf3h5j7I"
+youtube_title: "Treble Clef Lines and Spaces — How to Read Music"
 ---
 
 # Note Names on the Treble Clef

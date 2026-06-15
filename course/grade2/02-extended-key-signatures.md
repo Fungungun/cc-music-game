@@ -7,6 +7,8 @@ ameb_section: Key Signatures
 practice_module: key-signatures.html
 practice_label: Key Signatures
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Key Signatures — identify key signatures up to 3 sharps and 3 flats, and name the relative minor."
+youtube_id: "qV7qrUWGrN4"
+youtube_title: "Key Signatures Up to 3 Sharps and Flats + Relative Minors"
 ---
 
 # Extended Key Signatures (Grade 2)

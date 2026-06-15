@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 2 · Section III: Chords — identify root-position major and minor triads: D major, A major; A minor, D minor, E minor."
+youtube_id: "7CxxJQHypW0"
+youtube_title: "The 4 Types of Triads Explained on Piano"
 ---
 
 # Minor Chords and New Major Chords (Grade 2)

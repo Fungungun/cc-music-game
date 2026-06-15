@@ -7,6 +7,8 @@ ameb_section: Intervals
 practice_module: interval-quiz.html
 practice_label: Interval Quiz
 syllabus_ref: "AMEB Piano 2026 · Grade 3 · Section III: Intervals — name any interval from unison to octave as a scale degree (e.g., 'the 3rd of C major') when given the keynote."
+youtube_id: "OyWJ5IGDRu8"
+youtube_title: "Grade 3 Music Theory — Intervals as Scale Degrees"
 ---
 
 # Intervals as Scale Degrees (Grade 3)

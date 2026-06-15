@@ -7,6 +7,8 @@ ameb_section: Chords
 practice_module: chord-game.html
 practice_label: Chord Game
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Cadences — identify Perfect (V–I) and Plagal (IV–I) cadences in C major, both written on the staff and by ear."
+youtube_id: "5KkMo3KvhMk"
+youtube_title: "AMEB Ask Andrew — Writing a Perfect Cadence"
 ---
 
 # Cadences — Perfect and Plagal

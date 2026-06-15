@@ -7,6 +7,8 @@ ameb_section: Key Signatures
 practice_module: key-signatures.html
 practice_label: Key Signatures
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Key Signatures — identify C major (0), G major (1 sharp: F#) and F major (1 flat: Bb); state the relative minor of each."
+youtube_id: "hzf10j46YyI"
+youtube_title: "Key Signatures Explained: Order of Sharps and Flats"
 ---
 
 # Key Signatures

@@ -7,6 +7,8 @@ ameb_section: Note Values
 practice_module: note-values.html
 practice_label: Note Values
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: State the value in beats of semibreve, minim, crotchet, quaver, semiquaver and their equivalent rests (in 4/4 time)."
+youtube_id: "zSfEa1wOiNk"
+youtube_title: "Note Values — Duration of Notes (Music Theory)"
 ---
 
 # Note Values and Rests

@@ -7,6 +7,8 @@ ameb_section: Music Terms
 practice_module: terms-flashcards.html
 practice_label: Terms Flashcards
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Define the meaning of Italian terms and signs as listed in the Grade 1 syllabus."
+youtube_id: "7KG1eWoysoI"
+youtube_title: "Largo, Andante, Moderato, Allegro, Presto — Music Terms"
 ---
 
 # Music Terms and Signs (Grade 1)

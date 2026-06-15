@@ -7,6 +7,8 @@ ameb_section: Time Signatures
 practice_module: rhythm-trainer.html
 practice_label: Rhythm Trainer
 syllabus_ref: "AMEB Piano 2026 · Grade 1 · Section III: Identify time signatures 2/4, 3/4 and 4/4; state the number and type of beats per bar; recognise duple, triple and quadruple time by ear."
+youtube_id: "mlZVQbFW0JA"
+youtube_title: "Time Signatures, Bars and Barlines — Music Theory"
 ---
 
 # Time Signatures
