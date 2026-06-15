@@ -1,33 +1,19 @@
-/* Music Maestro — Service Worker v6.0 */
-var CACHE = 'music-maestro-v6';
+/* Music Maestro — Service Worker v7.0 */
+var CACHE = 'music-maestro-v7';
 
-/* Only cache truly static assets — NOT HTML pages.
-   HTML is always fetched fresh so stale cached pages never cause navigation failures. */
-var STATIC_ASSETS = [
-  '/style.css',
-  '/game.js',
-  '/supabase.js',
-  '/i18n.js',
-  '/manifest.json',
-  '/icon.svg'
-];
-
+/* On install: just pre-cache the offline shell assets.
+   CSS/JS are handled network-first so they never go stale. */
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(cache) {
-      return Promise.all(
-        STATIC_ASSETS.map(function(url) {
-          return cache.add(url).catch(function(err) {
-            console.warn('[SW] Failed to cache:', url, err);
-          });
-        })
-      );
+      return cache.addAll(['/manifest.json', '/icon.svg']).catch(function(){});
     }).then(function() {
       return self.skipWaiting();
     })
   );
 });
 
+/* On activate: delete ALL old caches so stale CSS/JS is wiped immediately */
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
@@ -41,35 +27,41 @@ self.addEventListener('activate', function(e) {
 self.addEventListener('fetch', function(e) {
   var url = e.request.url;
 
-  /* Ignore non-http(s) requests (e.g. chrome-extension://) */
+  /* Ignore non-http(s) requests */
   if (!url.startsWith('http')) return;
 
   /* CDN / audio samples — network first, cache fallback */
-  if (url.includes('cdn') || url.includes('tonejs.github.io') || url.includes('cdnjs')) {
+  if (url.includes('cdn.jsdelivr') || url.includes('cdnjs') || url.includes('tonejs.github.io')) {
     e.respondWith(
-      fetch(e.request).catch(function() { return caches.match(e.request); })
+      fetch(e.request)
+        .then(function(resp) {
+          if (resp && resp.status === 200) {
+            caches.open(CACHE).then(function(c){ c.put(e.request, resp.clone()); });
+          }
+          return resp;
+        })
+        .catch(function() { return caches.match(e.request); })
     );
     return;
   }
 
-  /* HTML navigation — don't intercept, let the browser handle natively */
-  if (e.request.mode === 'navigate') {
-    return;
-  }
+  /* HTML navigation — browser default, never intercept */
+  if (e.request.mode === 'navigate') return;
 
-  /* Static assets (CSS, JS, icons) — cache first */
+  /* All same-origin assets (CSS, JS, markdown, icons) — network first.
+     Always fetches fresh so deployments take effect immediately.
+     Falls back to cache only when offline. */
   e.respondWith(
-    caches.match(e.request).then(function(cached) {
-      if (cached) return cached;
-      return fetch(e.request).then(function(resp) {
+    fetch(e.request)
+      .then(function(resp) {
         if (resp && resp.status === 200) {
           var clone = resp.clone();
-          caches.open(CACHE).then(function(cache){ cache.put(e.request, clone); });
+          caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
         }
         return resp;
-      });
-    }).catch(function() {
-      return caches.match('/index.html');
-    })
+      })
+      .catch(function() {
+        return caches.match(e.request);
+      })
   );
 });
