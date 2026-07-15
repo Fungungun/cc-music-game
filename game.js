@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v6.1 · 2026-07-15";
+const APP_VERSION = "v6.2 · 2026-07-15";
 
 /* AMEB Section III context per module page */
 const AMEB_PAGE_TAGS = {

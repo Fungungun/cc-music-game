@@ -59,7 +59,7 @@
     <a href="index.html" class="back-btn" data-i18n="back">←</a>
     <div style="flex:1;">
       <h1>Aural Training</h1>
-      <div class="subtitle">Identify intervals by ear!</div>
+      <div class="subtitle">Pitch, intervals and beat — all by ear!</div>
     </div>
     <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
   </header>
@@ -70,8 +70,9 @@
       <span id="intro-arrow">▼</span>
     </div>
     <div class="intro-body" id="intro-body">
-      <p>Press the big <strong>▶ Play</strong> button to hear two notes. Listen carefully — are they close together or far apart? Then choose the correct interval name. No staff is shown — it's all about your ears!</p>
-      <p>You can press Play again any time to hear the notes again. After 2 wrong answers, the note names will be revealed.</p>
+      <p><strong>Higher or Lower</strong> — hear two notes and say whether the second is higher or lower (this is the Grade 1 exam task!).</p>
+      <p><strong>Intervals</strong> — hear two notes and name the interval. Press ▶ as many times as you like; after 2 wrong answers the notes are revealed.</p>
+      <p><strong>Tap the Beat</strong> — after a 4-count lead-in, tap the big button in time with the music, just like clapping the beat in the exam.</p>
     </div>
   </div>
 
@@ -90,16 +91,32 @@
     <!-- Grade selector -->
     <div class="mode-toggle" id="grade-selector"></div>
 
-    <!-- Play/hear mode toggle -->
+    <!-- Exercise mode toggle -->
     <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-mode-hl"        onclick="setExercise('higherlower')">👂 Higher or Lower</button>
+      <button class="mode-btn"        id="btn-mode-intervals" onclick="setExercise('intervals')">🎶 Intervals</button>
+      <button class="mode-btn"        id="btn-mode-beat"      onclick="setExercise('beat')">👏 Tap the Beat</button>
+    </div>
+
+    <!-- Play/hear mode toggle (intervals only) -->
+    <div class="mode-toggle" id="playmode-row">
       <button class="mode-btn active" id="btn-harmonic" onclick="setPlayMode('harmonic')">Together ♩♩</button>
       <button class="mode-btn"        id="btn-melodic"  onclick="setPlayMode('melodic')">One by one ♩→♩</button>
     </div>
 
     <!-- Big play button -->
     <div class="listen-area">
-      <button class="play-big-btn" id="play-btn" onclick="playCurrentInterval()">▶</button>
+      <button class="play-big-btn" id="play-btn" onclick="onBigButton()">▶</button>
       <div class="listen-hint" id="listen-hint">Press ▶ to hear the interval</div>
+    </div>
+
+    <!-- Beat tap area -->
+    <div id="beat-area" style="display:none;text-align:center;padding:4px 16px 10px;">
+      <button id="tap-btn" onclick="onTap()" disabled
+        style="width:150px;height:150px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;font-weight:900;color:white;background:linear-gradient(135deg,#F57C00,#FFB74D);box-shadow:0 6px 24px rgba(245,124,0,0.35);font-family:inherit;">
+        👏<br>TAP
+      </button>
+      <div id="beat-dots" style="margin-top:12px;font-size:1.1rem;letter-spacing:3px;min-height:24px;"></div>
     </div>
 
     <!-- Attempts indicator -->
@@ -183,9 +200,11 @@
     }
 
     /* ---- State ---- */
+    var exercise = 'higherlower';   /* 'higherlower' | 'intervals' | 'beat' */
     var currentRoot = 'C4';
     var currentUpper = 'G4';
     var currentInterval = null;
+    var currentDirection = 'higher';
     var wrongAttempts = 0;
     var answered = false;
     var playMode = 'harmonic';
@@ -194,10 +213,27 @@
     var score = new SessionScore('aural-training');
     attachMilestoneTracker(score, 10);
 
+    function setExercise(m) {
+      exercise = m;
+      document.getElementById('btn-mode-hl').classList.toggle('active', m === 'higherlower');
+      document.getElementById('btn-mode-intervals').classList.toggle('active', m === 'intervals');
+      document.getElementById('btn-mode-beat').classList.toggle('active', m === 'beat');
+      document.getElementById('playmode-row').style.display = m === 'intervals' ? '' : 'none';
+      document.getElementById('beat-area').style.display = m === 'beat' ? 'block' : 'none';
+      document.querySelector('.listen-area').style.display = m === 'beat' ? 'none' : 'block';
+      beatStop();
+      nextQuestion();
+    }
+
     function setPlayMode(m) {
       playMode = m;
       document.getElementById('btn-harmonic').classList.toggle('active', m === 'harmonic');
       document.getElementById('btn-melodic').classList.toggle('active', m === 'melodic');
+    }
+
+    function onBigButton() {
+      if (exercise === 'higherlower') playCurrentPair();
+      else playCurrentInterval();
     }
 
     function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -219,6 +255,176 @@
       wrongAttempts = 0;
       answered = false;
       hasPlayed = false;
+    }
+
+    /* ---- Higher or Lower (the actual Grade 1 aural task) ---- */
+    function generateHLQuestion() {
+      currentRoot = pickRandom(getRootNotes());
+      currentDirection = Math.random() < 0.5 ? 'higher' : 'lower';
+      /* Grade 1: any clear gap. Grade 2-3 (per AMEB): a major 3rd or perfect 5th. */
+      var gaps = getGrade() === 1 ? [3, 4, 5, 7, 9, 12] : [4, 7];
+      var gap = pickRandom(gaps);
+      var midi = Tonal.Note.midi(currentRoot);
+      currentUpper = Tonal.Note.fromMidi(midi + (currentDirection === 'higher' ? gap : -gap));
+      wrongAttempts = 0;
+      answered = false;
+      hasPlayed = false;
+    }
+
+    function playCurrentPair() {
+      var btn = document.getElementById('play-btn');
+      btn.classList.add('playing');
+      btn.textContent = '♪';
+      playMelodic([currentRoot, currentUpper], '4n', 80);
+      setTimeout(function(){ btn.classList.remove('playing'); btn.textContent = '▶'; }, 2000);
+      if (!hasPlayed) {
+        hasPlayed = true;
+        enableAnswerButtons();
+        document.getElementById('listen-hint').textContent = 'Was the second note higher or lower?';
+      }
+    }
+
+    function buildHLButtons() {
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      [{ id:'higher', label:'⬆️ Higher' }, { id:'lower', label:'⬇️ Lower' }].forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = opt.label;
+        btn.dataset.dir = opt.id;
+        btn.onclick = function(){ checkHLAnswer(opt.id, btn); };
+        if (!hasPlayed) { btn.disabled = true; btn.style.opacity = '0.5'; }
+        grid.appendChild(btn);
+      });
+    }
+
+    function checkHLAnswer(dir, btn) {
+      if (answered) return;
+      if (dir === currentDirection) {
+        answered = true;
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect(), 'correct');
+        triggerStarburst(btn);
+        trackAnswer('aural-training', 'higher-lower', true);
+        score.onCorrect();
+        setTimeout(function(){ nextQuestion(); }, 1600);
+      } else {
+        answered = true;
+        wrongAttempts++;
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        document.querySelectorAll('.answer-btn').forEach(function(b){
+          if (b.dataset.dir === currentDirection) b.classList.add('correct-ans');
+        });
+        document.getElementById('note-reveal').textContent =
+          '🎵 ' + currentRoot + ' → ' + currentUpper + ' — the second note was ' + currentDirection + '.';
+        setFeedback(randomWrong() + ' Listen for where the sound moves.', 'wrong');
+        trackAnswer('aural-training', 'higher-lower', false);
+        score.onWrong();
+        setTimeout(function(){ nextQuestion(); }, 2600);
+      }
+    }
+
+    /* ---- Tap the Beat (Grade 1: clap the beat of a passage) ---- */
+    var BEAT_BPM = 90;
+    var beat = { running:false, expected:[], taps:[], timeouts:[] };
+
+    function beatStop() {
+      beat.running = false;
+      beat.timeouts.forEach(clearTimeout);
+      beat.timeouts = [];
+    }
+
+    function startBeat() {
+      ensureAudio().then(function() {
+        beatStop();
+        var spb = 60 / BEAT_BPM;
+        var t0 = Tone.now() + 0.4;
+        var scaleUp   = ['C4','D4','E4','F4','G4','A4','B4','C5'];
+        var scaleDown = ['C5','B4','A4','G4','F4','E4','D4','C4'];
+        var melody = scaleUp.concat(scaleDown);
+
+        beat.running = true;
+        beat.taps = [];
+        beat.expected = [];
+        document.getElementById('beat-dots').textContent = 'Count-in: 1  2  3  4 …';
+        document.getElementById('tap-btn').disabled = true;
+        setFeedback('', 'empty');
+
+        /* 4-beat count-in on a high G */
+        for (var c = 0; c < 4; c++) {
+          sampler.triggerAttackRelease('G5', '16n', t0 + c * spb);
+        }
+        /* Melody — tap along with each beat */
+        var tMelody = t0 + 4 * spb;
+        melody.forEach(function(note, i) {
+          var when = tMelody + i * spb;
+          sampler.triggerAttackRelease(note, '8n', when);
+          beat.expected.push(when);
+        });
+
+        /* Enable tapping when the melody starts */
+        var untilMelodyMs = (tMelody - Tone.now()) * 1000;
+        beat.timeouts.push(setTimeout(function() {
+          document.getElementById('tap-btn').disabled = false;
+          document.getElementById('beat-dots').textContent = 'Tap with every note!';
+        }, untilMelodyMs));
+
+        /* Score shortly after the last beat */
+        var endMs = untilMelodyMs + (melody.length * spb + 0.6) * 1000;
+        beat.timeouts.push(setTimeout(finishBeat, endMs));
+      });
+    }
+
+    function onTap() {
+      if (!beat.running) return;
+      beat.taps.push(Tone.now());
+      var btn = document.getElementById('tap-btn');
+      btn.style.transform = 'scale(0.92)';
+      setTimeout(function(){ btn.style.transform = ''; }, 90);
+    }
+
+    function finishBeat() {
+      if (!beat.running) return;
+      beat.running = false;
+      document.getElementById('tap-btn').disabled = true;
+
+      var window = 0.18; /* ±180ms counts as on the beat */
+      var hits = 0;
+      var tapsUsed = {};
+      beat.expected.forEach(function(when) {
+        for (var i = 0; i < beat.taps.length; i++) {
+          if (!tapsUsed[i] && Math.abs(beat.taps[i] - when) <= window) {
+            tapsUsed[i] = true; hits++; return;
+          }
+        }
+      });
+
+      var totalBeats = beat.expected.length;
+      var ok = hits >= Math.ceil(totalBeats * 0.6) && beat.taps.length >= totalBeats * 0.5;
+      document.getElementById('beat-dots').textContent =
+        '🎯 ' + hits + ' of ' + totalBeats + ' beats on time';
+
+      if (ok) {
+        setFeedback(randomCorrect() + ' Great steady beat! 👏', 'correct');
+        trackAnswer('aural-training', 'beat-tap', true);
+        score.onCorrect();
+        triggerStarburst(document.getElementById('tap-btn'));
+      } else {
+        setFeedback(randomWrong() + ' Try counting "1-2-3-4" in your head as you tap.', 'wrong');
+        trackAnswer('aural-training', 'beat-tap', false);
+        score.onWrong();
+      }
+    }
+
+    function buildBeatButtons() {
+      var grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      var btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = '▶ Play & tap along';
+      btn.onclick = startBeat;
+      grid.appendChild(btn);
     }
 
     function pickDistractors(correct, count) {
@@ -271,7 +477,8 @@
       if (isCorrect(iv)) {
         answered = true;
         btn.classList.add('correct-ans');
-        var hint = INTERVAL_SONGS[currentInterval.short] || '';
+        /* Song hints describe a melodic shape — only show when notes play one by one */
+        var hint = playMode === 'melodic' ? (INTERVAL_SONGS[currentInterval.short] || '') : '';
         setFeedback(randomCorrect() + (hint ? ' 🎵 Think: ' + hint : ''), 'correct');
         triggerStarburst(btn);
         trackAnswer('aural-training', currentInterval.short, true);
@@ -293,8 +500,8 @@
           document.getElementById('note-reveal').textContent =
             '🎵 Notes: ' + currentRoot + ' → ' + currentUpper +
             ' (' + currentInterval.name + ', ' + currentInterval.semitones + ' semitones)';
-          var hint = INTERVAL_SONGS[currentInterval.short] || '';
-          setFeedback(randomWrong() + (hint ? ' Hint: ' + hint : ''), 'wrong');
+          var hint = playMode === 'melodic' ? (INTERVAL_SONGS[currentInterval.short] || '') : '';
+          setFeedback(randomWrong() + (hint ? ' Hint: ' + hint : ' Try "One by one" mode to hear the shape.'), 'wrong');
           setTimeout(function(){ nextQuestion(); }, 3000);
         } else {
           setFeedback(randomWrong() + ' Listen again!', 'wrong');
@@ -330,14 +537,27 @@
     }
 
     function nextQuestion() {
-      generateQuestion();
-      buildAnswerButtons();
       setFeedback('', 'empty');
-      updateAttemptDots();
       document.getElementById('note-reveal').textContent = '';
-      document.getElementById('listen-hint').textContent = 'Press ▶ to hear the interval';
       document.getElementById('play-btn').classList.remove('playing');
       document.getElementById('play-btn').textContent = '▶';
+      document.getElementById('attempts-dots').textContent = '';
+
+      if (exercise === 'beat') {
+        document.getElementById('beat-dots').textContent = '';
+        buildBeatButtons();
+        return;
+      }
+      if (exercise === 'higherlower') {
+        generateHLQuestion();
+        buildHLButtons();
+        document.getElementById('listen-hint').textContent = 'Press ▶ to hear two notes';
+        return;
+      }
+      generateQuestion();
+      buildAnswerButtons();
+      updateAttemptDots();
+      document.getElementById('listen-hint').textContent = 'Press ▶ to hear the interval';
     }
 
     /* ---- Start ---- */

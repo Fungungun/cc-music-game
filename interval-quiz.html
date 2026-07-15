@@ -93,6 +93,12 @@
       <button class="mode-btn" id="btn-melodic" onclick="setDisplayMode('melodic')" data-i18n="melodic">Melodic (one by one)</button>
     </div>
 
+    <!-- Grade 3 exam-style toggle (keynote given) -->
+    <div class="mode-toggle" id="g3-mode-row" style="display:none;">
+      <button class="mode-btn active" id="btn-anyroot" onclick="setKeyMode(false)">Any root</button>
+      <button class="mode-btn" id="btn-inkey" onclick="setKeyMode(true)">In a key (Grade 3 exam style)</button>
+    </div>
+
     <!-- Staff -->
     <div class="staff-container">
       <div id="staff"></div>
@@ -177,6 +183,33 @@
       'M7':'almost an octave — very tense!',
       'P8':'"Somewhere Over the Rainbow" (1st→2nd note)'
     };
+
+    /* ---- Grade 3 "in a key" mode (keynote given, answer as scale degree) ---- */
+    /* Major keys tested at Grade 3, with tonic + diatonic degrees 2nd–8th */
+    const G3_KEYS = [
+      { key:'C major',  tonic:'C4', abcKey:'C'  },
+      { key:'G major',  tonic:'G3', abcKey:'G'  },
+      { key:'F major',  tonic:'F3', abcKey:'F'  },
+      { key:'D major',  tonic:'D4', abcKey:'D'  },
+      { key:'A major',  tonic:'A3', abcKey:'A'  },
+      { key:'Bb major', tonic:'Bb3', abcKey:'Bb' },
+      { key:'Eb major', tonic:'Eb4', abcKey:'Eb' },
+      { key:'E major',  tonic:'E4', abcKey:'E'  },
+      { key:'Ab major', tonic:'Ab3', abcKey:'Ab' },
+    ];
+    const DEGREE_LABELS = ['2nd','3rd','4th','5th','6th','7th','8th'];
+    const DEGREE_TONAL  = ['2M','3M','4P','5P','6M','7M','8P'];
+
+    let inKeyMode = false;
+    let currentKey = null;
+    let currentDegree = null; /* index into DEGREE_LABELS */
+
+    function setKeyMode(on) {
+      inKeyMode = on;
+      document.getElementById('btn-anyroot').classList.toggle('active', !on);
+      document.getElementById('btn-inkey').classList.toggle('active', on);
+      nextQuestion();
+    }
 
     /* ---- State ---- */
     let currentRoot = 'C4';
@@ -331,15 +364,104 @@
       }, 1000);
     }
 
+    /* ---- Grade 3 in-key question flow ---- */
+    function generateKeyQuestion() {
+      currentKey = pickRandom(G3_KEYS);
+      currentDegree = Math.floor(Math.random() * DEGREE_LABELS.length);
+      currentRoot = currentKey.tonic;
+      try {
+        currentUpper = Tonal.Note.transpose(currentRoot, DEGREE_TONAL[currentDegree]);
+      } catch(e) {
+        currentUpper = currentRoot;
+      }
+      wrongAttempts = 0;
+      answeredThisRound = false;
+    }
+
+    function renderKeyStaff() {
+      const abc1 = toneToAbc(currentRoot);
+      const abc2 = toneToAbc(currentUpper);
+      const abcStr = 'X:1\nT:\nM:4/4\nL:1/4\nK:' + currentKey.abcKey + '\n' + abc1 + '2 ' + abc2 + '2|]';
+      renderAbc('staff', abcStr, {scale: 2.5, staffwidth: 200});
+    }
+
+    function buildDegreeButtons() {
+      var others = DEGREE_LABELS.filter(function(d, i){ return i !== currentDegree; })
+        .sort(function(){ return Math.random() - 0.5; }).slice(0, 3);
+      var all = [DEGREE_LABELS[currentDegree]].concat(others).sort(function(){ return Math.random() - 0.5; });
+      const grid = document.getElementById('answer-grid');
+      grid.innerHTML = '';
+      all.forEach(function(label) {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = label + ' of the scale';
+        btn.dataset.degree = label;
+        btn.onclick = function() { checkDegreeAnswer(label, btn); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function checkDegreeAnswer(label, btn) {
+      if (answeredThisRound) return;
+      var correct = DEGREE_LABELS[currentDegree];
+      if (label === correct) {
+        answeredThisRound = true;
+        btn.classList.add('correct-ans');
+        setFeedback(randomCorrect() + ' ' + currentUpper.replace(/\d+$/, '') + ' is the ' + correct + ' of ' + currentKey.key + '.', 'correct');
+        triggerStarburst(btn);
+        trackAnswer('interval-quiz', 'degree-' + correct, true);
+        score.onCorrect();
+        playCurrentInterval();
+        setTimeout(function() { nextQuestion(); }, 2200);
+      } else {
+        wrongAttempts++;
+        btn.classList.add('wrong-ans');
+        addShake(btn);
+        setFeedback(randomWrong() + ' Count letter names up from the keynote.', 'wrong');
+        trackAnswer('interval-quiz', 'degree-' + correct, false);
+        score.onWrong();
+        if (wrongAttempts >= 2) {
+          answeredThisRound = true;
+          document.querySelectorAll('.answer-btn').forEach(function(b) {
+            if (b.dataset.degree === correct) b.classList.add('correct-ans');
+          });
+          setFeedback('It’s the ' + correct + ' of ' + currentKey.key + ' — count up from ' + currentRoot.replace(/\d+$/, '') + '.', 'wrong');
+          setTimeout(function() { nextQuestion(); }, 3000);
+        }
+      }
+    }
+
+    function refreshG3Row() {
+      var row = document.getElementById('g3-mode-row');
+      var isG3 = getGrade() === 3;
+      row.style.display = isG3 ? '' : 'none';
+      if (!isG3 && inKeyMode) { inKeyMode = false;
+        document.getElementById('btn-anyroot').classList.add('active');
+        document.getElementById('btn-inkey').classList.remove('active');
+      }
+    }
+
     function nextQuestion() {
+      refreshG3Row();
+      setFeedback('', 'empty');
+      document.getElementById('hint-box').style.display = 'none';
+
+      if (inKeyMode && getGrade() === 3) {
+        generateKeyQuestion();
+        renderKeyStaff();
+        buildDegreeButtons();
+        document.getElementById('interval-info').textContent =
+          'Keynote: ' + currentRoot.replace(/\d+$/, '') + ' (' + currentKey.key + ') — name the second note as a degree of the scale';
+        document.getElementById('btn-hint').style.display = 'none';
+        return;
+      }
+
       generateQuestion();
       renderCurrentStaff();
       buildAnswerButtons(currentInterval);
-      setFeedback('', 'empty');
       document.getElementById('interval-info').textContent =
         'Root: ' + currentRoot + ' — what is the interval?';
       // Reset hint
-      document.getElementById('hint-box').style.display = 'none';
       var hintBtn = document.getElementById('btn-hint');
       if (INTERVAL_SONGS[currentInterval.short]) {
         hintBtn.style.display = 'inline-flex';
