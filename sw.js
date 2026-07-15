@@ -1,5 +1,5 @@
-/* Music Maestro — Service Worker v7.0 */
-var CACHE = 'music-maestro-v7';
+/* Music Maestro — Service Worker v7.1 */
+var CACHE = 'music-maestro-v7-1';
 
 /* On install: just pre-cache the offline shell assets.
    CSS/JS are handled network-first so they never go stale. */
