@@ -3,424 +3,376 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📅 Daily Challenge — Music Maestro</title>
+  <title>Daily Challenge — Music Maestro</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .page-header { background: linear-gradient(90deg, #E65100, #FFE0B2); }
-    .page-header h1 { color: #3E1000; }
-    .back-btn { border-color: #E65100; color: #3E1000; }
+    .page-header { background: linear-gradient(90deg, #E65100, #FFCC80); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
 
-    /* Streak calendar */
-    .streak-section {
-      background: rgba(255,255,255,0.8);
-      border-radius: 16px;
-      padding: 16px;
-      margin: 0 0 16px;
-      text-align: center;
-    }
-    .streak-title { font-size: 0.85rem; color: #888; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.05em; }
-    .streak-count { font-size: 2.2rem; font-weight: 900; color: #E65100; line-height: 1; }
-    .streak-label { font-size: 0.85rem; color: #999; margin-top: 2px; }
-    .calendar-row { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
-    .cal-day {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; font-weight: 700; font-family: monospace;
-    }
-    .cal-day.done    { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
-    .cal-day.today   { background: linear-gradient(135deg, #FF8FAB, #FFB74D); color: white; }
-    .cal-day.missed  { background: #f5f5f5; color: #ccc; }
-    .cal-day.future  { background: #fafafa; color: #ddd; border: 1px dashed #eee; }
+    .start-screen { text-align:center; padding:28px 16px 32px; max-width:560px; margin:0 auto; }
+    .start-title { font-size:1.7rem; font-weight:900; color:#BF360C; margin-bottom:6px; }
+    .start-sub { font-size:0.95rem; color:#666; margin-bottom:20px; }
 
-    /* Completed state */
-    .completed-box {
-      background: linear-gradient(135deg, #FFF3B0, #FFE87A);
-      border-radius: 20px;
-      padding: 28px 20px;
-      text-align: center;
-      margin: 10px 0 20px;
-    }
-    .completed-box h2 { margin: 0 0 8px; font-size: 1.5rem; }
-    .completed-box p  { color: #6D4C00; margin: 0 0 14px; }
+    .streak-hero { background:white; border-radius:20px; padding:20px; margin:14px 0; box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+    .streak-flame { font-size:2.6rem; }
+    .streak-days { font-size:1.5rem; font-weight:900; color:#E65100; }
+    .streak-cal { display:flex; gap:6px; justify-content:center; margin-top:12px; }
+    .cal-dot { width:34px; text-align:center; }
+    .cal-dot .d-label { font-size:0.65rem; color:#aaa; font-weight:700; }
+    .cal-dot .d-mark { width:26px; height:26px; border-radius:50%; margin:3px auto 0; display:flex; align-items:center; justify-content:center; font-size:0.85rem; background:#f0f2f7; color:#ccc; }
+    .cal-dot .d-mark.done { background:linear-gradient(135deg,#FFB74D,#FF8A65); color:white; }
 
-    /* Question area */
-    .question-counter { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600; }
-    .q-card {
-      background: white; border-radius: 16px;
-      padding: 22px 20px; margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    }
-    .q-type-tag {
-      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.06em; color: #aaa; margin-bottom: 8px;
-    }
-    .q-text { font-size: 1.05rem; font-weight: 600; color: #333; margin-bottom: 14px; line-height: 1.5; }
-    .answer-grid .answer-btn { min-width: 140px; }
+    .q-header { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#FFF3E0; border-bottom:2px solid #FFE0B2; }
+    .q-progress-text { font-size:0.9rem; font-weight:700; color:#E65100; white-space:nowrap; }
+    .q-bar-wrap { flex:1; height:8px; background:#FFE0B2; border-radius:4px; overflow:hidden; }
+    .q-bar-fill { height:100%; background:linear-gradient(90deg,#F57C00,#FFB74D); border-radius:4px; transition:width 0.3s; }
+    .q-score-chip { background:#F57C00; color:white; border-radius:12px; padding:3px 12px; font-size:0.85rem; font-weight:800; white-space:nowrap; }
+
+    .q-card { background:white; border-radius:20px; padding:20px 16px; margin:10px 12px; box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+    .q-type-chip { display:inline-block; background:#FFE0B2; color:#E65100; border-radius:12px; padding:3px 12px; font-size:0.82rem; font-weight:800; margin-bottom:10px; }
+    .q-text { font-size:1.05rem; font-weight:700; margin-bottom:12px; line-height:1.4; }
+    .q-staff-box { background:#FAFAFA; border:1px solid #eee; border-radius:12px; padding:8px 4px; text-align:center; margin:10px 0; min-height:70px; }
+
+    .choices-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:12px 0; }
+    .choices-grid.single-col { grid-template-columns:1fr; }
+    .choice-btn { padding:13px 8px; border-radius:14px; border:2px solid #ddd; background:white; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.15s; font-family:inherit; text-align:center; line-height:1.3; }
+    .choice-btn:hover:not(:disabled) { background:#FFF3E0; border-color:#F57C00; transform:translateY(-1px); }
+    .choice-btn.correct-ans { background:#c8f7dc; border-color:#4caf50; }
+    .choice-btn.wrong-ans { background:#fdd; border-color:#f44336; }
+    .choice-btn:disabled { cursor:default; }
+    .choice-btn.locked { opacity:0.45; cursor:not-allowed; }
+
+    .q-feedback { text-align:center; font-size:1.05rem; font-weight:700; min-height:32px; padding:6px; }
+    .q-feedback.correct { color:#4CAF50; }
+    .q-feedback.wrong { color:#FF6B6B; }
+    .q-explanation { background:#FFF3E0; border-radius:10px; padding:9px 13px; font-size:0.87rem; color:#555; margin:7px 0; display:none; line-height:1.5; }
+    .next-q-btn { width:100%; background:linear-gradient(90deg,#F57C00,#FFB74D); color:white; border:none; border-radius:14px; padding:13px; font-size:0.95rem; font-weight:800; cursor:pointer; font-family:inherit; margin-top:8px; display:none; }
+
+    .play-aural-btn { display:block; width:76px; height:76px; border-radius:50%; background:linear-gradient(135deg,#F57C00,#FFB74D); color:white; border:none; font-size:1.9rem; cursor:pointer; margin:8px auto; box-shadow:0 4px 14px rgba(245,124,0,0.4); transition:transform 0.1s; }
+    .play-aural-hint { font-size:0.82rem; color:#888; text-align:center; margin-bottom:8px; }
+
+    .results-screen { text-align:center; padding:20px 14px 32px; max-width:560px; margin:0 auto; }
+    .result-emoji { font-size:4rem; margin:10px 0; }
+    .result-title { font-size:1.5rem; font-weight:900; color:#BF360C; }
+    .result-sub { font-size:0.95rem; color:#666; margin:6px 0 16px; }
+    .home-btn { background:white; color:#E65100; border:2px solid #E65100; border-radius:20px; padding:13px 26px; font-size:0.95rem; font-weight:800; cursor:pointer; margin:8px; font-family:inherit; }
   </style>
 </head>
 <body>
 
-  <div id="loading-overlay">
-    <div class="spinner"></div>
-    <div>Loading… 🎹</div>
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading piano sounds... 🎹</p>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn">←</a>
+  <h1 class="page-title">Daily Challenge</h1>
+  <div id="header-score" class="score-display" style="display:none;">
+    <span id="header-score-text">0/0</span>
+  </div>
+</header>
+
+<!-- ═══ START / ALREADY-DONE SCREEN ═══ -->
+<div id="screen-start">
+  <div class="start-screen">
+    <div class="start-title">Daily Challenge 📅</div>
+    <div class="start-sub">5 mixed questions from your grade — once a day, every day</div>
+
+    <div class="streak-hero">
+      <span class="streak-flame">🔥</span>
+      <div class="streak-days"><span id="streak-count">0</span>-day streak</div>
+      <div class="streak-cal" id="streak-cal"></div>
+    </div>
+
+    <div id="today-status"></div>
+
+    <button class="btn btn-primary" id="start-btn" onclick="startChallenge()"
+      style="font-size:1.1rem;padding:16px 38px;margin-top:6px;" disabled>
+      Play today's 5 questions
+    </button>
+  </div>
+</div>
+
+<!-- ═══ QUESTION SCREEN ═══ -->
+<div id="screen-question" style="display:none;">
+  <div class="q-header">
+    <span class="q-progress-text">Q&nbsp;<span id="q-num">1</span>/5</span>
+    <div class="q-bar-wrap"><div class="q-bar-fill" id="q-bar" style="width:0%"></div></div>
+    <div class="q-score-chip">✓&nbsp;<span id="q-correct-count">0</span></div>
   </div>
 
-  <header class="page-header">
-    <a href="/" class="back-btn">←</a>
-    <div style="flex:1;">
-      <h1>📅 Daily Challenge</h1>
-      <div class="subtitle" id="date-subtitle"></div>
-    </div>
-    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">中文</button>
-  </header>
+  <div class="q-card">
+    <div class="q-type-chip" id="q-chip"></div>
+    <div class="q-text" id="q-text"></div>
 
-  <main class="main-content">
-
-    <!-- Streak + calendar -->
-    <div class="streak-section">
-      <div class="streak-title">🔥 DAILY STREAK</div>
-      <div class="streak-count" id="streak-count">0</div>
-      <div class="streak-label">days in a row</div>
-      <div class="calendar-row" id="calendar-row"></div>
+    <div id="q-staff-box" class="q-staff-box" style="display:none;">
+      <div id="q-staff"></div>
     </div>
 
-    <!-- Score bar (shown during challenge) -->
-    <div class="score-display" id="score-area" style="display:none;">
-      <div class="score-item"><span>Score</span> <span id="score-correct">0/0</span></div>
-      <div class="score-item"><span>Streak</span> <span id="score-streak">🔥 0</span></div>
-    </div>
-    <div class="progress-section" id="progress-area" style="display:none;">
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">0 / 5</div>
+    <div id="q-aural-box" style="display:none;">
+      <button class="play-aural-btn" id="q-play-btn" onclick="playAural()">▶</button>
+      <div class="play-aural-hint">Tap ▶ to listen, then choose your answer</div>
     </div>
 
-    <!-- Completed state -->
-    <div class="completed-box" id="completed-box" style="display:none;">
-      <div style="font-size:2.5rem;">🎉</div>
-      <h2 id="completed-headline">Challenge complete!</h2>
-      <p id="completed-sub"></p>
-      <div style="font-size:1.8rem;" id="completed-stars"></div>
+    <div class="choices-grid" id="q-choices"></div>
+
+    <div class="q-feedback" id="q-feedback"></div>
+    <div class="q-explanation" id="q-explanation"></div>
+    <button class="next-q-btn" id="q-next-btn" onclick="advanceQuestion()">Next →</button>
+  </div>
+</div>
+
+<!-- ═══ RESULTS SCREEN ═══ -->
+<div id="screen-results" style="display:none;">
+  <div class="results-screen">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub" id="result-sub"></div>
+
+    <div class="streak-hero">
+      <span class="streak-flame">🔥</span>
+      <div class="streak-days"><span id="result-streak">0</span>-day streak</div>
+      <div class="streak-cal" id="result-cal"></div>
     </div>
 
-    <!-- Start screen -->
-    <div id="start-screen" style="text-align:center;padding:20px 0;">
-      <p style="color:#666;margin-bottom:20px;">5 mixed questions · one chance per day</p>
-      <button class="btn" style="background:linear-gradient(90deg,#E65100,#FFB74D);color:white;font-size:1.1rem;padding:16px 36px;" onclick="startChallenge()">Start today's challenge 🚀</button>
-    </div>
+    <p style="font-size:0.9rem;color:#888;">Come back tomorrow for 5 new questions!</p>
+    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+  </div>
+</div>
 
-    <!-- Question area -->
-    <div id="question-area" style="display:none;">
-      <div class="question-counter" id="question-counter">Question 1 of 5</div>
-      <div class="q-card">
-        <div class="q-type-tag" id="q-type-tag"></div>
-        <div class="q-text" id="q-text"></div>
-        <div id="q-staff"></div>
-        <div id="q-play-row" style="text-align:center;margin-bottom:10px;display:none;">
-          <button class="btn btn-secondary" onclick="playCurrentQ()">▶ Play</button>
-        </div>
-      </div>
-      <div class="feedback empty" id="feedback"></div>
-      <div class="answer-grid" id="answer-grid"></div>
-    </div>
+<script src="i18n.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+<script src="auth.js"></script>
+<script src="game.js"></script>
+<script src="exam-questions.js"></script>
+<script>
+/* ============================================================
+   Daily Challenge — 5 questions/day from the shared generators
+   ============================================================ */
 
-  </main>
+var QUESTIONS_PER_DAY = 5;
 
-  <script src="i18n.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="supabase.js"></script>
-  <script src="game.js"></script>
-  <script>
+function getDailyData() {
+  try { return JSON.parse(localStorage.getItem('cc-daily')) || { lastPlayed:'', history:{} }; }
+  catch(e) { return { lastPlayed:'', history:{} }; }
+}
+function saveDailyData(d) {
+  try { localStorage.setItem('cc-daily', JSON.stringify(d)); } catch(e) {}
+}
 
-    /* ── Date helpers ── */
-    function todayKey() {
-      var d = new Date();
-      return 'mm-daily-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    }
-    function dateKey(offset) {
-      var d = new Date();
-      d.setDate(d.getDate() + offset);
-      return 'mm-daily-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    }
-    function getTodayData() {
-      try { return JSON.parse(localStorage.getItem(todayKey())) || {}; } catch(e) { return {}; }
-    }
-    function saveTodayData(data) {
-      localStorage.setItem(todayKey(), JSON.stringify(data));
-    }
+function buildCalendar(elId) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = '';
+  var streak = getDayStreak();
+  var labels = ['S','M','T','W','T','F','S'];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(Date.now() - i * 86400000);
+    var key = _localDateStr(d);
+    var done = !!(streak.history && streak.history[key]);
+    var dot = document.createElement('div');
+    dot.className = 'cal-dot';
+    dot.innerHTML =
+      '<div class="d-label">' + labels[d.getDay()] + '</div>' +
+      '<div class="d-mark' + (done ? ' done' : '') + '">' + (done ? '✓' : '·') + '</div>';
+    el.appendChild(dot);
+  }
+}
 
-    function calcStreak() {
-      var streak = 0;
-      for (var i = 0; i >= -365; i--) {
-        var key = dateKey(i);
-        var data; try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
-        if (data.completed) streak++;
-        else if (i < 0) break;
-      }
-      return streak;
-    }
+function refreshStartScreen() {
+  var streak = getDayStreak();
+  document.getElementById('streak-count').textContent = streak.days || 0;
+  buildCalendar('streak-cal');
 
-    function buildCalendar() {
-      var row = document.getElementById('calendar-row');
-      row.innerHTML = '';
-      for (var i = -6; i <= 0; i++) {
-        var key = dateKey(i);
-        var data; try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
-        var d = new Date(); d.setDate(d.getDate() + i);
-        var label = d.toLocaleDateString('en', {weekday:'short'}).slice(0,1);
-        var el = document.createElement('div');
-        el.className = 'cal-day ' + (i === 0 ? (data.completed ? 'done' : 'today') : (data.completed ? 'done' : 'missed'));
-        el.textContent = data.completed ? '✓' : label;
-        el.title = d.toLocaleDateString('en', {month:'short',day:'numeric'}) + (data.completed ? ' ✓' : '');
-        row.appendChild(el);
-      }
-      document.getElementById('streak-count').textContent = calcStreak();
-    }
+  var daily = getDailyData();
+  var today = _localDateStr();
+  var statusEl = document.getElementById('today-status');
+  var startBtn = document.getElementById('start-btn');
+  if (daily.lastPlayed === today) {
+    var scoreToday = daily.history && daily.history[today];
+    statusEl.innerHTML = '<p style="color:#4CAF50;font-weight:800;margin:8px 0;">✅ Done for today — you scored ' +
+      scoreToday + '/' + QUESTIONS_PER_DAY + '. Come back tomorrow!</p>';
+    startBtn.style.display = 'none';
+  } else {
+    statusEl.innerHTML = '';
+    startBtn.style.display = 'inline-block';
+  }
+}
 
-    /* ── Question bank (5 types: note, interval, scale, term, chord) ── */
-    var NOTE_NAMES = ['C','D','E','F','G','A','B'];
-    var INTERVALS = [
-      { name:'Major 2nd', semitones:2, grade:1 }, { name:'Major 3rd', semitones:4, grade:1 },
-      { name:'Perfect 4th', semitones:5, grade:1 }, { name:'Perfect 5th', semitones:7, grade:1 },
-      { name:'Octave', semitones:12, grade:1 },
-      { name:'Minor 3rd', semitones:3, grade:2 }, { name:'Minor 6th', semitones:8, grade:2 },
-      { name:'Major 6th', semitones:9, grade:2 }
-    ];
-    var TERMS = [
-      { term:'Allegro',   meaning:'Fast' },       { term:'Andante',  meaning:'Walking pace' },
-      { term:'Piano',     meaning:'Soft' },        { term:'Forte',    meaning:'Loud' },
-      { term:'Legato',    meaning:'Smoothly' },    { term:'Staccato', meaning:'Detached' },
-      { term:'Crescendo', meaning:'Getting louder'}, { term:'Da Capo', meaning:'From the beginning' },
-      { term:'Fine',      meaning:'The end' },     { term:'Moderato', meaning:'At a moderate pace' },
-      { term:'Presto',    meaning:'Very fast' },   { term:'Adagio',   meaning:'Slowly' }
-    ];
-    var SCALES = [
-      { name:'C major',   notes:['C4','D4','E4','F4','G4','A4','B4','C5'] },
-      { name:'G major',   notes:['G4','A4','B4','C5','D5','E5','F#5','G5'] },
-      { name:'F major',   notes:['F4','G4','A4','Bb4','C5','D5','E5','F5'] }
-    ];
+/* ── Session ── */
+var session = { questions:[], current:0, correct:0, answered:false, advancing:false };
+var score = new SessionScore('daily-challenge');
 
-    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-    function shuffle(arr) { return arr.slice().sort(function(){ return Math.random()-0.5; }); }
+function startChallenge() {
+  session.questions = buildPool(getGrade(), QUESTIONS_PER_DAY);
+  session.current = 0;
+  session.correct = 0;
 
-    function makeNoteQ() {
-      var n = pickRandom(NOTE_NAMES);
-      var wrong = shuffle(NOTE_NAMES.filter(function(x){ return x !== n; })).slice(0,3);
-      var opts = shuffle([n].concat(wrong));
-      return { type:'Note Reading', text:'What note is this? C D E F G A B', answer:n, options:opts,
-               play: function(){ playNote(n+'4','2n'); } };
-    }
+  document.getElementById('screen-start').style.display    = 'none';
+  document.getElementById('screen-question').style.display = 'block';
+  document.getElementById('header-score').style.display    = 'flex';
+  showQuestion(0);
+}
 
-    function makeIntervalQ() {
-      var pool = INTERVALS.filter(function(i){ return i.grade <= getGrade(); });
-      var iv = pickRandom(pool);
-      var root = pickRandom(['C4','E4','G4','F4']);
-      var upper = Tonal.Note.fromMidi(Tonal.Note.midi(root) + iv.semitones);
-      var wrong = shuffle(pool.filter(function(i){ return i.name !== iv.name; })).slice(0,3).map(function(i){ return i.name; });
-      var opts = shuffle([iv.name].concat(wrong));
-      return { type:'Interval', text:'Listen — what interval do you hear?', answer:iv.name, options:opts,
-               playNotes:[root, upper], play: function(){ playChord([root, upper],'2n'); setTimeout(function(){ playMelodic([root,upper],'4n',80); },1200); } };
-    }
+function showQuestion(idx) {
+  var q = session.questions[idx];
+  session.answered = false;
+  session.advancing = false;
 
-    function makeTermQ() {
-      var term = pickRandom(TERMS);
-      var wrong = shuffle(TERMS.filter(function(t){ return t.term !== term.term; })).slice(0,3).map(function(t){ return t.meaning; });
-      var opts = shuffle([term.meaning].concat(wrong));
-      return { type:'Music Term', text:'What does "' + term.term + '" mean?', answer:term.meaning, options:opts };
-    }
+  document.getElementById('q-num').textContent = idx + 1;
+  document.getElementById('q-bar').style.width = (idx / QUESTIONS_PER_DAY * 100) + '%';
+  document.getElementById('q-correct-count').textContent = session.correct;
+  document.getElementById('header-score-text').textContent = session.correct + '/' + idx;
+  document.getElementById('q-chip').textContent = q.chip;
+  document.getElementById('q-text').innerHTML = q.text;
 
-    function makeScaleQ() {
-      var scale = pickRandom(SCALES);
-      var allNames = SCALES.map(function(s){ return s.name; });
-      var wrong = shuffle(allNames.filter(function(n){ return n !== scale.name; })).slice(0,3);
-      var opts = shuffle([scale.name].concat(wrong));
-      return { type:'Scale', text:'Listen — which scale is this?', answer:scale.name, options:opts,
-               play: function(){ playScale(scale.notes, 100); } };
-    }
+  var staffBox = document.getElementById('q-staff-box');
+  if (q.abcStr) {
+    staffBox.style.display = 'block';
+    setTimeout(function(){ renderAbc('q-staff', q.abcStr, {scale:2.2, staffwidth:260}); }, 10);
+  } else {
+    staffBox.style.display = 'none';
+    document.getElementById('q-staff').innerHTML = '';
+  }
 
-    function makeTimeSigQ() {
-      var sigs = [
-        { sig:'2/4', desc:'2 beats per bar (march)' },
-        { sig:'3/4', desc:'3 beats per bar (waltz)' },
-        { sig:'4/4', desc:'4 beats per bar (common time)' }
-      ];
-      var ts = pickRandom(sigs);
-      var wrong = shuffle(sigs.filter(function(s){ return s.sig !== ts.sig; })).map(function(s){ return s.sig; });
-      var opts = shuffle([ts.sig].concat(wrong));
-      return { type:'Time Signature', text:'Which time signature has ' + ts.desc + '?', answer:ts.sig, options:opts };
-    }
+  var auralBox = document.getElementById('q-aural-box');
+  if (q.aural) {
+    auralBox.style.display = 'block';
+    var pb = document.getElementById('q-play-btn');
+    pb.textContent = '▶'; pb.disabled = false;
+  } else {
+    auralBox.style.display = 'none';
+  }
 
-    var questionBuilders = [makeNoteQ, makeIntervalQ, makeTermQ, makeScaleQ, makeTimeSigQ];
+  var grid = document.getElementById('q-choices');
+  grid.innerHTML = '';
+  grid.className = 'choices-grid' + (q.choices.length <= 2 ? ' single-col' : '');
+  q.choices.forEach(function(ch) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn' + (q.aural ? ' locked' : '');
+    btn.innerHTML = ch;
+    if (q.aural) btn.disabled = true;
+    btn.onclick = function(){ checkAnswer(ch, btn, q); };
+    grid.appendChild(btn);
+  });
 
-    /* Map module names to question builder */
-    var MODULE_BUILDER = {
-      'note-namer':    makeNoteQ,
-      'interval-quiz': makeIntervalQ,
-      'aural-training':makeIntervalQ,
-      'terms-flashcards': makeTermQ,
-      'scale-builder': makeScaleQ,
-      'barline-quiz':  makeTimeSigQ
-    };
+  document.getElementById('q-feedback').textContent = '';
+  document.getElementById('q-feedback').className = 'q-feedback';
+  document.getElementById('q-explanation').style.display = 'none';
+  document.getElementById('q-next-btn').style.display = 'none';
+}
 
-    function buildDailySet() {
-      /* Find weak modules and bias toward them */
-      var weak = getWeakConcepts(5);
-      var qs = [];
-      var used = {};
+function checkAnswer(chosen, btn, q) {
+  if (session.answered) return;
+  session.answered = true;
 
-      /* First: one question per distinct weak module (up to 3) */
-      weak.forEach(function(w) {
-        if (qs.length < 3 && MODULE_BUILDER[w.module] && !used[w.module]) {
-          qs.push(MODULE_BUILDER[w.module]());
-          used[w.module] = true;
-        }
-      });
+  var allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(function(b){ b.disabled = true; b.classList.remove('locked'); });
 
-      /* Fill remaining slots with shuffled builders */
-      var builders = shuffle(questionBuilders);
-      var bi = 0;
-      while (qs.length < 5) {
-        qs.push(builders[bi % builders.length]());
-        bi++;
-      }
-      return shuffle(qs);
-    }
+  var isOk = (chosen === q.answer);
+  if (isOk) {
+    btn.classList.add('correct-ans');
+    session.correct++;
+    document.getElementById('q-feedback').textContent = randomCorrect();
+    document.getElementById('q-feedback').className = 'q-feedback correct';
+    triggerStarburst(btn);
+    score.onCorrect();
+    trackAnswer('daily-challenge', q.concept, true);
+  } else {
+    btn.classList.add('wrong-ans');
+    allBtns.forEach(function(b){ if (b.innerHTML === q.answer) b.classList.add('correct-ans'); });
+    addShake(btn);
+    document.getElementById('q-feedback').textContent = randomWrong();
+    document.getElementById('q-feedback').className = 'q-feedback wrong';
+    score.onWrong();
+    trackAnswer('daily-challenge', q.concept, false);
+  }
 
-    /* ── Challenge state ── */
-    var questions = [];
-    var currentQIdx = 0;
-    var correctCount = 0;
-    var answered = false;
-    var score;
+  var expEl = document.getElementById('q-explanation');
+  expEl.innerHTML = q.explanation;
+  expEl.style.display = 'block';
 
-    function startChallenge() {
-      var today = getTodayData();
-      if (today.completed) { showCompleted(today); return; }
+  var nextBtn = document.getElementById('q-next-btn');
+  nextBtn.textContent = session.current < QUESTIONS_PER_DAY - 1 ? 'Next Question →' : 'Finish 🎉';
+  nextBtn.style.display = 'block';
+  document.getElementById('q-correct-count').textContent = session.correct;
+  document.getElementById('header-score-text').textContent = session.correct + '/' + (session.current + 1);
 
-      questions = buildDailySet();
-      currentQIdx = 0;
-      correctCount = 0;
-      answered = false;
-      score = new SessionScore('daily-challenge');
+  if (isOk) {
+    setTimeout(function(){ if (!session.advancing) advanceQuestion(); }, 1800);
+  }
+}
 
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('question-area').style.display = 'block';
-      document.getElementById('score-area').style.display = 'flex';
-      document.getElementById('progress-area').style.display = 'block';
+function advanceQuestion() {
+  if (session.advancing) return;
+  session.advancing = true;
+  document.getElementById('q-next-btn').style.display = 'none';
 
-      showQuestion();
-    }
+  if (session.current < QUESTIONS_PER_DAY - 1) {
+    session.current++;
+    showQuestion(session.current);
+  } else {
+    showResults();
+  }
+}
 
-    function showQuestion() {
-      var q = questions[currentQIdx];
-      document.getElementById('question-counter').textContent = 'Question ' + (currentQIdx+1) + ' of 5';
-      document.getElementById('q-type-tag').textContent = q.type;
-      document.getElementById('q-text').textContent = q.text;
-      document.getElementById('feedback').className = 'feedback empty';
-      document.getElementById('feedback').textContent = '';
-      answered = false;
-
-      var playRow = document.getElementById('q-play-row');
-      playRow.style.display = q.play ? 'block' : 'none';
-
-      updateProgressBar(currentQIdx, 5);
-
-      var grid = document.getElementById('answer-grid');
-      grid.innerHTML = '';
-      q.options.forEach(function(opt) {
-        var btn = document.createElement('button');
-        btn.className = 'answer-btn';
-        btn.textContent = opt;
-        btn.onclick = function(){ checkDailyAnswer(opt, btn, q); };
-        grid.appendChild(btn);
-      });
-
-      // Auto-play audio questions
-      if (q.play) setTimeout(function(){ q.play(); }, 400);
-    }
-
-    function playCurrentQ() {
-      var q = questions[currentQIdx];
-      if (q && q.play) q.play();
-    }
-
-    function checkDailyAnswer(opt, btn, q) {
-      if (answered) return;
-      answered = true;
-
-      if (opt === q.answer) {
-        btn.classList.add('correct-ans');
-        setFeedback(randomCorrect(), 'correct');
-        triggerStarburst(btn);
-        correctCount++;
-        score.onCorrect();
-      } else {
-        btn.classList.add('wrong-ans');
-        addShake(btn);
-        document.querySelectorAll('.answer-btn').forEach(function(b){
-          if (b.textContent === q.answer) b.classList.add('correct-ans');
-        });
-        setFeedback(randomWrong() + ' Correct: ' + q.answer, 'wrong');
-        score.onWrong();
-      }
-
-      setTimeout(function() {
-        currentQIdx++;
-        if (currentQIdx < 5) {
-          showQuestion();
-        } else {
-          finishChallenge();
-        }
-      }, 1600);
-    }
-
-    function setFeedback(msg, type) {
-      var el = document.getElementById('feedback');
-      el.textContent = msg;
-      el.className = 'feedback ' + (type || 'empty');
-    }
-
-    function finishChallenge() {
-      var data = { completed: true, score: correctCount, date: new Date().toISOString() };
-      saveTodayData(data);
-      buildCalendar();
-      showCompleted(data);
-    }
-
-    function showCompleted(data) {
-      document.getElementById('question-area').style.display = 'none';
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('score-area').style.display = 'none';
-      document.getElementById('progress-area').style.display = 'none';
-
-      var s = data.score || 0;
-      var stars = s >= 5 ? '⭐⭐⭐' : s >= 3 ? '⭐⭐' : '⭐';
-      var msg = s === 5 ? 'Perfect score! You\'re a music maestro! 🎓' :
-                s >= 3 ? 'Great work! Keep practising! 🎵' : 'Good effort — come back tomorrow! 💪';
-
-      document.getElementById('completed-headline').textContent = 'Challenge complete! ' + s + '/5';
-      document.getElementById('completed-sub').textContent = msg;
-      document.getElementById('completed-stars').textContent = stars;
-      document.getElementById('completed-box').style.display = 'block';
-    }
-
-    /* ── Init ── */
-    initSampler(function() {
-      var today = new Date();
-      document.getElementById('date-subtitle').textContent =
-        today.toLocaleDateString('en', { weekday:'long', month:'long', day:'numeric' });
-
-      buildCalendar();
-
-      var todayData = getTodayData();
-      if (todayData.completed) {
-        document.getElementById('start-screen').style.display = 'none';
-        showCompleted(todayData);
-      }
+function playAural() {
+  var q = session.questions[session.current];
+  if (!q || !q.playChords) return;
+  ensureAudio().then(function() {
+    var btn = document.getElementById('q-play-btn');
+    btn.disabled = true; btn.textContent = '♪';
+    var t = Tone.now() + 0.05;
+    q.playChords.forEach(function(chord, i) {
+      sampler.triggerAttackRelease(chord, '2n', t + i * 1.3);
     });
-  </script>
+    var dur = (q.playChords.length * 1.3 + 1.0) * 1000;
+    setTimeout(function() {
+      btn.textContent = '▶'; btn.disabled = false;
+      document.querySelectorAll('.choice-btn').forEach(function(b){
+        b.disabled = false; b.classList.remove('locked');
+      });
+    }, dur);
+  });
+}
+
+function showResults() {
+  /* Record today's play */
+  var daily = getDailyData();
+  var today = _localDateStr();
+  daily.lastPlayed = today;
+  daily.history = daily.history || {};
+  daily.history[today] = session.correct;
+  saveDailyData(daily);
+  var streak = recordDailyActivity();
+
+  document.getElementById('screen-question').style.display = 'none';
+  document.getElementById('screen-results').style.display = 'block';
+  document.getElementById('header-score').style.display = 'none';
+
+  var pct = session.correct / QUESTIONS_PER_DAY;
+  var emoji = pct === 1 ? '🏆' : pct >= 0.8 ? '🌟' : pct >= 0.6 ? '💪' : '🌱';
+  var title = pct === 1 ? 'Perfect 5/5!' : session.correct + '/' + QUESTIONS_PER_DAY + ' today';
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent =
+    pct === 1 ? 'Flawless! See you tomorrow 🎹' : 'Every day makes you stronger. See you tomorrow!';
+  document.getElementById('result-streak').textContent = streak.days || 1;
+  buildCalendar('result-cal');
+}
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', function() {
+  refreshStartScreen();
+  initSampler(function() {
+    document.getElementById('start-btn').disabled = false;
+  });
+});
+</script>
 </body>
 </html>

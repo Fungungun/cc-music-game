@@ -34,6 +34,7 @@ window.TRANSLATIONS = {
     'mod-form-detective':   '🔍 Form Detective',
     'mod-learn':            '📖 Theory Guide',
     'mod-mock-exam':        '📝 Mock Exam',
+    'mod-daily-challenge':  '📅 Daily Challenge',
 
     // Module descriptions
     'desc-note-namer':       'Identify notes on treble & bass clef staves',
@@ -48,6 +49,7 @@ window.TRANSLATIONS = {
     'desc-form-detective':   'Binary, Ternary, cadences & time signatures',
     'desc-learn':            'Full theory reference — every topic, every grade',
     'desc-mock-exam':        'Timed 20-question exam sessions, Grade 1–3',
+    'desc-daily-challenge':  '5 mixed questions a day — build your streak!',
 
     // How to play intros
     'how-note-namer':       'A note appears on the staff. Look carefully at where it sits on lines and spaces, then tap the correct letter name (C D E F G A B). You can toggle between treble and bass clef!',
@@ -166,6 +168,7 @@ window.TRANSLATIONS = {
     'mod-form-detective':   '🔍 曲式侦探',
     'mod-learn':            '📖 乐理指南',
     'mod-mock-exam':        '📝 模拟考试',
+    'mod-daily-challenge':  '📅 每日挑战',
 
     // Module descriptions
     'desc-note-namer':       '认读高音谱表和低音谱表上的音符',
@@ -180,6 +183,7 @@ window.TRANSLATIONS = {
     'desc-form-detective':   '二段式、三段式、终止式和拍号',
     'desc-learn':            '完整乐理参考 — 每个主题、每个级别',
     'desc-mock-exam':        '每次20题模拟考试，第1–3级',
+    'desc-daily-challenge':  '每天5道混合题 — 保持连续打卡！',
 
     // How to play intros
     'how-note-namer':       '五线谱上会出现一个音符。仔细看它在线条和间隔上的位置，然后点击正确的音符名称（C D E F G A B）。可以切换高音谱号和低音谱号！',
@@ -299,6 +303,7 @@ window.TRANSLATIONS = {
     'mod-form-detective':   '🔍 Detective de forma',
     'mod-learn':            '📖 Guía de teoría',
     'mod-mock-exam':        '📝 Examen de práctica',
+    'mod-daily-challenge':  '📅 Reto diario',
 
     // Module descriptions
     'desc-note-namer':       'Identifica notas en clave de sol y clave de fa',
@@ -313,6 +318,7 @@ window.TRANSLATIONS = {
     'desc-form-detective':   'Forma binaria, ternaria, cadencias y compases',
     'desc-learn':            'Referencia de teoría completa — cada tema, cada grado',
     'desc-mock-exam':        'Sesiones de 20 preguntas, Grados 1–3',
+    'desc-daily-challenge':  '5 preguntas mixtas al día — ¡mantén tu racha!',
 
     // How to play intros
     'how-note-namer':       '¡Aparece una nota en el pentagrama! Mira bien su posición en las líneas y espacios, y toca el nombre correcto (C D E F G A B). ¡Puedes cambiar entre clave de sol y clave de fa!',

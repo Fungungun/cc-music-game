@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v6.0 · 2026-07-15";
+const APP_VERSION = "v6.1 · 2026-07-15";
 
 /* AMEB Section III context per module page */
 const AMEB_PAGE_TAGS = {
@@ -678,6 +678,42 @@ function saveModuleData(module, data) {
   } catch(e) {}
 }
 
+/* ============ Day streak (cross-day retention) ============ */
+function _localDateStr(d) {
+  d = d || new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function getDayStreak() {
+  try {
+    return JSON.parse(localStorage.getItem('mm-day-streak')) || { days: 0, last: '', history: {} };
+  } catch(e) {
+    return { days: 0, last: '', history: {} };
+  }
+}
+
+/* Called on every answered question (any module). Idempotent per day. */
+function recordDailyActivity() {
+  var s = getDayStreak();
+  var today = _localDateStr();
+  if (s.last === today) return s;
+
+  var yesterday = _localDateStr(new Date(Date.now() - 86400000));
+  s.days = (s.last === yesterday) ? (s.days || 0) + 1 : 1;
+  s.last = today;
+  s.history = s.history || {};
+  s.history[today] = true;
+
+  /* Prune history beyond 70 days */
+  var cutoff = _localDateStr(new Date(Date.now() - 70 * 86400000));
+  Object.keys(s.history).forEach(function(k) { if (k < cutoff) delete s.history[k]; });
+
+  try { localStorage.setItem('mm-day-streak', JSON.stringify(s)); } catch(e) {}
+  return s;
+}
+
 /* ============ SessionScore ============ */
 class SessionScore {
   constructor(module) {
@@ -693,12 +729,14 @@ class SessionScore {
     this.total++;
     this.streak++;
     this.bestStreak = Math.max(this.bestStreak, this.streak);
+    recordDailyActivity();
     this._update();
   }
 
   onWrong() {
     this.total++;
     this.streak = 0;
+    recordDailyActivity();
     this._update();
   }
 
@@ -1000,6 +1038,7 @@ function showSessionSummary(opts) {
       '<div style="text-align:center;margin-bottom:4px;font-size:2rem;">' + star + '</div>' +
       '<h2 style="text-align:center;margin:0 0 4px;color:#333;font-size:1.4rem;">' + headline + '</h2>' +
       '<p style="text-align:center;color:#888;font-size:0.9rem;margin:0 0 14px;">' + sub + '</p>' +
+      (getDayStreak().days > 1 ? '<p style="text-align:center;color:#E65100;font-weight:800;font-size:0.9rem;margin:0 0 12px;">🔥 ' + getDayStreak().days + '-day practice streak!</p>' : '') +
       '<div style="background:linear-gradient(135deg,#f5f0ff,#fff0f5);border-radius:16px;padding:14px 16px;text-align:center;margin-bottom:12px;">' +
         '<span style="font-size:2rem;font-weight:900;color:#7B52C9;">' + correct + '</span>' +
         '<span style="color:#aaa;font-size:1rem;"> / ' + total + ' correct</span>' +

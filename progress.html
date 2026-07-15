@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parent View — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-header { background: linear-gradient(90deg, #3a7bd5, #80C4F0); }
+    .page-header h1 { color: white; }
+    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
+
+    .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
+    .intro { font-size: 0.9rem; color: #666; line-height: 1.5; margin-bottom: 14px; }
+
+    .stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .stat-card { flex: 1; min-width: 140px; background: white; border-radius: 16px; padding: 14px 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-num { font-size: 1.6rem; font-weight: 900; color: #1a2233; }
+    .stat-label { font-size: 0.78rem; color: #888; font-weight: 700; }
+
+    .module-row { background: white; border-radius: 14px; padding: 12px 16px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .module-row .m-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .module-row .m-name { font-weight: 800; color: #1a2233; font-size: 0.95rem; }
+    .module-row .m-stats { font-size: 0.8rem; color: #888; }
+    .acc-bar { background: #f0f2f7; border-radius: 4px; height: 8px; overflow: hidden; }
+    .acc-fill { height: 100%; border-radius: 4px; }
+
+    .weak-list { background: white; border-radius: 16px; padding: 14px 16px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .weak-list h3 { margin: 0 0 10px; font-size: 0.95rem; color: #1a2233; }
+    .weak-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5; font-size: 0.88rem; }
+    .weak-item:last-child { border: none; }
+
+    .note-box { background: #FFF8E1; border-radius: 12px; padding: 12px 16px; font-size: 0.82rem; color: #7A5700; line-height: 1.5; margin-top: 16px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn">←</a>
+  <h1 class="page-title">Parent View</h1>
+</header>
+
+<main class="wrap">
+  <p class="intro">A summary of your child's practice on this device — how often they practise, how accurate they are in each area, and what to work on next with their teacher.</p>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">🔥 DAY STREAK</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-answered">0</div><div class="stat-label">QUESTIONS ANSWERED</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-accuracy">–</div><div class="stat-label">OVERALL ACCURACY</div></div>
+  </div>
+
+  <div id="modules-section"></div>
+
+  <div class="weak-list" id="weak-section" style="display:none;">
+    <h3>💡 Suggested focus areas</h3>
+    <div id="weak-items"></div>
+  </div>
+
+  <div class="empty-state" id="empty-state" style="display:none;">
+    <div style="font-size:3rem;margin-bottom:10px;">🎵</div>
+    <p>No practice recorded on this device yet.<br>Once your child answers some questions, their progress appears here.</p>
+  </div>
+
+  <div class="note-box">
+    📌 Progress is stored on this device. If your child practises on the family iPad, open this page on that iPad. Signed-in accounts also back up progress automatically.
+  </div>
+</main>
+
+<script src="auth.js"></script>
+<script src="game.js"></script>
+<script>
+  var MODULE_LABELS = {
+    'note-namer':'Note Namer', 'scale-builder':'Scale Builder',
+    'key-signatures':'Key Signatures', 'note-values':'Note Values',
+    'interval-quiz':'Interval Quiz', 'chord-game':'Chord Game',
+    'rhythm-trainer':'Rhythm Trainer', 'terms-flashcards':'Terms Flashcards',
+    'aural-training':'Aural Training', 'form-detective':'Form Detective',
+    'mock-exam':'Mock Exam', 'daily-challenge':'Daily Challenge'
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var streak = getDayStreak();
+    document.getElementById('stat-streak').textContent = streak.days || 0;
+
+    var mastery = {};
+    try { mastery = JSON.parse(localStorage.getItem('mm-mastery')) || {}; } catch(e) {}
+
+    /* Aggregate per module */
+    var byModule = {};
+    var totalC = 0, totalW = 0;
+    Object.keys(mastery).forEach(function(key) {
+      var sep = key.indexOf(':');
+      if (sep < 0) return;
+      var mod = key.slice(0, sep);
+      var m = mastery[key];
+      byModule[mod] = byModule[mod] || { correct: 0, wrong: 0 };
+      byModule[mod].correct += m.correct || 0;
+      byModule[mod].wrong   += m.wrong   || 0;
+      totalC += m.correct || 0;
+      totalW += m.wrong   || 0;
+    });
+
+    var total = totalC + totalW;
+    document.getElementById('stat-answered').textContent = total;
+    document.getElementById('stat-accuracy').textContent = total ? Math.round(totalC / total * 100) + '%' : '–';
+
+    var section = document.getElementById('modules-section');
+    var mods = Object.keys(byModule).sort();
+    if (!mods.length) {
+      document.getElementById('empty-state').style.display = 'block';
+      return;
+    }
+
+    mods.forEach(function(mod) {
+      var d = byModule[mod];
+      var answered = d.correct + d.wrong;
+      var pct = answered ? Math.round(d.correct / answered * 100) : 0;
+      var color = pct >= 80 ? '#4CAF50' : pct >= 55 ? '#FFB74D' : '#FF6B6B';
+      var best = (getModuleData(mod).highScore || 0);
+      var row = document.createElement('div');
+      row.className = 'module-row';
+      row.innerHTML =
+        '<div class="m-head">' +
+          '<span class="m-name">' + (MODULE_LABELS[mod] || mod) + '</span>' +
+          '<span class="m-stats">' + pct + '% of ' + answered + ' · best ' + best + '</span>' +
+        '</div>' +
+        '<div class="acc-bar"><div class="acc-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>';
+      section.appendChild(row);
+    });
+
+    /* Weakest concepts across all modules */
+    var weak = getWeakConcepts(5);
+    if (weak.length) {
+      document.getElementById('weak-section').style.display = 'block';
+      var box = document.getElementById('weak-items');
+      weak.forEach(function(w) {
+        var pct = Math.round(w.accuracy * 100);
+        var item = document.createElement('div');
+        item.className = 'weak-item';
+        item.innerHTML =
+          '<span>' + w.concept + ' <span style="color:#aaa;">(' + (MODULE_LABELS[w.module] || w.module) + ')</span></span>' +
+          '<span style="font-weight:800;color:' + (pct >= 55 ? '#FFB74D' : '#FF6B6B') + ';">' + pct + '%</span>';
+        box.appendChild(item);
+      });
+    }
+  });
+</script>
+</body>
+</html>

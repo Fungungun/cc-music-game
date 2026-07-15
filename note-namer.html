@@ -231,6 +231,25 @@
       el.className = 'feedback ' + (type || 'empty');
     }
 
+    /* Teaching hint: which mnemonic covers the current note */
+    const LINE_NOTES  = { treble: ['E4','G4','B4','D5','F5'], bass: ['G2','B2','D3','F3','A3'] };
+    const SPACE_NOTES = { treble: ['F4','A4','C5','E5'],      bass: ['A2','C3','E3','G3'] };
+    function noteHint(note, clef) {
+      if (note.tone === 'C4' && clef === 'treble') return 'Middle C sits on its own short line just below the treble staff.';
+      if (note.tone === 'C4' && clef === 'bass')   return 'Middle C sits on its own short line just above the bass staff.';
+      if (LINE_NOTES[clef].indexOf(note.tone) !== -1) {
+        return clef === 'treble'
+          ? 'It’s on a LINE. Treble lines (bottom up): E-G-B-D-F — "Every Good Boy Deserves Fruit".'
+          : 'It’s on a LINE. Bass lines (bottom up): G-B-D-F-A — "Good Boys Deserve Fruit Always".';
+      }
+      if (SPACE_NOTES[clef].indexOf(note.tone) !== -1) {
+        return clef === 'treble'
+          ? 'It’s in a SPACE. Treble spaces spell F-A-C-E.'
+          : 'It’s in a SPACE. Bass spaces (bottom up): A-C-E-G — "All Cows Eat Grass".';
+      }
+      return 'It’s on a ledger line — count letter names up or down from the staff.';
+    }
+
     function checkAnswer(letter) {
       if (answeredThisRound) return;
 
@@ -253,17 +272,17 @@
           btn.classList.add('wrong-ans');
           addShake(btn);
         }
-        setFeedback(randomWrong(), 'wrong');
+        setFeedback(randomWrong() + ' Hint: ' + noteHint(currentNote, currentClef), 'wrong');
         trackAnswer('note-namer', currentNote.name + '-' + (currentNote.clef||'treble'), false);
         score.onWrong();
 
         if (wrongAttempts >= 2) {
-          // Reveal correct answer
+          // Reveal correct answer, with the "why" so it sticks
           const correctBtn = document.querySelector('.note-btn[data-letter="' + currentNote.name + '"]');
           if (correctBtn) correctBtn.classList.add('correct-ans');
-          setFeedback('The answer was ' + currentNote.name + '! Have another go next time 😊', 'wrong');
+          setFeedback('It’s ' + currentNote.name + '. ' + noteHint(currentNote, currentClef), 'wrong');
           answeredThisRound = true;
-          setTimeout(function() { nextNote(); }, 2000);
+          setTimeout(function() { nextNote(); }, 3200);
         }
       }
     }
