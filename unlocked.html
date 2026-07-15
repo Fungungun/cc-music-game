@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Full Access — Music Maestro</title>
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="stylesheet" href="/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="supabase.js"></script>
+  <title>Payment Confirmation — Music Maestro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="auth.js"></script>
   <style>
     body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; background:linear-gradient(135deg,#FFF0F5,#FFF8F0); }
-    .unlock-box { background:white; border-radius:28px; padding:40px 32px; max-width:400px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.12); }
+    .unlock-box { background:white; border-radius:28px; padding:40px 32px; max-width:420px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.12); }
     .unlock-icon { font-size:4.5rem; margin-bottom:12px; }
     h1 { font-size:1.8rem; font-weight:900; color:#333; margin:0 0 10px; }
     p  { color:#666; margin:0 0 8px; line-height:1.6; }
@@ -18,78 +17,88 @@
     .features li { padding:6px 0; font-size:0.95rem; color:#555; border-bottom:1px solid #f5f5f5; }
     .features li:last-child { border:none; }
     .cta { display:block; background:linear-gradient(90deg,#FF8FAB,#FFB74D); color:white; border-radius:16px; padding:16px; font-size:1.1rem; font-weight:800; text-decoration:none; margin-top:24px; box-shadow:0 4px 16px rgba(255,143,171,0.35); }
-    .already-msg { display:none; }
+    .spinner { width:44px; height:44px; border:5px solid #FFE0EA; border-top-color:#FF8FAB; border-radius:50%; margin:0 auto 16px; animation:spin 0.9s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
+  <!-- Checking: payment confirmed by Stripe webhook → profile shows unlocked -->
+  <div class="unlock-box" id="checking-box">
+    <div class="spinner"></div>
+    <h1>Confirming your payment…</h1>
+    <p>This usually takes a few seconds. Hang tight!</p>
+  </div>
+
   <div class="unlock-box" id="success-box" style="display:none;">
     <div class="unlock-icon">🎉</div>
     <h1>You're unlocked!</h1>
     <p>Welcome to Music Maestro Full Access. All Grade 2 &amp; 3 content is now yours forever.</p>
     <ul class="features">
       <li>✅ Grade 2 &amp; 3 modules unlocked</li>
-      <li>✅ All 12 practice modules</li>
-      <li>✅ Full exam practice tests</li>
+      <li>✅ All 27 structured theory lessons</li>
+      <li>✅ Grade 2 &amp; 3 mock exams</li>
       <li>✅ Intervals, cadences &amp; inversions</li>
       <li>✅ Compound time signatures</li>
     </ul>
-    <a href="/" class="cta">Start practising now 🎹</a>
+    <a href="index.html" class="cta">Start practising now 🎹</a>
   </div>
 
-  <div class="unlock-box" id="already-box" style="display:none;">
-    <div class="unlock-icon">🎹</div>
-    <h1>You already have full access!</h1>
-    <p>Your account is fully unlocked. Jump straight into practice.</p>
-    <a href="/" class="cta">Go to Music Maestro →</a>
+  <div class="unlock-box" id="pending-box" style="display:none;">
+    <div class="unlock-icon">⏳</div>
+    <h1>Payment received — processing</h1>
+    <p>Your payment went through, but our system is still catching up. Your account will unlock automatically within a few minutes.</p>
+    <p style="font-size:0.88rem;">Still locked after 10 minutes? Email <a href="mailto:chenghuan.irving.liu@gmail.com">chenghuan.irving.liu@gmail.com</a> with your Stripe receipt and we'll sort it right away.</p>
+    <a href="index.html" class="cta" style="background:#eee;color:#666;box-shadow:none;">← Back to Music Maestro</a>
   </div>
 
-  <div class="unlock-box" id="error-box" style="display:none;">
-    <div class="unlock-icon">🤔</div>
-    <h1>Something looks off</h1>
-    <p>We couldn't confirm your payment. If you've just paid, please contact us with your Stripe receipt and we'll sort it right away.</p>
-    <a href="/" class="cta" style="background:#eee;color:#666;box-shadow:none;">← Back to Music Maestro</a>
+  <div class="unlock-box" id="signin-box" style="display:none;">
+    <div class="unlock-icon">🔑</div>
+    <h1>Sign in to finish</h1>
+    <p>Sign in with the account you used before paying, and your Full Access will appear.</p>
+    <button class="cta" style="border:none;cursor:pointer;width:100%;font-family:inherit;" onclick="showAuthModal({ allowGuest:false, onSuccess: startPolling })">Sign in</button>
   </div>
 
   <script>
-    (function() {
-      var params = new URLSearchParams(window.location.search);
-      var success = params.get('success') === '1';
-      var alreadyUnlocked = localStorage.getItem('mm-unlocked') === 'true';
+    var boxes = ['checking-box', 'success-box', 'pending-box', 'signin-box'];
+    function show(id) {
+      boxes.forEach(function(b) {
+        document.getElementById(b).style.display = (b === id) ? 'block' : 'none';
+      });
+    }
 
-      if (alreadyUnlocked) {
-        document.getElementById('already-box').style.display = 'block';
-        return;
-      }
+    /* The webhook (Stripe → /api/stripe-webhook) flips is_unlocked server-side.
+       This page only *reads* that state — nothing here can grant access. */
+    var attempts = 0;
+    var MAX_ATTEMPTS = 15;   /* 15 × 2s = 30s */
 
-      if (success) {
-        /* Set permanent unlock (localStorage + Supabase) */
-        localStorage.setItem('mm-unlocked', 'true');
-        document.getElementById('success-box').style.display = 'block';
-        /* If signed in, update Supabase profile too */
-        if (typeof mmMarkUnlocked === 'function') {
-          mmMarkUnlocked().catch(function(){});
-        }
-        /* Fire starburst after short delay */
-        setTimeout(function() {
-          var emojis = ['🎉','🌟','⭐','🎵','🎹','✨','💫','🎶'];
-          for (var i = 0; i < 12; i++) {
-            (function(idx) {
-              setTimeout(function() {
-                var el = document.createElement('div');
-                el.style.cssText = 'position:fixed;font-size:2rem;pointer-events:none;z-index:999;animation:burst 0.9s ease forwards;';
-                el.style.left = Math.random() * 90 + 'vw';
-                el.style.top  = Math.random() * 80 + 'vh';
-                el.textContent = emojis[idx % emojis.length];
-                document.body.appendChild(el);
-                el.addEventListener('animationend', function(){ el.remove(); });
-              }, idx * 120);
-            })(i);
+    function poll() {
+      fetch('/api/auth/me', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.user) { show('signin-box'); return; }
+          if (data.profile && data.profile.is_unlocked) {
+            localStorage.setItem('mm-unlocked', 'true');
+            show('success-box');
+            return;
           }
-        }, 300);
-      } else {
-        document.getElementById('error-box').style.display = 'block';
-      }
-    })();
+          attempts++;
+          if (attempts >= MAX_ATTEMPTS) { show('pending-box'); return; }
+          setTimeout(poll, 2000);
+        })
+        .catch(function() {
+          attempts++;
+          if (attempts >= MAX_ATTEMPTS) { show('pending-box'); return; }
+          setTimeout(poll, 2000);
+        });
+    }
+
+    function startPolling() {
+      attempts = 0;
+      show('checking-box');
+      poll();
+    }
+
+    startPolling();
   </script>
 </body>
 </html>

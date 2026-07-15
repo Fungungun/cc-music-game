@@ -1,5 +1,5 @@
-/* Music Maestro — Service Worker v7.1 */
-var CACHE = 'music-maestro-v7-1';
+/* Music Maestro — Service Worker v7.2 */
+var CACHE = 'music-maestro-v7-2';
 
 /* On install: just pre-cache the offline shell assets.
    CSS/JS are handled network-first so they never go stale. */
@@ -29,6 +29,9 @@ self.addEventListener('fetch', function(e) {
 
   /* Ignore non-http(s) requests */
   if (!url.startsWith('http')) return;
+
+  /* API calls — always straight to the network, never cached */
+  if (new URL(url).pathname.indexOf('/api/') === 0) return;
 
   /* CDN / audio samples — network first, cache fallback */
   if (url.includes('cdn.jsdelivr') || url.includes('cdnjs') || url.includes('tonejs.github.io')) {

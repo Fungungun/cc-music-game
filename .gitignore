@@ -5,3 +5,6 @@ Thumbs.db
 contacts.csv
 digital-syllabus-1781169118/
 *.pdf
+.dev.vars
+.wrangler/
+node_modules/

@@ -1,182 +1,106 @@
 /* =============================================
-   Music Maestro — Supabase Client (supabase.js)
-   Must be loaded AFTER the Supabase CDN script
-   and BEFORE game.js on every page.
+   Music Maestro — Auth Client (auth.js)
+   Talks to Cloudflare Pages Functions (/api/*).
+   Load BEFORE game.js on every page.
+   Public surface (kept identical to the old supabase.js):
+     mmIsSignedIn, mmGetUser, mmGetProfile, mmHasFullAccess,
+     mmSignIn, mmSignUp, mmSignOut, mmSyncProgress,
+     showAuthModal, showAccountMenu, 'mm-auth-changed' event.
    ============================================= */
 
-var MM_SUPABASE_URL = 'https://esdkipxtmfuecubjjcoa.supabase.co';
-var MM_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzZGtpcHh0bWZ1ZWN1YmpqY29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzODc4MDQsImV4cCI6MjA5MDk2MzgwNH0.vgBd3Wx_c16ra-kryT7Y7q0QpFE_Nf96jcqy3p8_Kl4';
-
 /* ── Global state ── */
-window._mmDb      = null;   // Supabase client
-window._mmSession = null;   // Current auth session
-window._mmProfile = null;   // Cached profiles row
+window._mmUser    = null;   // { id, email }
+window._mmProfile = null;   // { name, grade, is_unlocked }
 
-/* ── Init (called once SDK is ready) ── */
-function _mmInitClient() {
-  if (window._mmDb) return;
-  try {
-    window._mmDb = window.supabase.createClient(MM_SUPABASE_URL, MM_SUPABASE_KEY);
-  } catch(e) {
-    console.warn('Music Maestro: Supabase client init failed', e);
-    return;
-  }
-
-  /* Listen for auth state changes (sign in, sign out, token refresh) */
-  window._mmDb.auth.onAuthStateChange(function(event, session) {
-    window._mmSession = session;
-    if (session) {
-      _mmLoadProfile(session.user.id);
-    } else {
-      window._mmProfile = null;
-      _mmFireAuthEvent();
-    }
+function _mmApi(path, method, body) {
+  return fetch('/api/' + path, {
+    method: method || 'GET',
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    credentials: 'same-origin',
+    body: body ? JSON.stringify(body) : undefined,
+  }).then(function(resp) {
+    return resp.json().then(function(data) {
+      return { status: resp.status, data: data };
+    });
+  }).catch(function() {
+    return { status: 0, data: { error: 'Network error — check your connection.' } };
   });
-
-  /* Restore existing session (e.g. page reload) */
-  window._mmDb.auth.getSession().then(function(r) {
-    var session = r && r.data && r.data.session;
-    if (session) {
-      window._mmSession = session;
-      _mmLoadProfile(session.user.id);
-    } else {
-      _mmFireAuthEvent(); // no session — still fire so UI can initialise
-    }
-  }).catch(function() { _mmFireAuthEvent(); });
 }
 
-function _mmLoadProfile(userId) {
-  if (!window._mmDb) return;
-  window._mmDb
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
-    .then(function(r) {
-      if (r && r.data) {
-        window._mmProfile = r.data;
-        /* Sync unlock status to localStorage for fast access on next load */
-        if (r.data.is_unlocked) {
-          localStorage.setItem('mm-unlocked', 'true');
-        }
-        /* Sync name if not already set locally */
-        if (r.data.name && !localStorage.getItem('player-name')) {
-          localStorage.setItem('player-name', r.data.name);
-        }
-      }
-      _mmFireAuthEvent();
-    })
-    .catch(function() { _mmFireAuthEvent(); });
+function _mmApplyAuth(data) {
+  window._mmUser    = data && data.user    ? data.user    : null;
+  window._mmProfile = data && data.profile ? data.profile : null;
+  if (window._mmProfile) {
+    /* Cache for fast access on next load; profile is the source of truth */
+    if (window._mmProfile.is_unlocked) {
+      localStorage.setItem('mm-unlocked', 'true');
+    } else {
+      localStorage.removeItem('mm-unlocked');
+    }
+    if (window._mmProfile.name && !localStorage.getItem('player-name')) {
+      localStorage.setItem('player-name', window._mmProfile.name);
+    }
+  }
+  _mmFireAuthEvent();
 }
 
 function _mmFireAuthEvent() {
   window.dispatchEvent(new CustomEvent('mm-auth-changed', {
-    detail: {
-      user:    window._mmSession && window._mmSession.user,
-      profile: window._mmProfile
-    }
+    detail: { user: window._mmUser, profile: window._mmProfile }
   }));
 }
 
 /* ── Public API ── */
 
 function mmIsSignedIn() {
-  return !!(window._mmSession && window._mmSession.user);
+  return !!window._mmUser;
 }
 
 function mmGetUser() {
-  return window._mmSession && window._mmSession.user;
+  return window._mmUser;
 }
 
 function mmGetProfile() {
   return window._mmProfile;
 }
 
-/* Source-of-truth access check: Supabase profile OR localStorage cache */
+/* Access check: server profile is the source of truth once loaded;
+   localStorage acts only as a fast cache before /api/auth/me returns. */
 function mmHasFullAccess() {
-  if (window._mmProfile && window._mmProfile.is_unlocked) return true;
+  if (window._mmProfile) return !!window._mmProfile.is_unlocked;
   return localStorage.getItem('mm-unlocked') === 'true';
 }
 
 async function mmSignIn(email, password) {
-  if (!window._mmDb) return { error: { message: 'Not connected' } };
-  return await window._mmDb.auth.signInWithPassword({ email: email, password: password });
+  var r = await _mmApi('auth/signin', 'POST', { email: email, password: password });
+  if (r.status !== 200) return { error: { message: r.data.error || 'Sign in failed.' } };
+  _mmApplyAuth(r.data);
+  return { data: r.data };
 }
 
 async function mmSignUp(email, password, name) {
-  if (!window._mmDb) return { error: { message: 'Not connected' } };
-  return await window._mmDb.auth.signUp({
-    email: email,
-    password: password,
-    options: { data: { name: name || '' } }
-  });
+  var r = await _mmApi('auth/signup', 'POST', { email: email, password: password, name: name || '' });
+  if (r.status !== 200) return { error: { message: r.data.error || 'Sign up failed.' } };
+  if (name) localStorage.setItem('player-name', String(name).trim().slice(0, 20));
+  _mmApplyAuth(r.data);
+  return { data: r.data };
 }
 
 async function mmSignOut() {
-  if (!window._mmDb) return;
-  await window._mmDb.auth.signOut();
-  window._mmSession = null;
+  await _mmApi('auth/signout', 'POST', {});
+  window._mmUser = null;
   window._mmProfile = null;
   /* Clear cached values that belong to the signed-in user */
   localStorage.removeItem('mm-unlocked');
   localStorage.removeItem('player-name');
+  _mmFireAuthEvent();
 }
 
 /* ── Progress sync ── */
-/* Fire-and-forget: localStorage is primary, Supabase is backup */
+/* Fire-and-forget: localStorage is primary, the server copy is backup */
 function mmSyncProgress(module, concept, isCorrect) {
-  if (!window._mmDb || !window._mmSession) return;
-  var userId = window._mmSession.user.id;
-
-  /* Try update first, then insert */
-  window._mmDb
-    .from('progress')
-    .select('id, correct, wrong')
-    .eq('user_id', userId)
-    .eq('module', module)
-    .eq('concept', concept)
-    .single()
-    .then(function(r) {
-      if (r && r.data) {
-        window._mmDb
-          .from('progress')
-          .update({
-            correct:   r.data.correct + (isCorrect ? 1 : 0),
-            wrong:     r.data.wrong   + (isCorrect ? 0 : 1),
-            last_seen: new Date().toISOString()
-          })
-          .eq('id', r.data.id)
-          .then(function() {});
-      } else {
-        window._mmDb
-          .from('progress')
-          .insert({
-            user_id: userId,
-            module:  module,
-            concept: concept,
-            correct: isCorrect ? 1 : 0,
-            wrong:   isCorrect ? 0 : 1
-          })
-          .then(function() {});
-      }
-    })
-    .catch(function() {});
-}
-
-/* ── Mark profile as paid/unlocked (called from unlocked.html) ── */
-async function mmMarkUnlocked() {
-  if (!window._mmDb || !window._mmSession) return false;
-  var userId = window._mmSession.user.id;
-  var r = await window._mmDb
-    .from('profiles')
-    .update({ is_unlocked: true })
-    .eq('id', userId);
-  if (!r.error) {
-    if (window._mmProfile) window._mmProfile.is_unlocked = true;
-    localStorage.setItem('mm-unlocked', 'true');
-    return true;
-  }
-  return false;
+  if (!mmIsSignedIn()) return;
+  _mmApi('progress', 'POST', { module: module, concept: concept, correct: !!isCorrect });
 }
 
 /* ── Auth modal ── */
@@ -298,14 +222,6 @@ function _mmAuthError(msg) {
   el.style.cssText = 'display:block;background:#FFF0F0;border:1px solid #FFCDD2;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#C62828;margin-bottom:12px;';
 }
 
-function _mmAuthNotice(msg) {
-  /* Green success notice — used for email confirmation, etc. */
-  var el = document.getElementById('mm-auth-err');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.cssText = 'display:block;background:#F0FFF4;border:1px solid #A5D6A7;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#2E7D32;margin-bottom:12px;';
-}
-
 function _mmAuthShowForgot() {
   var main   = document.getElementById('mm-auth-main');
   var forgot = document.getElementById('mm-auth-forgot-panel');
@@ -330,23 +246,26 @@ async function _mmAuthSendReset() {
   var btn   = document.getElementById('mm-reset-btn');
   var msg   = document.getElementById('mm-reset-msg');
 
-  if (!email) {
-    if (msg) { msg.textContent = 'Please enter your email address.'; msg.style.cssText = 'display:block;background:#FFF0F0;border:1px solid #FFCDD2;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#C62828;margin-bottom:12px;'; }
-    return;
+  function show(text, isError) {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.style.cssText = isError
+      ? 'display:block;background:#FFF0F0;border:1px solid #FFCDD2;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#C62828;margin-bottom:12px;'
+      : 'display:block;background:#F0FFF4;border:1px solid #A5D6A7;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#2E7D32;margin-bottom:12px;';
   }
+
+  if (!email) { show('Please enter your email address.', true); return; }
   if (btn) { btn.disabled = true; btn.textContent = '...'; }
   if (msg) msg.style.display = 'none';
 
-  var result = await window._mmDb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/reset-password'
-  });
+  var r = await _mmApi('auth/reset-request', 'POST', { email: email });
 
   if (btn) { btn.disabled = false; btn.textContent = 'Send reset link 📧'; }
 
-  if (result.error) {
-    if (msg) { msg.textContent = result.error.message || 'Something went wrong. Try again.'; msg.style.cssText = 'display:block;background:#FFF0F0;border:1px solid #FFCDD2;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#C62828;margin-bottom:12px;'; }
+  if (r.status !== 200) {
+    show(r.data.error || 'Something went wrong. Try again.', true);
   } else {
-    if (msg) { msg.textContent = '✅ Reset link sent! Check your inbox (and spam folder).'; msg.style.cssText = 'display:block;background:#F0FFF4;border:1px solid #A5D6A7;border-radius:10px;padding:10px 14px;font-size:0.87rem;color:#2E7D32;margin-bottom:12px;'; }
+    show('✅ Reset link sent! Check your inbox (and spam folder).', false);
     if (btn) btn.style.display = 'none';
   }
 }
@@ -374,13 +293,6 @@ async function _mmAuthSubmit() {
   if (result.error) {
     _mmAuthError(result.error.message || 'Something went wrong. Please try again.');
     if (btn) btn.textContent = mode === 'signup' ? 'Create account 🎹' : 'Sign in 🎵';
-    return;
-  }
-
-  /* Sign-up requires email confirmation */
-  if (mode === 'signup' && result.data && result.data.user && !result.data.session) {
-    if (btn) { btn.textContent = 'Create account 🎹'; btn.disabled = false; }
-    _mmAuthNotice('📧 Check your email to confirm your account, then sign in here.');
     return;
   }
 
@@ -443,29 +355,24 @@ async function _mmChangePassword() {
   var user = mmGetUser();
   if (!user || !user.email) return;
 
-  var result = await window._mmDb.auth.resetPasswordForEmail(user.email, {
-    redirectTo: window.location.origin + '/reset-password'
-  });
-
-  if (result.error) {
-    alert('Could not send reset email: ' + result.error.message);
+  var r = await _mmApi('auth/reset-request', 'POST', { email: user.email });
+  if (r.status !== 200) {
+    alert('Could not send reset email: ' + (r.data.error || 'unknown error'));
   } else {
     alert('📧 Password reset link sent to ' + user.email + '\n\nCheck your inbox and follow the link to set a new password.');
   }
 }
 
-/* ── Bootstrap ── */
+/* ── Bootstrap: restore session from the HttpOnly cookie ── */
 (function() {
-  function tryInit() {
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      _mmInitClient();
+  _mmApi('auth/me', 'GET').then(function(r) {
+    if (r.status === 200 && r.data && r.data.user) {
+      _mmApplyAuth(r.data);
     } else {
-      setTimeout(tryInit, 80);
+      /* Not signed in: fire so UI can initialise. Keep the localStorage
+         unlock cache — it may belong to a guest purchase flow — but only
+         a signed-in profile can (re)assert it. */
+      _mmFireAuthEvent();
     }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
-  } else {
-    tryInit();
-  }
+  });
 })();

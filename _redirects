@@ -1,0 +1,5 @@
+# Block backend/internal files from being served as static assets
+/functions/* / 301
+/migrations/* / 301
+/wrangler.toml / 301
+/CLAUDE.md / 301

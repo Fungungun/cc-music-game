@@ -3,7 +3,7 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v5.12 · 2026-07-14";
+const APP_VERSION = "v6.0 · 2026-07-15";
 
 /* AMEB Section III context per module page */
 const AMEB_PAGE_TAGS = {
@@ -564,12 +564,22 @@ function hasFullAccess() {
 
 var STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04';
 
+/* client_reference_id ties the Stripe checkout to the signed-in user so the
+   webhook can unlock the right account. Sign-in is required before paying. */
+function _paymentUrl() {
+  var user = typeof mmGetUser === 'function' ? mmGetUser() : null;
+  if (user && user.id) {
+    return STRIPE_PAYMENT_LINK + '?client_reference_id=' + encodeURIComponent(user.id);
+  }
+  return STRIPE_PAYMENT_LINK;
+}
+
 function gotoPayment() {
   if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
-    window.location.href = STRIPE_PAYMENT_LINK;
+    window.location.href = _paymentUrl();
   } else {
     if (typeof showAuthModal === 'function') {
-      showAuthModal({ allowGuest: false, onSuccess: function() { window.location.href = STRIPE_PAYMENT_LINK; } });
+      showAuthModal({ allowGuest: false, onSuccess: function() { window.location.href = _paymentUrl(); } });
     }
   }
 }
@@ -606,7 +616,10 @@ function showUpgradeModal() {
 /* ============ Grade System ============ */
 function getGrade() {
   var g = parseInt(localStorage.getItem('cc-grade') || '1');
-  if (g > 1 && !hasFullAccess()) { setGrade(1); return 1; }
+  /* Clamp the *effective* grade without persisting: on a fresh page load the
+     profile arrives async, so writing back here would wipe a paid user's
+     saved grade before their unlock status is known. */
+  if (g > 1 && !hasFullAccess()) return 1;
   return Math.min(Math.max(g, 1), 3);
 }
 function setGrade(g) {
@@ -617,6 +630,7 @@ function buildGradeSelector(containerId, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
 
+  container.innerHTML = '';
   [1, 2, 3].forEach(function(g) {
     var locked = g > 1 && !hasFullAccess();
     var btn = document.createElement('button');
@@ -631,6 +645,22 @@ function buildGradeSelector(containerId, onChange) {
     };
     container.appendChild(btn);
   });
+
+  /* The profile loads async after page init; when auth state arrives the
+     effective grade may change (paid user on a fresh device). Rebuild the
+     selector and notify the page so it re-renders at the right grade. */
+  if (!container._mmAuthListener) {
+    container._mmAuthListener = true;
+    var lastGrade = getGrade();
+    window.addEventListener('mm-auth-changed', function() {
+      buildGradeSelector(containerId, onChange);
+      var now = getGrade();
+      if (now !== lastGrade) {
+        lastGrade = now;
+        if (onChange) onChange(now);
+      }
+    });
+  }
 }
 
 /* ============ localStorage ============ */
