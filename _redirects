@@ -1,3 +1,12 @@
+# Deleted v4 pages → their v5 replacements (301 permanent)
+/rhythm-tapper /rhythm-trainer 301
+/rhythm-tapper.html /rhythm-trainer.html 301
+/mock-test /mock-exam 301
+/mock-test.html /mock-exam.html 301
+/barline-quiz /note-values 301
+/barline-quiz.html /note-values.html 301
+/guitar-chords / 301
+
 # Block backend/internal files from being served as static assets
 /functions/* / 301
 /migrations/* / 301

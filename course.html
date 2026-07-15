@@ -274,7 +274,11 @@ async function loadLesson() {
             '?rel=0&modestbranding=1" ' +
             'title="' + ytTitle + '" ' +
             'allowfullscreen loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>' +
-        '</div>';
+        '</div>' +
+        /* Fallback path if the third-party embed breaks or is blocked */
+        '<p style="font-size:0.8rem;color:#999;text-align:right;margin:4px 0 12px;">' +
+          'Video not loading? <a href="https://www.youtube.com/watch?v=' + parsed.meta.youtube_id +
+          '" target="_blank" rel="noopener" style="color:#7B52C9;">Watch on YouTube ↗</a></p>';
     }
 
     // Render markdown body

@@ -1,4 +1,4 @@
-# CLAUDE.md — CC Music Game (v5.5)
+# CLAUDE.md — CC Music Game (v6.3)
 
 Context for Claude Code sessions working on this project.
 
@@ -20,11 +20,43 @@ The product approach is: **teach → practice → exam prep**. Every module has 
 | Tone.js v14.8.32 | Piano audio via Salamander Grand Piano samples |
 | Tonal.js | Music theory helpers (scales, intervals, note math) |
 | abcjs | Renders sheet music from ABC notation strings |
-| Cloudflare Pages | Auto-deploys on `git push` to `main` |
-| Supabase v2 JS SDK | Auth (sign-in/up/out), profile, progress sync |
-| Stripe | One-time payment link, $14.99 AUD |
+| Cloudflare Pages | Hosting; deployed by GitHub Actions (`wrangler pages deploy`) |
+| Cloudflare Pages Functions | Backend API in `functions/` (plain JS, auto-detected) |
+| Cloudflare D1 | Database `music-game` — users, sessions, progress |
+| Resend | Password-reset email only (`RESEND_API_KEY` env var) |
+| Stripe | One-time payment link, $14.99 AUD + webhook → D1 unlock |
 
-**No npm, no bundlers, no framework.** All scripts loaded from CDN.
+**No npm, no bundlers, no framework.** All frontend scripts loaded from CDN.
+**Everything runs on Cloudflare free-tier services** — no Supabase, no external backend.
+
+### Backend (functions/ + D1)
+
+```
+functions/_shared/util.js         Session cookie auth, PBKDF2 password hashing, D1 helpers
+functions/api/auth/signup.js      POST {email,password,name} → user + HttpOnly session cookie
+functions/api/auth/signin.js      POST {email,password}
+functions/api/auth/signout.js     POST — deletes session, clears cookie
+functions/api/auth/me.js          GET  → { user, profile:{name,grade,is_unlocked} }
+functions/api/auth/reset-request.js  POST {email} — emails reset link via Resend
+functions/api/auth/reset-confirm.js  POST {token,password}
+functions/api/progress.js         GET/POST — per-concept progress upsert (session required)
+functions/api/stripe-webhook.js   checkout.session.completed → is_unlocked=1 (signature verified)
+migrations/0001_init.sql          D1 schema (apply: npx wrangler d1 execute music-game --remote --file=...)
+wrangler.toml                     D1 binding `DB` → database music-game (bindings applied on deploy)
+```
+
+**Paywall enforcement**: the Stripe webhook is the ONLY code path that sets `is_unlocked`.
+`gotoPayment()` appends `?client_reference_id=<userId>` to the payment link; the webhook
+matches on it (fallback: checkout email). `unlocked.html` (Stripe success URL — keep the
+filename) polls `/api/auth/me`; it cannot grant access. Client-side `mm-unlocked`
+localStorage is a cache only, overwritten from the profile on every page load.
+**Accepted residual**: Grade 2–3 SYLLABUS data and course/*.md are public static files;
+the real gate is the account flag. Hiding content entirely would need an auth proxy.
+
+**Required Cloudflare Pages env vars** (Settings → Environment variables):
+`STRIPE_WEBHOOK_SECRET` (from the Stripe webhook endpoint), `RESEND_API_KEY`.
+Local dev secrets go in `.dev.vars` (gitignored). Local dev: `npx wrangler pages dev .`
+(apply migrations with `--local` first).
 
 ---
 
@@ -44,35 +76,47 @@ Every HTML page (except `index.html`, which may optionally omit abcjs) must incl
 ## File structure
 
 ```
-index.html              Home page — hero + grade selector + 12 module cards + exam CTA
+index.html              Home page — grade selector + daily/streak banner + 12 module cards + exam CTA
 style.css               Shared styles (design system, components, responsive)
-game.js                 Shared utilities + SYLLABUS data object (see below)
+game.js                 Shared utilities + SYLLABUS data + day streak + session summary
+auth.js                 Auth client for /api/* (same public surface the old supabase.js had)
+exam-questions.js       Shared question generators + buildPool (mock exam + daily challenge)
 i18n.js                 Translation strings — English / Chinese / Spanish
-supabase.js             Supabase auth helpers (do not modify unless auth breaks)
 
-note-namer.html         Identify notes on treble/bass clef staff
+note-namer.html         Identify notes on treble/bass clef staff (mnemonic hints on wrong answers)
 scale-builder.html      Build major & harmonic minor scales on piano keyboard
-key-signatures.html     Identify key signatures (sharps/flats → key name) [NEW]
-note-values.html        Identify note/rest values in beats [NEW]
-interval-quiz.html      Name diatonic intervals (visual + aural modes)
+key-signatures.html     Identify key signatures (sharps/flats → key name)
+note-values.html        Identify note/rest values in beats
+interval-quiz.html      Name intervals (visual + aural; Grade 3 "in a key" degree mode)
 chord-game.html         Identify triads, inversions, cadence types
 rhythm-trainer.html     Tap along to rhythms + identify time signatures
 terms-flashcards.html   Italian/French terms — SRS spaced repetition
-aural-training.html     Ear training — intervals, pitch direction, sing-back
+aural-training.html     Ear training — Higher/Lower, Intervals, Tap the Beat
 form-detective.html     Binary/Ternary form, cadence types, time signatures
+daily-challenge.html    5 questions/day from exam-questions.js — feeds the day streak
 learn.html              Theory reference — all testable content per grade
-mock-exam.html          Mock exam — 20-question sessions drawn from 100-question banks
-syllabus.html           AMEB Piano 2026 Section III coverage map — what's tested vs what's in the app
+mock-exam.html          Mock exam — 20 dynamically generated questions per session
+course.html + course/   27 structured markdown lessons (YouTube embeds + fallback links)
+syllabus.html           AMEB Piano 2026 Section III coverage map — honest, keep it that way
+progress.html           Parent View — day streak, per-module accuracy, focus areas
 
-landing.html            Public landing page (auth gate)
-reset-password.html     Password reset flow
+landing.html            Public marketing page (claims must match the real app — see below)
+unlocked.html           Stripe success URL — polls /api/auth/me, never grants access itself
+reset-password.html     Password reset (?token= → POST /api/auth/reset-confirm)
 teachers.html           For Teachers page
 privacy.html            Privacy policy
 terms.html              Terms of service
 404.html                Not found page
-sw.js                   Service worker (PWA offline support)
+sw.js                   Service worker (network-first; never intercepts /api/*)
+_redirects              Legacy 301s + blocks /functions, /migrations, wrangler.toml, CLAUDE.md
+functions/ migrations/  Backend — see Tech stack section
 CLAUDE.md               This file
 ```
+
+**Marketing truth rule**: `landing.html` and `teachers.html` may only advertise features
+that exist in the app right now. When a module is added/removed, update both pages in the
+same commit. Never fabricate testimonials — the landing page has a reserved comment slot
+for real quotes only.
 
 ---
 
@@ -119,14 +163,21 @@ Shows `#loading-overlay`, creates Tone.Sampler with Salamander samples, hides ov
 
 **GitHub repo**: `fungungun/cc-music-game` | **Branch**: `main`
 **Live URL**: `music.vensoai.com` (custom domain on Cloudflare Pages)
+**Deploy mechanism**: GitHub Actions (`.github/workflows/deploy.yml`) runs
+`npx wrangler pages deploy .` on every push to `main`. The `wrangler.toml`
+D1 binding is applied automatically on deploy. If the Cloudflare dashboard
+git integration is also connected, disconnect it (double deploys).
 
 ```bash
 git add -p                         # stage specific changes
 git commit -m "vX.Y: describe"
-git push                           # auto-deploys within ~60s
+git push                           # GH Actions deploys within ~60s
 ```
 
 **All links must be relative** — `href="style.css"`, never `/style.css` or absolute paths.
+**Never run `wrangler pages deploy` from an untracked working tree** — it uploads every
+file in the directory. Keep private files out of the project root entirely
+(they live in `~/Documents/music_game_private/`).
 
 ---
 
@@ -145,10 +196,13 @@ git push                           # auto-deploys within ~60s
 | `cc-aural-training` | `{ highScore, streak }` |
 | `cc-form-detective` | `{ highScore, streak }` |
 | `cc-mock-exam` | `{ highScore, streak }` |
+| `cc-daily-challenge` | `{ highScore, streak }` |
+| `cc-daily` | `{ lastPlayed: 'YYYY-MM-DD', history: { [date]: score } }` |
+| `mm-day-streak` | `{ days, last: 'YYYY-MM-DD', history: { [date]: true } }` — cross-day practice streak |
 | `cc-terms-srs` | `{ [termId]: { nextDue, interval, reps } }` |
 | `mm-mastery` | `{ [module:concept]: { correct, wrong, lastSeen } }` |
 | `cc-grade` | `"1"` / `"2"` / `"3"` |
-| `mm-unlocked` | `"true"` (fallback when Supabase unavailable) |
+| `mm-unlocked` | `"true"` — CACHE of the profile flag only; auth.js overwrites it from `/api/auth/me` |
 | `player-name` | Display name |
 | `mm-lang` | `"en"` / `"zh"` / `"es"` |
 
@@ -186,6 +240,7 @@ git push                           # auto-deploys within ~60s
 | Form Detective | `purple` | `#8B2FC9 → #D4AAFF` |
 | Learn | `grape` | `#6d3fc9 → #C4AAFF` |
 | Mock Exam | `brown` | `#bf7a30 → #FFD4A3` |
+| Daily Challenge | `orange` | `#F57C00 → #FFCC80` |
 
 **Key component classes:**
 - `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-mint`, `.btn-lavender`, etc.
@@ -209,13 +264,17 @@ git push                           # auto-deploys within ~60s
 ## Grade gating
 
 ```javascript
-getGrade()           // Returns 1-3; falls back to 1 if Grade 2+ without access
-hasFullAccess()      // true if Supabase profile shows paid, or localStorage mm-unlocked
+getGrade()           // Effective grade 1-3; clamps to 1 without access but NEVER writes
+                     // back (profile loads async — a destructive write here once wiped
+                     // paid users' saved grade on fresh loads)
+hasFullAccess()      // Profile is_unlocked (source of truth) or mm-unlocked cache pre-load
 showUpgradeModal()   // Shows inline upgrade modal with Stripe link
-gotoPayment()        // Requires sign-in first, then redirects to Stripe
+gotoPayment()        // Requires sign-in, appends ?client_reference_id=<userId>, → Stripe
+buildGradeSelector() // Self-rebuilds on mm-auth-changed so pages re-render at the right grade
 ```
 
 `STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/eVq5kE1Kf6rZ2OH78h1ck04'`
+Unlocking happens ONLY via `functions/api/stripe-webhook.js` — see Tech stack section.
 
 ---
 
@@ -359,15 +418,18 @@ Format: `"vX.Y · YYYY-MM-DD"`
 
 ---
 
-## Build status (as of v5.5)
+## Build status (as of v6.3)
 
 | Phase | Status | Files |
 |---|---|---|
-| Phase 1 — Foundation | ✅ Done | `game.js`, `style.css`, `CLAUDE.md` |
-| Phase 2 — Home + Auth | ✅ Done | `index.html`, `i18n.js` |
-| Phase 3 — Basic Modules | ✅ Done | `note-namer.html`, `scale-builder.html`, `key-signatures.html`, `note-values.html` |
-| Phase 4 — Advanced Modules | ✅ Done | `interval-quiz.html`, `chord-game.html`, `rhythm-trainer.html`, `terms-flashcards.html` |
-| Phase 5 — Specialist | ✅ Done | `aural-training.html`, `form-detective.html`, `learn.html` |
-| Phase 6 — Mock Exam | ✅ Done | `mock-exam.html` |
-| Phase 7 — Polish + Deploy | ✅ Done | All modules v5.3 |
-| Phase 8 — Syllabus Alignment | ✅ Done | `syllabus.html` (new), `key-signatures.html` (+ relative minor mode), `mock-exam.html` (+ relative minor Qs) |
+| Phases 1–8 (v5.x) — Full app build + syllabus alignment | ✅ Done | all modules, `syllabus.html`, `course/` |
+| v5.12 — Truth & copy fixes | ✅ Done | `landing.html`, `teachers.html`, `index.html` |
+| v6.0 — Cloudflare D1 backend, real paywall | ✅ Done | `functions/`, `migrations/`, `auth.js`, `unlocked.html`, `reset-password.html` |
+| v6.1 — Retention (streak, daily challenge, parent view) | ✅ Done | `daily-challenge.html`, `progress.html`, `exam-questions.js`, `game.js` |
+| v6.2 — Pedagogy (Grade 1 aural tasks, Grade 3 intervals) | ✅ Done | `aural-training.html`, `interval-quiz.html`, `syllabus.html` |
+| v6.3 — Cleanup, SEO, docs | ✅ Done | `_redirects`, `sitemap.xml`, `privacy.html`, this file |
+
+**Pending (owner action, not code)**: Stripe webhook endpoint + `STRIPE_WEBHOOK_SECRET`;
+Resend account + `RESEND_API_KEY` + vensoai.com sender domain; enable Cloudflare Web
+Analytics (beacon snippet); disconnect CF Pages git integration if double-deploying;
+pause/delete the old Supabase project; collect real teacher/parent testimonials.
