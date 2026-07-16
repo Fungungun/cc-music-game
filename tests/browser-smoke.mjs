@@ -17,7 +17,8 @@ const routes = [
   'index.html', 'note-namer.html', 'scale-builder.html', 'key-signatures.html',
   'note-values.html', 'interval-quiz.html', 'chord-game.html', 'rhythm-trainer.html',
   'terms-flashcards.html', 'aural-training.html', 'form-detective.html',
-  'daily-challenge.html', 'learn.html', 'mock-exam.html', 'progress.html'
+  'daily-challenge.html', 'learn.html', 'mock-exam.html', 'progress.html',
+  'ameb-grade-1-note-values-practice.html'
 ];
 const interactions = {
   'note-namer.html':'.note-btn', 'scale-builder.html':'button[onclick="showMeScale()"]',

@@ -18,14 +18,19 @@ for (const route of routes) {
   assert.match(canonicals[0], new RegExp(`https://music\\.vensoai\\.com/${route}`));
 }
 
-for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-2-piano-theory-practice']) {
+for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-2-piano-theory-practice']) {
   const html = fs.readFileSync(path.join(root, `${route}.html`), 'utf8');
   assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${route} must have one primary heading`);
 }
+
+const noteValuesResource = fs.readFileSync(path.join(root, 'ameb-grade-1-note-values-practice.html'), 'utf8');
+assert.match(noteValuesResource, /note-values\.html\?grade=1&amp;ref=organic-note-values/);
+assert.match(noteValuesResource, /"@type":"LearningResource"/);
 
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
 for (const route of routes) {
   assert.match(sitemap, new RegExp(`<loc>https://music\\.vensoai\\.com/${route}</loc><lastmod>2026-07-17</lastmod>`));
 }
+assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 
 console.log('SEO metadata tests passed');
