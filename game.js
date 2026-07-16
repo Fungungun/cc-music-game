@@ -5,6 +5,17 @@
 
 const APP_VERSION = "v6.3 · 2026-07-15";
 
+/* A teacher-shared free assignment should open at the assigned grade even if
+   this device previously viewed a different grade. Paid grades are never
+   enabled by a URL parameter. */
+(function applyAssignedFreeGrade() {
+  try {
+    if (new URLSearchParams(location.search).get('grade') === '1') {
+      localStorage.setItem('cc-grade', '1');
+    }
+  } catch (_) {}
+})();
+
 /* AMEB Section III context per module page */
 const AMEB_PAGE_TAGS = {
   'note-namer':       { section: 'Notes on Staff',       desc: 'Identify notes on treble and bass clef — AMEB Section III' },
