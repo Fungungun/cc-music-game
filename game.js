@@ -1040,6 +1040,15 @@ function showSessionSummary(opts) {
   var nextHtml = next
     ? '<a href="' + next.href + '" style="display:block;margin-top:4px;background:#fffdf8;color:#7e2038;border:1px solid #cfc5b6;border-radius:3px;padding:11px 16px;text-decoration:none;font-weight:700;font-size:0.9rem;">Next up: ' + next.label + ' →</a>'
     : '';
+  var upgradeHtml = '';
+  if (module === 'note-values' && !hasFullAccess()) {
+    upgradeHtml =
+      '<div style="margin:12px 0 0;padding:13px 14px;background:#fffdf8;border:1px solid #cfc5b6;border-radius:3px;text-align:left;">' +
+        '<div style="font-weight:800;color:#292724;font-size:0.92rem;margin-bottom:4px;">Practising beyond Grade 1?</div>' +
+        '<div style="color:#625b52;font-size:0.84rem;line-height:1.45;margin-bottom:10px;">Grade 2 and 3 add dotted rhythms, compound time and mixed review.</div>' +
+        '<button onclick="if(typeof showUpgradeModal===\'function\')showUpgradeModal();" style="display:block;width:100%;background:#7e2038;color:white;border:none;border-radius:3px;padding:10px 12px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;">Unlock Grade 2 &amp; 3 - $14.99 AUD</button>' +
+      '</div>';
+  }
 
   var existing = document.getElementById('session-summary-modal');
   if (existing) existing.remove();
@@ -1059,7 +1068,7 @@ function showSessionSummary(opts) {
           '<div style="background:#7e2038;width:' + pct + '%;height:100%;border-radius:2px;"></div>' +
         '</div>' +
       '</div>' +
-      weakHtml + nextHtml +
+      weakHtml + nextHtml + upgradeHtml +
       '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:#7e2038;color:white;border:none;border-radius:3px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;font-family:inherit;">Keep practising</button>' +
       '<a href="index.html" style="display:block;text-align:center;margin-top:10px;color:#625b52;font-size:0.85rem;text-decoration:none;">Back to home</a>' +
     '</div>';
