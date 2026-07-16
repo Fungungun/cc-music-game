@@ -13,7 +13,7 @@ window.TRANSLATIONS = {
     'skip': 'Skip →',
 
     // Index
-    'app-title': '🎹 Music Maestro',
+    'app-title': 'Music Maestro',
     'app-tagline': 'AMEB Piano exam prep — Grades 1, 2 & 3',
     'overall-progress': 'Overall Progress',
     'grade-selector-label': 'Your Grade',
@@ -147,7 +147,7 @@ window.TRANSLATIONS = {
     'skip': '跳过 →',
 
     // Index
-    'app-title': '🎹 音乐大师',
+    'app-title': '音乐大师',
     'app-tagline': 'AMEB钢琴考试备考 — 第1、2、3级',
     'overall-progress': '总体进度',
     'grade-selector-label': '你的级别',
@@ -282,7 +282,7 @@ window.TRANSLATIONS = {
     'skip': 'Saltar →',
 
     // Index
-    'app-title': '🎹 Music Maestro',
+    'app-title': 'Music Maestro',
     'app-tagline': 'Preparación examen AMEB Piano — Grados 1, 2 y 3',
     'overall-progress': 'Progreso general',
     'grade-selector-label': 'Tu grado',
