@@ -3,8 +3,6 @@
    All at global/window scope — no ES modules
    ============================================= */
 
-const APP_VERSION = "v6.3 · 2026-07-15";
-
 /* A teacher-shared free assignment should open at the assigned grade even if
    this device previously viewed a different grade. Paid grades are never
    enabled by a URL parameter. */
@@ -34,11 +32,6 @@ const AMEB_PAGE_TAGS = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-  var footer = document.createElement('div');
-  footer.style.cssText = 'text-align:center;font-size:11px;color:#bbb;padding:12px 0 20px;';
-  footer.textContent = APP_VERSION;
-  document.body.appendChild(footer);
-
   /* Auto-inject AMEB context tag on module pages */
   var pageKey = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
   var tagData = AMEB_PAGE_TAGS[pageKey];
