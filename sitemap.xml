@@ -3,6 +3,7 @@
   <url><loc>https://music.vensoai.com/</loc><priority>1.0</priority></url>
   <url><loc>https://music.vensoai.com/landing</loc><priority>0.9</priority></url>
   <url><loc>https://music.vensoai.com/teachers</loc><priority>0.9</priority></url>
+  <url><loc>https://music.vensoai.com/ameb-practice-checklist</loc><priority>0.9</priority></url>
   <url><loc>https://music.vensoai.com/course</loc><priority>0.9</priority></url>
   <url><loc>https://music.vensoai.com/syllabus</loc><priority>0.8</priority></url>
   <url><loc>https://music.vensoai.com/learn</loc><priority>0.8</priority></url>

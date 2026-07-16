@@ -45,8 +45,32 @@ export async function onRequestPost(context) {
   let event;
   try { event = JSON.parse(payload); } catch { return new Response('Bad payload', { status: 400 }); }
 
-  if (event.type !== 'checkout.session.completed') {
+  if (event.type !== 'checkout.session.completed' && event.type !== 'charge.refunded') {
     return new Response('Ignored', { status: 200 });
+  }
+
+  const eventId = String(event.id || '');
+  if (!eventId) return new Response('Missing event id', { status: 400 });
+
+  if (event.type === 'charge.refunded') {
+    const charge = event.data && event.data.object;
+    const paymentIntentId = charge && (typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent && charge.payment_intent.id);
+    if (!charge || !paymentIntentId) return new Response('Missing charge data', { status: 400 });
+    await env.DB.batch([
+      env.DB.prepare('INSERT OR IGNORE INTO stripe_events (event_id,event_type,livemode) VALUES (?,?,?)')
+        .bind(eventId, event.type, event.livemode ? 1 : 0),
+      env.DB.prepare(`UPDATE stripe_payments SET refunded_amount=?, payment_status=?, updated_at=datetime('now')
+        WHERE payment_intent_id=?`)
+        .bind(Number(charge.amount_refunded || 0), Number(charge.amount_refunded || 0) >= Number(charge.amount || 0) ? 'refunded' : 'paid', paymentIntentId),
+      env.DB.prepare(`UPDATE users SET is_unlocked=CASE WHEN EXISTS (
+        SELECT 1 FROM stripe_payments p WHERE p.user_id=users.id AND p.livemode=1
+        AND p.payment_status='paid' AND p.refunded_amount=0
+      ) THEN 1 ELSE 0 END WHERE id=(SELECT user_id FROM stripe_payments WHERE payment_intent_id=?)`)
+        .bind(paymentIntentId),
+      env.DB.prepare(`INSERT OR IGNORE INTO funnel_events (id,event_name,page,channel) VALUES (?,?,?,?)`)
+        .bind('stripe-' + eventId, 'refund', '/checkout', 'stripe')
+    ]);
+    return new Response('OK', { status: 200 });
   }
 
   const session = event.data && event.data.object;
@@ -56,28 +80,35 @@ export async function onRequestPost(context) {
   }
 
   const customerId = typeof session.customer === 'string' ? session.customer : '';
+  const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : '';
   const userId = session.client_reference_id || '';
   const email = (session.customer_details && session.customer_details.email || '').trim().toLowerCase();
 
-  let result = { meta: { changes: 0 } };
-  if (userId) {
-    result = await env.DB.prepare(
-      'UPDATE users SET is_unlocked = 1, stripe_customer_id = ? WHERE id = ?'
-    ).bind(customerId, userId).run();
-  }
-  if (!result.meta.changes && email) {
-    /* Fallback: match by the email used at checkout */
-    result = await env.DB.prepare(
-      'UPDATE users SET is_unlocked = 1, stripe_customer_id = ? WHERE email = ?'
-    ).bind(customerId, email).run();
-  }
+  let matched = null;
+  if (userId) matched = await env.DB.prepare('SELECT id FROM users WHERE id=?').bind(userId).first();
+  if (!matched && email) matched = await env.DB.prepare('SELECT id FROM users WHERE email=?').bind(email).first();
 
-  if (!result.meta.changes) {
+  if (!matched) {
     /* Return 200 so Stripe doesn't retry forever; reconcile manually from the receipt */
     console.log('stripe-webhook: no matching user', session.id, 'ref=', userId, 'email=', email);
     return new Response('No matching user — manual reconciliation needed', { status: 200 });
   }
 
+  await env.DB.batch([
+    env.DB.prepare('INSERT OR IGNORE INTO stripe_events (event_id,event_type,livemode) VALUES (?,?,?)')
+      .bind(eventId, event.type, event.livemode ? 1 : 0),
+    env.DB.prepare(`INSERT INTO stripe_payments
+      (checkout_session_id,payment_intent_id,user_id,customer_id,customer_email,amount_total,currency,livemode,payment_status,completed_at)
+      VALUES (?,?,?,?,?,?,?,?,?,datetime('now'))
+      ON CONFLICT(checkout_session_id) DO UPDATE SET
+        payment_intent_id=excluded.payment_intent_id,user_id=excluded.user_id,customer_id=excluded.customer_id,
+        customer_email=excluded.customer_email,amount_total=excluded.amount_total,currency=excluded.currency,
+        livemode=excluded.livemode,payment_status=excluded.payment_status,updated_at=datetime('now')`)
+      .bind(session.id, paymentIntentId || null, matched.id, customerId, email, Number(session.amount_total || 0), String(session.currency || 'aud'), event.livemode ? 1 : 0, 'paid'),
+    env.DB.prepare('UPDATE users SET is_unlocked=1,stripe_customer_id=? WHERE id=?').bind(customerId, matched.id),
+    env.DB.prepare(`INSERT INTO funnel_events (id,event_name,user_id,page,channel) VALUES (?,?,?,?,?)`)
+      .bind('stripe-' + eventId, 'successful_payment', matched.id, '/checkout', 'stripe')
+  ]);
   console.log('stripe-webhook: unlocked', userId || email, 'session', session.id);
   return new Response('OK', { status: 200 });
 }

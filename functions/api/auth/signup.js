@@ -22,9 +22,12 @@ export async function onRequestPost(context) {
   const salt = randomHex(16);
   const hash = await hashPassword(password, salt);
 
-  await env.DB.prepare(
-    'INSERT INTO users (id, email, password_hash, salt, name) VALUES (?, ?, ?, ?, ?)'
-  ).bind(id, email, hash, salt, name).run();
+  await env.DB.batch([
+    env.DB.prepare('INSERT INTO users (id, email, password_hash, salt, name) VALUES (?, ?, ?, ?, ?)')
+      .bind(id, email, hash, salt, name),
+    env.DB.prepare(`INSERT INTO funnel_events (id,event_name,user_id,page,channel) VALUES (?,?,?,?,?)`)
+      .bind(randomHex(16), 'signup_complete', id, '/signup', 'product')
+  ]);
 
   const token = await createSession(env, id);
   const row = { id, email, name, grade: 1, is_unlocked: 0 };

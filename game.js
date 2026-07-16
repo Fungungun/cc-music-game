@@ -575,6 +575,7 @@ function _paymentUrl() {
 }
 
 function gotoPayment() {
+  if (typeof mmTrack === 'function') mmTrack('checkout_start');
   if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
     window.location.href = _paymentUrl();
   } else {
@@ -585,6 +586,7 @@ function gotoPayment() {
 }
 
 function showUpgradeModal() {
+  if (typeof mmTrack === 'function') mmTrack('upgrade_view');
   var existing = document.getElementById('upgrade-modal');
   if (existing) { existing.style.display = 'flex'; return; }
 
