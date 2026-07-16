@@ -33,6 +33,12 @@ assert.match(noteValuesResource, /mmTrack\('resource_share',\{channel:'organic-n
 const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 assert.match(readme, /ameb-grade-1-note-values-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values/);
 
+const checklist = fs.readFileSync(path.join(root, 'ameb-practice-checklist.html'), 'utf8');
+assert.match(checklist, /ameb-grade-1-note-values-practice\.html\?ref=practice-checklist/);
+
+const generalKnowledge = fs.readFileSync(path.join(root, 'ameb-piano-general-knowledge-questions.html'), 'utf8');
+assert.match(generalKnowledge, /ameb-grade-1-note-values-practice\.html\?ref=general-knowledge-sheet/);
+
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
 for (const route of routes) {
   assert.match(sitemap, new RegExp(`<loc>https://music\\.vensoai\\.com/${route}</loc><lastmod>2026-07-17</lastmod>`));
