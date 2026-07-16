@@ -26,6 +26,9 @@ for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-p
 const noteValuesResource = fs.readFileSync(path.join(root, 'ameb-grade-1-note-values-practice.html'), 'utf8');
 assert.match(noteValuesResource, /note-values\.html\?grade=1&amp;ref=organic-note-values/);
 assert.match(noteValuesResource, /"@type":"LearningResource"/);
+assert.match(noteValuesResource, /id="copy-family-note"/);
+assert.match(noteValuesResource, /utm_source=family-note&utm_medium=referral&utm_campaign=note-values-sheet/);
+assert.match(noteValuesResource, /mmTrack\('resource_share',\{channel:'organic-note-values',experiment:'family-note'\}\)/);
 
 const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 assert.match(readme, /ameb-grade-1-note-values-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values/);

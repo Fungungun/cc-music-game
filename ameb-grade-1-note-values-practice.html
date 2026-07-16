@@ -52,6 +52,7 @@
     <div class="question"><p><span class="qno">08</span><strong>In 2/4, can one semibreve fit inside a single bar?</strong></p><details><summary>Show answer</summary><div class="answer"><strong>No.</strong> A semibreve is 4 crotchet beats, but a 2/4 bar only has 2 crotchet beats.</div></details></div>
 
     <button class="print-btn" onclick="window.print()">Print this practice sheet</button>
+    <button class="print-btn" id="copy-family-note" type="button">Copy family note</button>
 
     <div class="practice-box">
       <h2 style="margin-top:0">A five-minute parent routine</h2>
@@ -69,6 +70,19 @@
 
     <div class="cta"><h2>Continue with free interactive practice</h2><p>Grade 1 note-values practice is free and needs no account. The app gives immediate feedback after each answer.</p><a href="note-values.html?grade=1&amp;ref=organic-note-values">Open the free note-values drill</a><a href="ameb-grade-1-theory-practice.html?ref=organic-note-values">Review the full Grade 1 guide</a></div>
   </main>
-  <script>window.addEventListener('DOMContentLoaded',function(){if(window.mmTrack)mmTrack('landing_visit',{channel:'organic-note-values'});});</script>
+  <script>
+    window.addEventListener('DOMContentLoaded',function(){
+      if(window.mmTrack)mmTrack('landing_visit',{channel:'organic-note-values'});
+      var copy=document.getElementById('copy-family-note');
+      if(!copy)return;
+      var url='https://music.vensoai.com/ameb-grade-1-note-values-practice?utm_source=family-note&utm_medium=referral&utm_campaign=note-values-sheet';
+      var text='Free Grade 1 note-values practice sheet and interactive drill:\n'+url+'\n\nMusic Maestro is an independent practice resource and is not affiliated with or endorsed by AMEB.';
+      function fallback(value){var area=document.createElement('textarea');area.value=value;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();var ok=document.execCommand('copy');document.body.removeChild(area);return ok;}
+      copy.addEventListener('click',function(){
+        var operation=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(text).then(function(){return true;}):Promise.resolve(fallback(text));
+        operation.then(function(ok){if(!ok)throw new Error('copy failed');copy.textContent='Copied';if(window.mmTrack)mmTrack('resource_share',{channel:'organic-note-values',experiment:'family-note'});setTimeout(function(){copy.textContent='Copy family note';},2200);}).catch(function(){copy.textContent='Copy unavailable';setTimeout(function(){copy.textContent='Copy family note';},2200);});
+      });
+    });
+  </script>
 </body>
 </html>
