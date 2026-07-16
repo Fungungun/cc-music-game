@@ -2,7 +2,7 @@
    CC's Music Game — Shared Styles
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap');
 
 /* CSS Variables */
 :root {
@@ -1062,6 +1062,49 @@ body {
 /* SVG staff responsive */
 .staff-container svg { max-width:100%; height:auto; }
 
+/* 2026 visual direction — music workbook, not pastel dashboard */
+:root {
+  --pink:#8f243f; --yellow:#d2b36a; --mint:#b8c8b0; --lavender:#c7c0b7;
+  --coral:#c67b4c; --sky:#9ab1b5; --purple:#786b78;
+  --white:#fffdf8; --offwhite:#f5f0e7; --text:#23211e; --text-light:#676159;
+  --shadow:rgba(52,43,31,.09); --radius:6px; --radius-sm:4px;
+  --font:'DM Sans','Segoe UI',sans-serif; --font-display:'Lora',Georgia,serif;
+}
+body { background:#f3eee5; background-image:linear-gradient(rgba(104,91,72,.035) 1px,transparent 1px); background-size:100% 32px; }
+.page-header { height:68px; background:#fffdf8; box-shadow:none; border-bottom:1px solid #cfc6b8; }
+.page-header::after { display:none; }
+.page-header h1 { font-family:var(--font-display); font-weight:600; letter-spacing:-.025em; }
+.back-btn { border:1px solid #b9afa0; border-radius:3px; box-shadow:none; }
+.back-btn:hover { background:#eee7dc; transform:none; }
+.btn { border-radius:3px; font-weight:600; box-shadow:none; letter-spacing:.01em; }
+.btn:hover { transform:translateY(-1px); box-shadow:0 3px 0 rgba(51,42,31,.14); }
+.btn-primary { background:#8f243f; }
+.btn-secondary { background:#fffdf8; border:1px solid #aaa092; }
+.progress-bar { border-radius:0; background:#ddd5c9; height:6px; }
+.progress-fill { border-radius:0; background:#8f243f; }
+.score-item,.staff-container,.answer-btn { border-radius:4px; border:1px solid #d2c9bc; box-shadow:none; }
+.answer-btn { font-weight:600; }
+.module-card { border-radius:4px; border:1px solid #cfc6b8; box-shadow:none; background:#fffdf8; transition:border-color .15s,transform .15s; }
+.module-card:hover { transform:translateY(-2px); box-shadow:none; border-color:#7c7062; }
+.module-card .card-band { min-height:74px; border-radius:0; background:#37332e !important; }
+.module-card .card-icon { font-family:var(--font-display); font-weight:600; }
+.module-card .card-title { font-family:var(--font-display); font-weight:600; font-size:1.08rem; }
+.module-card .card-score { font-weight:500; }
+.mode-toggle { border-radius:3px; }
+.mode-btn { border-radius:2px; font-weight:600; }
+.mode-btn.active { background:#37332e; border-color:#37332e; }
+.grade-badge,.grade-badge.grade-1,.grade-badge.grade-2,.grade-badge.grade-3 { border-radius:2px; background:#e7dfd2; color:#514a42; box-shadow:none; }
+.exam-banner { border-radius:4px; background:#37332e; box-shadow:none; }
+.exam-banner h2,.lessons-banner-title { font-family:var(--font-display); font-weight:600; }
+.lessons-banner { border-radius:4px; background:#8f243f; box-shadow:none; }
+.lessons-banner-right { background:transparent; border:1px solid rgba(255,255,255,.55); border-radius:2px; }
+.total-stars,.ameb-page-tag,.course-sidebar,.course-lesson-content { border-radius:4px; box-shadow:none; }
+.ameb-page-tag { background:#ece5da; border-color:#cfc4b4; }
+.ameb-tag-label,.ameb-tag-section,.ameb-tag-link { color:#7e2038; }
+.course-sidebar-hd,.course-mobile-nav { background:#37332e; border-radius:3px 3px 0 0; }
+.course-lesson-content h1,.course-lesson-content h2 { font-family:var(--font-display); }
+.course-lesson-content h2 { color:#7e2038; border-bottom-color:#d8cec0; }
+
 /* Mobile — hide sidebar, show dropdown nav */
 @media (max-width:780px) {
   .course-sidebar { display:none; }
@@ -1070,4 +1113,3 @@ body {
   .course-lesson-content { padding:18px 16px; }
   .course-lesson-footer { justify-content:center; }
 }
-

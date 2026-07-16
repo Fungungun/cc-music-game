@@ -37,7 +37,7 @@
 
     /* Upgrade banner */
     .upgrade-banner {
-      background: linear-gradient(90deg, #FF8FAB, #FFB74D);
+      background: #8f243f;
       padding: 12px 20px; text-align: center; display: none;
     }
     .upgrade-banner span { color: white; font-weight: 700; font-size: 0.95rem; }
@@ -55,9 +55,9 @@
       z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .onboard-box {
-      background: white; border-radius: 28px; padding: 36px 28px;
+      background: #fffdf8; border-radius: 6px; padding: 36px 28px;
       max-width: 420px; width: 100%; text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25); border:1px solid #cfc6b8;
     }
     .onboard-box h2 { margin: 0 0 10px; font-size: 1.6rem; font-weight: 900; }
     .onboard-box p  { color: #5a6480; margin: 0 0 14px; line-height: 1.6; font-size: 0.95rem; }
@@ -67,7 +67,7 @@
     /* Weak area banner */
     .weak-banner {
       margin: 10px 0 0; padding: 12px 16px;
-      background: #fff; border-radius: 16px; border-left: 4px solid #FFB74D;
+      background: #fffdf8; border-radius: 4px; border-left: 3px solid #8f243f;
       font-size: 0.88rem; color: #555; display: none;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
@@ -75,17 +75,17 @@
     /* Badges */
     .badges-section {
       margin: 14px 0 0; padding: 14px 16px;
-      background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      background: #fffdf8; border-radius: 4px; box-shadow: none; border:1px solid #d3cabc;
     }
     .badges-title { font-size: 0.72rem; color: #aaa; margin-bottom: 8px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
     .badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .badge-chip {
       display: flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 20px;
+      padding: 5px 12px; border-radius: 2px;
       font-size: 0.8rem; font-weight: 700;
       background: #f0f2f7; color: #aaa;
     }
-    .badge-chip.earned { background: linear-gradient(135deg, #FFF3B0, #FFE87A); color: #6D4C00; }
+    .badge-chip.earned { background: #ded1ad; color: #4f4225; }
 
     /* Footer links */
     .footer-links {
@@ -124,7 +124,7 @@
 
   <!-- Page header -->
   <header class="page-header">
-    <h1 data-i18n="app-title">🎹 Music Maestro</h1>
+    <h1 data-i18n="app-title">Music Maestro</h1>
     <select id="lang-select" class="lang-btn" onchange="setLanguage(this.value)" title="Language / 语言 / Idioma">
       <option value="en">🌐 English</option>
       <option value="zh">🌐 中文</option>
@@ -155,7 +155,7 @@
 
   <!-- Upgrade banner -->
   <div class="upgrade-banner" id="upgrade-banner">
-    <span>🎹 Enjoying Music Maestro? </span>
+    <span>Continue beyond Grade 1. </span>
     <a onclick="gotoPayment()">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
   </div>
 
@@ -167,12 +167,12 @@
 
     <!-- Daily challenge / streak banner -->
     <a href="daily-challenge.html" id="daily-banner" style="display:flex;align-items:center;gap:12px;background:white;border-radius:16px;padding:12px 16px;margin:10px 0 0;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #F57C00;">
-      <span style="font-size:1.8rem;">🔥</span>
+      <span style="font-family:var(--font-display);font-size:1.5rem;color:#8f243f;">01</span>
       <span style="flex:1;">
         <span id="daily-banner-title" style="display:block;font-weight:800;color:#1a2233;font-size:0.95rem;">Daily Challenge</span>
         <span id="daily-banner-sub" style="display:block;color:#888;font-size:0.82rem;">5 quick questions — build your streak</span>
       </span>
-      <span id="daily-banner-cta" style="background:linear-gradient(90deg,#F57C00,#FFB74D);color:white;font-weight:800;font-size:0.85rem;border-radius:12px;padding:8px 14px;white-space:nowrap;">Play →</span>
+      <span id="daily-banner-cta" style="background:#37332e;color:white;font-weight:700;font-size:0.85rem;border-radius:2px;padding:8px 14px;white-space:nowrap;">Play →</span>
     </a>
 
     <!-- Weak area recommendation -->
@@ -193,7 +193,7 @@
 
     <!-- Exam banner -->
     <div class="exam-banner" style="margin-top:8px;" id="exam-banner">
-      <h2>📝 Mock Exam</h2>
+      <h2>Mock examination</h2>
       <p>20-question timed sessions drawn from a bank of 100+ questions per grade — just like the real AMEB theory test.</p>
       <a href="mock-exam.html" class="btn" style="display:inline-block;margin:0 auto;">Start Practice Exam →</a>
       <p style="margin-top:12px;font-size:0.83rem;opacity:0.85;">All questions are aligned to the <a href="syllabus.html" style="color:inherit;font-weight:800;text-decoration:underline;">AMEB Piano 2026 Syllabus →</a></p>
@@ -201,7 +201,7 @@
 
     <!-- Badges -->
     <div class="badges-section" id="badges-section" style="display:none;margin-top:14px;">
-      <div class="badges-title">🏅 ACHIEVEMENTS</div>
+      <div class="badges-title">ACHIEVEMENTS</div>
       <div class="badges-row" id="badges-row"></div>
     </div>
 
