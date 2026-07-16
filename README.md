@@ -1,51 +1,53 @@
-# 🎹 CC's Music Game
+# Music Maestro
 
-A web-based music theory learning game built for CC (Xi), a piano student working towards AMEB Grade 2–3.
+Music Maestro is an independent browser-based practice resource for Australian piano students working around AMEB Grades 1–3. It provides short theory, aural and general-knowledge activities that fit between lessons.
 
-## Modules
+[Open Music Maestro](https://music.vensoai.com/landing?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-primary) · [View the coverage and limits](https://music.vensoai.com/syllabus?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-coverage) · [Teacher resources](https://music.vensoai.com/teachers?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-teachers)
 
-| Module | What it teaches |
-|---|---|
-| 🎵 Note Namer | Identify notes on treble and bass clef staves |
-| 🎼 Scale Builder | Build major and harmonic minor scales on a piano keyboard |
-| 🎶 Interval Quiz | Name musical intervals (Major 3rd, Perfect 5th, etc.) |
-| 🎸 Chord Game | Identify triads (root/1st inversion) and cadence types |
-| 🥁 Rhythm Tapper | Tap along to rhythm patterns; graded on timing accuracy |
-| 📚 Terms Flashcards | All AMEB Grade 1–3 Italian/French music terms with spaced repetition |
-| 🔍 Form Detective | Identify Binary/Ternary form, cadence types, and time signatures |
+## Product scope
 
-## How to play
+- Grade 1 interactive practice is free without an account.
+- Grade 2–3 access is an optional AUD 14.99 one-time purchase, not a subscription.
+- Thirteen practice activities cover note reading, scales, key signatures, note values, intervals, chords, rhythm, terms, aural work, form, daily review, lessons and mixed review.
+- Explanations follow practice answers, and progress remains available on the learner's device.
+- English, Chinese and Spanish interfaces are available.
 
-Just open `index.html` in a browser. No install or build step needed.
+Music Maestro is a supplementary practice tool. It is not an official examination paper, does not predict an exam result, and is not affiliated with or endorsed by AMEB. Students should confirm their current pathway and requirements with their teacher and the current official syllabus.
 
-For the best experience on an iPad, use Safari in landscape mode.
+## Free resources
 
-## Live site
+- [Grade 1 theory practice guide](https://music.vensoai.com/ameb-grade-1-theory-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade1)
+- [Grade 2 readiness diagnostic](https://music.vensoai.com/ameb-grade-2-piano-theory-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2)
+- [Piano general-knowledge questions](https://music.vensoai.com/ameb-piano-general-knowledge-questions?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-general-knowledge)
+- [Weekly practice checklist](https://music.vensoai.com/ameb-practice-checklist?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-checklist)
+- [Printable three-piece preparation sheet](https://music.vensoai.com/downloads/ameb-piano-general-knowledge-practice-sheet.pdf)
 
-Deployed at: **https://cc-music-game.pages.dev**
+## Technology
 
-## Deployment
+The product uses plain HTML, CSS and JavaScript with Cloudflare Pages, Functions and D1. Stripe handles the one-time checkout. Musical notation and audio use abcjs, Tone.js and Salamander Grand Piano samples where appropriate.
 
-Hosted on Cloudflare Pages. Every push to `main` triggers an automatic deploy.
+The repository intentionally has no client-side framework or required build step.
 
-**One-time setup (already done):**
-1. Go to [pages.cloudflare.com](https://pages.cloudflare.com)
-2. Create a project → Connect to Git → select `cc-music-game`
-3. Framework preset: None | Build command: _(blank)_ | Output dir: `/`
+## Local development
 
-## Tech stack
-
-- Pure HTML, CSS, and vanilla JavaScript — no build tools, no npm
-- [Tone.js](https://tonejs.github.io/) for piano audio (Salamander Grand Piano samples)
-- [Tonal.js](https://github.com/tonaljs/tonal) for music theory helpers
-- [abcjs](https://www.abcjs.net/) for rendering sheet music notation
-
-## Updating
+Serve the repository root with any static web server:
 
 ```bash
-git add .
-git commit -m "describe your change"
-git push
+npx serve .
 ```
 
-Cloudflare Pages will automatically deploy within ~60 seconds.
+Cloudflare Functions and D1 routes require Wrangler for local integration testing:
+
+```bash
+npx wrangler pages dev .
+```
+
+Do not commit `.dev.vars`, account secrets, contact lists or operational outreach records.
+
+## Primary audience
+
+Music Maestro is designed for adult parents, piano teachers and music schools supporting Grade 1–3 students. Community participation and teacher outreach should be transparent, limited and useful without requiring a purchase.
+
+## Licence and attribution
+
+No AMEB authority or endorsement is expressed or implied. Consult the repository history and third-party library licences before redistributing source or bundled assets.
