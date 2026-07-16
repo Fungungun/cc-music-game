@@ -86,7 +86,7 @@
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <p>Loading piano sounds... 🎹</p>
+  <p>Loading piano sounds... </p>
 </div>
 
 <header class="page-header">
@@ -100,7 +100,7 @@
 <!-- ═══ START SCREEN ═══ -->
 <div id="screen-start">
   <div class="start-screen">
-    <div class="start-title">AMEB Piano Mock Exam 🎓</div>
+    <div class="start-title">AMEB Piano Mock Exam </div>
     <div class="start-sub">20 questions from the Grade exam syllabus</div>
 
     <div class="mode-toggle" id="grade-selector" style="justify-content:center;margin:16px 0;"></div>
@@ -124,7 +124,7 @@
   <div class="q-header">
     <span class="q-progress-text">Q&nbsp;<span id="q-num">1</span>/20</span>
     <div class="q-bar-wrap"><div class="q-bar-fill" id="q-bar" style="width:0%"></div></div>
-    <div class="q-score-chip">✓&nbsp;<span id="q-correct-count">0</span></div>
+    <div class="q-score-chip">Correct&nbsp;<span id="q-correct-count">0</span></div>
   </div>
 
   <div class="q-card">
@@ -151,7 +151,7 @@
 <!-- ═══ RESULTS SCREEN ═══ -->
 <div id="screen-results" style="display:none;">
   <div class="results-screen">
-    <div style="font-size:1.4rem;font-weight:900;color:#4A1070;margin-bottom:2px;">Exam Complete! 🎓</div>
+    <div style="font-size:1.4rem;font-weight:900;color:#4A1070;margin-bottom:2px;">Exam Complete! </div>
     <div id="results-label" style="font-size:0.88rem;color:#888;margin-bottom:12px;"></div>
 
     <div class="score-circle" id="score-circle"><span id="score-pct">0%</span></div>
@@ -159,17 +159,17 @@
     <div class="score-subtitle" id="score-subtitle"></div>
 
     <div class="tally-chips">
-      <div class="tally-chip tally-correct">✓ <span id="final-correct">0</span> correct</div>
-      <div class="tally-chip tally-wrong">✗ <span id="final-wrong">0</span> wrong</div>
+      <div class="tally-chip tally-correct"><span id="final-correct">0</span> correct</div>
+      <div class="tally-chip tally-wrong"><span id="final-wrong">0</span> wrong</div>
     </div>
 
     <div class="review-section" id="review-section" style="display:none;">
-      <div class="review-title">❌ Review these items:</div>
+      <div class="review-title">Review these items</div>
       <div id="review-list"></div>
     </div>
 
-    <button class="retake-btn" onclick="retakeExam()">🔄 Try Again</button>
-    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+    <button class="retake-btn" onclick="retakeExam()"> Try Again</button>
+    <button class="home-btn" onclick="window.location.href='index.html'"> Home</button>
   </div>
 </div>
 
@@ -177,6 +177,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+<script src="growth.js"></script>
 <script src="auth.js"></script>
 <script src="game.js"></script>
 <script src="exam-questions.js"></script>
@@ -290,7 +291,7 @@ function checkAnswer(chosen, btn, q) {
   expEl.style.display = 'block';
 
   var nextBtn = document.getElementById('q-next-btn');
-  nextBtn.textContent = session.current < 19 ? 'Next Question →' : 'See Results 🎓';
+  nextBtn.textContent = session.current < 19 ? 'Next Question →' : 'See Results ';
   nextBtn.style.display = 'block';
   document.getElementById('q-correct-count').textContent = session.correct;
   document.getElementById('header-score-text').textContent = session.correct + '/' + (session.current + 1);
@@ -336,6 +337,7 @@ function playAural() {
 
 /* ── Results ─────────────────────────────────── */
 function showResults() {
+  if (typeof window.mmTrack === 'function') window.mmTrack('practice_complete');
   document.getElementById('screen-question').style.display = 'none';
   document.getElementById('screen-results').style.display  = 'block';
   document.getElementById('header-score').style.display    = 'none';
@@ -348,11 +350,11 @@ function showResults() {
   document.getElementById('final-wrong').textContent   = session.wrong;
 
   var desc, sub, cls;
-  if      (pct >= 85) { desc='High Distinction'; sub='Outstanding! 🏆';              cls='score-hd'; }
-  else if (pct >= 75) { desc='Distinction';       sub='Excellent work! ⭐';           cls='score-dist'; }
-  else if (pct >= 65) { desc='Credit';            sub='Great effort — keep it up! 👍'; cls='score-credit'; }
-  else if (pct >= 50) { desc='Pass';              sub='Passed! Review the items below. 💪'; cls='score-pass'; }
-  else                { desc='Not Yet Passing';   sub='Keep practicing — you can do it! 🌟'; cls='score-fail'; }
+  if      (pct >= 85) { desc='High Distinction'; sub='Outstanding! ';              cls='score-hd'; }
+  else if (pct >= 75) { desc='Distinction';       sub='Excellent work.';                 cls='score-dist'; }
+  else if (pct >= 65) { desc='Credit';            sub='Great effort — keep it up! '; cls='score-credit'; }
+  else if (pct >= 50) { desc='Pass';              sub='Passed! Review the items below. '; cls='score-pass'; }
+  else                { desc='Not Yet Passing';   sub='Keep practicing — you can do it! '; cls='score-fail'; }
 
   document.getElementById('score-circle').className    = 'score-circle ' + cls;
   document.getElementById('score-descriptor').textContent = desc;

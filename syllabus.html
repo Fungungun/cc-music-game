@@ -297,10 +297,10 @@
   };
 
   var STATUS_META = {
-    full:    { cls:'s-full',    icon:'✅' },
-    partial: { cls:'s-partial', icon:'⚠️' },
-    gap:     { cls:'s-gap',     icon:'❌' },
-    voice:   { cls:'s-voice',   icon:'🎤' },
+    full:    { cls:'s-full',    icon:'Full' },
+    partial: { cls:'s-partial', icon:'Partial' },
+    gap:     { cls:'s-gap',     icon:'Gap' },
+    voice:   { cls:'s-voice',   icon:'' },
   };
 
   function countStatus(grade) {
@@ -316,14 +316,14 @@
     var html = '';
 
     if (data.note) {
-      html += '<div class="grade-note-box">ℹ️ ' + data.note + '</div>';
+      html += '<div class="grade-note-box">' + data.note + '</div>';
     }
 
     var c = countStatus(g);
     html += '<div class="coverage-summary">' +
-      '<span class="cs-chip cs-full">✅ ' + c.full + ' fully covered</span>' +
-      (c.partial ? '<span class="cs-chip cs-partial">⚠️ ' + c.partial + ' partially covered</span>' : '') +
-      (c.gap ? '<span class="cs-chip cs-gap">❌ ' + c.gap + ' not in app</span>' : '') +
+      '<span class="cs-chip cs-full">' + c.full + ' fully covered</span>' +
+      (c.partial ? '<span class="cs-chip cs-partial">' + c.partial + ' partially covered</span>' : '') +
+      (c.gap ? '<span class="cs-chip cs-gap">' + c.gap + ' not in app</span>' : '') +
       '</div>';
 
     data.sections.forEach(function(sec) {
@@ -363,7 +363,7 @@
     var btn = document.createElement('button');
     btn.className = 'mode-btn' + (g === curGrade ? ' active' : '');
     var label = 'Grade ' + g;
-    if (g >= 2 && !hasFullAccess()) label += ' 🔒';
+    if (g >= 2 && !hasFullAccess()) label += ' ';
     btn.textContent = label;
     btn.onclick = function() {
       document.querySelectorAll('#grade-tabs .mode-btn').forEach(function(b){ b.classList.remove('active'); });

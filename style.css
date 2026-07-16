@@ -2,8 +2,6 @@
    CC's Music Game — Shared Styles
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap');
-
 /* CSS Variables */
 :root {
   --pink:    #FFB7C5;
@@ -20,7 +18,7 @@
   --shadow:  rgba(0,0,0,0.10);
   --radius:  14px;
   --radius-sm: 8px;
-  --font:    'Nunito', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font:    ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 }
 
 /* Reset & Base */
@@ -1068,7 +1066,7 @@ body {
   --coral:#c67b4c; --sky:#9ab1b5; --purple:#786b78;
   --white:#fffdf8; --offwhite:#f5f0e7; --text:#23211e; --text-light:#676159;
   --shadow:rgba(52,43,31,.09); --radius:6px; --radius-sm:4px;
-  --font:'DM Sans','Segoe UI',sans-serif; --font-display:'Lora',Georgia,serif;
+  --font:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; --font-display:Georgia,'Times New Roman',serif;
 }
 body { background:#f3eee5; background-image:linear-gradient(rgba(104,91,72,.035) 1px,transparent 1px); background-size:100% 32px; }
 .page-header { height:68px; background:#fffdf8; box-shadow:none; border-bottom:1px solid #cfc6b8; }
@@ -1085,6 +1083,7 @@ body { background:#f3eee5; background-image:linear-gradient(rgba(104,91,72,.035)
 .score-item,.staff-container,.answer-btn { border-radius:4px; border:1px solid #d2c9bc; box-shadow:none; }
 .answer-btn { font-weight:600; }
 .module-card { border-radius:4px; border:1px solid #cfc6b8; box-shadow:none; background:#fffdf8; transition:border-color .15s,transform .15s; }
+.cards-grid { min-height:500px; }
 .module-card:hover { transform:translateY(-2px); box-shadow:none; border-color:#7c7062; }
 .module-card .card-band { min-height:74px; border-radius:0; background:#37332e !important; }
 .module-card .card-icon { font-family:var(--font-display); font-weight:600; }
@@ -1108,8 +1107,14 @@ body { background:#f3eee5; background-image:linear-gradient(rgba(104,91,72,.035)
 /* Mobile — hide sidebar, show dropdown nav */
 @media (max-width:780px) {
   .course-sidebar { display:none; }
-  .course-mobile-nav { display:block; background:linear-gradient(135deg,#4C1D95,#7C3AED); border-radius:var(--radius); padding:14px; margin-bottom:16px; }
+  .course-mobile-nav { display:block; background:#37332e; border-radius:var(--radius); padding:14px; margin-bottom:16px; }
   .course-layout { display:block; }
   .course-lesson-content { padding:18px 16px; }
   .course-lesson-footer { justify-content:center; }
+}
+@media (max-width:600px) {
+  .cards-grid { min-height:1030px; }
+}
+@media (max-width:380px) {
+  .cards-grid { min-height:2050px; }
 }

@@ -8,16 +8,15 @@
   <link rel="stylesheet" href="style.css" />
   <script src="auth.js"></script>
   <style>
-    body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; background:linear-gradient(135deg,#FFF0F5,#FFF8F0); }
-    .unlock-box { background:white; border-radius:28px; padding:40px 32px; max-width:420px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.12); }
-    .unlock-icon { font-size:4.5rem; margin-bottom:12px; }
-    h1 { font-size:1.8rem; font-weight:900; color:#333; margin:0 0 10px; }
-    p  { color:#666; margin:0 0 8px; line-height:1.6; }
+    body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; background:#f3eee5; font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#292724; }
+    .unlock-box { background:#fffdf8; border:1px solid #cfc5b6; border-radius:4px; padding:40px 32px; max-width:420px; width:100%; box-shadow:0 18px 54px rgba(36,33,29,0.12); }
+    h1 { font:600 1.8rem/1.15 Georgia,serif; color:#292724; margin:0 0 10px; }
+    p  { color:#625b52; margin:0 0 8px; line-height:1.6; }
     .features { text-align:left; margin:20px 0; padding:0; list-style:none; }
-    .features li { padding:6px 0; font-size:0.95rem; color:#555; border-bottom:1px solid #f5f5f5; }
+    .features li { padding:9px 0; font-size:0.95rem; color:#4d4943; border-bottom:1px solid #d7cec1; }
     .features li:last-child { border:none; }
-    .cta { display:block; background:linear-gradient(90deg,#FF8FAB,#FFB74D); color:white; border-radius:16px; padding:16px; font-size:1.1rem; font-weight:800; text-decoration:none; margin-top:24px; box-shadow:0 4px 16px rgba(255,143,171,0.35); }
-    .spinner { width:44px; height:44px; border:5px solid #FFE0EA; border-top-color:#FF8FAB; border-radius:50%; margin:0 auto 16px; animation:spin 0.9s linear infinite; }
+    .cta { display:block; background:#7e2038; color:white; border-radius:3px; padding:15px; font-size:1rem; font-weight:700; text-decoration:none; margin-top:24px; box-shadow:none; }
+    .spinner { width:40px; height:40px; border:3px solid #d7cec1; border-top-color:#7e2038; border-radius:50%; margin:0 auto 18px; animation:spin 0.9s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
@@ -30,21 +29,19 @@
   </div>
 
   <div class="unlock-box" id="success-box" style="display:none;">
-    <div class="unlock-icon">🎉</div>
     <h1>You're unlocked!</h1>
     <p>Welcome to Music Maestro Full Access. All Grade 2 &amp; 3 content is now yours forever.</p>
     <ul class="features">
-      <li>✅ Grade 2 &amp; 3 modules unlocked</li>
-      <li>✅ All 27 structured theory lessons</li>
-      <li>✅ Grade 2 &amp; 3 mock exams</li>
-      <li>✅ Intervals, cadences &amp; inversions</li>
-      <li>✅ Compound time signatures</li>
+      <li>Grade 2 &amp; 3 modules unlocked</li>
+      <li>All 27 structured theory lessons</li>
+      <li>Grade 2 &amp; 3 mock exams</li>
+      <li>Intervals, cadences &amp; inversions</li>
+      <li>Compound time signatures</li>
     </ul>
-    <a href="index.html" class="cta">Start practising now 🎹</a>
+    <a href="index.html" class="cta">Start practising now</a>
   </div>
 
   <div class="unlock-box" id="pending-box" style="display:none;">
-    <div class="unlock-icon">⏳</div>
     <h1>Payment received — processing</h1>
     <p>Your payment went through, but our system is still catching up. Your account will unlock automatically within a few minutes.</p>
     <p style="font-size:0.88rem;">Still locked after 10 minutes? Email <a href="mailto:chenghuan.irving.liu@gmail.com">chenghuan.irving.liu@gmail.com</a> with your Stripe receipt and we'll sort it right away.</p>
@@ -52,7 +49,6 @@
   </div>
 
   <div class="unlock-box" id="signin-box" style="display:none;">
-    <div class="unlock-icon">🔑</div>
     <h1>Sign in to finish</h1>
     <p>Sign in with the account you used before paying, and your Full Access will appear.</p>
     <button class="cta" style="border:none;cursor:pointer;width:100%;font-family:inherit;" onclick="showAuthModal({ allowGuest:false, onSuccess: startPolling })">Sign in</button>

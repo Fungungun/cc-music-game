@@ -17,8 +17,9 @@ const AMEB_PAGE_TAGS = {
   'terms-flashcards': { section: 'Music Terms',          desc: 'Italian and French performance directions — AMEB Section III' },
   'aural-training':   { section: 'Aural Tests',          desc: 'Pitch direction and intervals by ear — AMEB Section III' },
   'form-detective':   { section: 'Musical Form',         desc: 'Binary (AB) and Ternary (ABA) form — AMEB Grade 2–3, Section III' },
-  'mock-exam':        { section: 'Mock Examination',     desc: '20 questions across all AMEB Piano Section III topics' },
-  'course':           { section: 'Theory Lessons',       desc: 'Structured lessons covering all AMEB Piano 2026 Section III topics — Grades 1–3' },
+  'mock-exam':        { section: 'Mock Examination',     desc: '20 original questions across the documented practice topics' },
+  'daily-challenge':  { section: 'Daily Review',         desc: 'Five mixed questions from the documented practice topics' },
+  'course':           { section: 'Theory Lessons',       desc: 'Structured Grade 1–3 lessons mapped in the public coverage guide' },
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '<a href="syllabus.html" class="ameb-tag-link">Full syllabus</a>';
       mainEl.insertBefore(tagEl, mainEl.firstChild);
     }
+    if (typeof window.mmTrack === 'function') window.mmTrack('practice_start');
   }
 
   if ('serviceWorker' in navigator) {
@@ -596,22 +598,21 @@ function showUpgradeModal() {
 
   var modal = document.createElement('div');
   modal.id = 'upgrade-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(24,22,19,0.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
   modal.innerHTML =
-    '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.25);">' +
-      '<div style="font-size:3rem;margin-bottom:10px;">🎹</div>' +
-      '<h2 style="margin:0 0 6px;color:#333;font-size:1.45rem;">Unlock Grade 2 &amp; 3</h2>' +
-      '<p style="color:#777;font-size:0.92rem;margin:0 0 18px;line-height:1.5;">All modules · All exam content · Yours forever</p>' +
-      '<ul style="text-align:left;padding:0 0 0 4px;margin:0 0 20px;list-style:none;font-size:0.9rem;color:#555;">' +
-        '<li style="padding:4px 0;">✅ 14 scales + key signatures</li>' +
-        '<li style="padding:4px 0;">✅ All 12 intervals with full names</li>' +
-        '<li style="padding:4px 0;">✅ Triads, inversions &amp; all cadence types</li>' +
-        '<li style="padding:4px 0;">✅ Compound time signatures</li>' +
-        '<li style="padding:4px 0;">✅ 68 terms + mock exam (100+ questions)</li>' +
+    '<div role="dialog" aria-modal="true" aria-labelledby="upgrade-title" style="background:#f7f3eb;border:1px solid #cfc5b6;border-radius:4px;padding:32px 28px;max-width:390px;width:100%;text-align:left;box-shadow:0 18px 54px rgba(0,0,0,0.28);">' +
+      '<p style="margin:0 0 12px;color:#8f243f;font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">One-time access</p>' +
+      '<h2 id="upgrade-title" style="font:600 1.65rem/1.15 Georgia,serif;margin:0 0 8px;color:#292724;">Unlock Grade 2 &amp; 3</h2>' +
+      '<p style="color:#625b52;font-size:0.92rem;margin:0 0 18px;line-height:1.5;">All 13 modules and 27 lessons. Keep access without a subscription.</p>' +
+      '<ul style="text-align:left;padding:0;margin:0 0 22px;list-style:none;font-size:0.9rem;color:#4d4943;border-top:1px solid #cfc5b6;">' +
+        '<li style="padding:9px 0;border-bottom:1px solid #cfc5b6;">Grade 2 &amp; 3 scales and key signatures</li>' +
+        '<li style="padding:9px 0;border-bottom:1px solid #cfc5b6;">Full interval names, triads and inversions</li>' +
+        '<li style="padding:9px 0;border-bottom:1px solid #cfc5b6;">Cadences and compound time</li>' +
+        '<li style="padding:9px 0;border-bottom:1px solid #cfc5b6;">Grade 2 &amp; 3 mixed review sessions</li>' +
       '</ul>' +
-      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\';gotoPayment();" style="display:block;width:100%;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border-radius:16px;padding:16px;font-size:1.1rem;font-weight:800;border:none;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 16px rgba(255,143,171,0.35);">Unlock Full Access — $14.99 AUD 🚀</button>' +
-      '<p style="font-size:0.75rem;color:#bbb;margin:0 0 14px;">One-time payment · Secure checkout via Stripe</p>' +
-      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:0.88rem;text-decoration:underline;">Continue with Grade 1 (free)</button>' +
+      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\';gotoPayment();" style="display:block;width:100%;background:#7e2038;color:white;border-radius:3px;padding:15px;font-size:1rem;font-weight:700;border:none;cursor:pointer;margin-bottom:8px;">Continue — $14.99 AUD</button>' +
+      '<p style="font-size:0.75rem;color:#625b52;margin:0 0 14px;text-align:center;">Secure Stripe checkout · One-time AUD payment</p>' +
+      '<button onclick="document.getElementById(\'upgrade-modal\').style.display=\'none\'" style="display:block;width:100%;background:none;border:1px solid #cfc5b6;border-radius:3px;color:#4d4943;cursor:pointer;font-size:0.88rem;padding:11px;">Continue with free Grade 1</button>' +
     '</div>';
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e) {
@@ -641,7 +642,7 @@ function buildGradeSelector(containerId, onChange) {
     var locked = g > 1 && !hasFullAccess();
     var btn = document.createElement('button');
     btn.className = 'mode-btn' + (g === getGrade() ? ' active' : '') + (locked ? ' locked' : '');
-    btn.textContent = (locked ? '🔒 ' : '') + 'Grade ' + g;
+    btn.textContent = (locked ? ' ' : '') + 'Grade ' + g;
     btn.onclick = function() {
       if (locked) { showUpgradeModal(); return; }
       setGrade(g);
@@ -750,7 +751,7 @@ class SessionScore {
     const el = document.getElementById('score-correct');
     const st = document.getElementById('score-streak');
     if (el) el.textContent = this.correct + '/' + this.total;
-    if (st) st.textContent = '🔥 ' + this.streak;
+    if (st) st.textContent = ' ' + this.streak;
     updateProgressBar(this.correct, this.total || 1);
     const data = getModuleData(this.module);
     if (this.correct > (data.highScore || 0)) data.highScore = this.correct;
@@ -771,7 +772,7 @@ function triggerStarburst(anchorEl) {
   const rect = anchorEl.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
-  const emojis = ['⭐','🌟','✨','💫','🎵','🎉','🎹','🎶'];
+  const emojis = ['', '', '', '', '', '', '', ''];
   for (let i = 0; i < 7; i++) {
     const el = document.createElement('div');
     el.className = 'starburst';
@@ -988,8 +989,11 @@ function showSessionSummary(opts) {
   var total    = opts.total   || 0;
   var onContinue = opts.onContinue;
   var pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  if (module && total > 0 && typeof window.mmTrack === 'function') {
+    window.mmTrack('practice_complete');
+  }
 
-  var star = pct >= 90 ? '🌟🌟🌟' : pct >= 70 ? '🌟🌟' : '🌟';
+  var star = pct >= 90 ? '' : pct >= 70 ? '' : '';
   var headline = pct >= 90 ? 'Outstanding session!' : pct >= 70 ? 'Great work!' : 'Keep practising!';
   var sub = pct >= 90 ? "You're really getting it!" :
             pct >= 70 ? "You're making solid progress." :
@@ -1044,7 +1048,7 @@ function showSessionSummary(opts) {
       '<div style="text-align:center;margin-bottom:4px;font-size:2rem;">' + star + '</div>' +
       '<h2 style="text-align:center;margin:0 0 4px;color:#333;font-size:1.4rem;">' + headline + '</h2>' +
       '<p style="text-align:center;color:#888;font-size:0.9rem;margin:0 0 14px;">' + sub + '</p>' +
-      (getDayStreak().days > 1 ? '<p style="text-align:center;color:#E65100;font-weight:800;font-size:0.9rem;margin:0 0 12px;">🔥 ' + getDayStreak().days + '-day practice streak!</p>' : '') +
+      (getDayStreak().days > 1 ? '<p style="text-align:center;color:#E65100;font-weight:800;font-size:0.9rem;margin:0 0 12px;"> ' + getDayStreak().days + '-day practice streak!</p>' : '') +
       '<div style="background:linear-gradient(135deg,#f5f0ff,#fff0f5);border-radius:16px;padding:14px 16px;text-align:center;margin-bottom:12px;">' +
         '<span style="font-size:2rem;font-weight:900;color:#7B52C9;">' + correct + '</span>' +
         '<span style="color:#aaa;font-size:1rem;"> / ' + total + ' correct</span>' +
@@ -1053,7 +1057,7 @@ function showSessionSummary(opts) {
         '</div>' +
       '</div>' +
       weakHtml + nextHtml +
-      '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;">Keep practising 🎵</button>' +
+      '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;">Keep practising </button>' +
       '<a href="index.html" style="display:block;text-align:center;margin-top:10px;color:#aaa;font-size:0.85rem;text-decoration:none;">← Back to home</a>' +
     '</div>';
 

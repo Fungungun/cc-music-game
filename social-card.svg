@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Music Maestro — AMEB Piano Theory Practice</title>
+  <desc id="desc">Editorial card with music staff notation and details about free Grade 1 piano theory practice.</desc>
+  <rect width="1200" height="630" fill="#f3eee5"/>
+  <g stroke="#ded5c8" stroke-width="1">
+    <path d="M0 78.5h1200M0 158.5h1200M0 238.5h1200M0 318.5h1200M0 398.5h1200M0 478.5h1200M0 558.5h1200"/>
+  </g>
+  <rect x="64" y="54" width="1072" height="522" rx="5" fill="#fffdf8" stroke="#cfc6b8" stroke-width="2"/>
+  <rect x="64" y="54" width="16" height="522" fill="#8f243f"/>
+  <text x="128" y="122" fill="#8f243f" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="4">AMEB PIANO · GRADES 1–3</text>
+  <text x="124" y="232" fill="#23211e" font-family="Georgia, serif" font-size="72" font-weight="600" letter-spacing="-3">Music Maestro</text>
+  <text x="128" y="290" fill="#625b52" font-family="Arial, sans-serif" font-size="30">Theory practice that fits between lessons.</text>
+  <g transform="translate(128 352)" stroke="#676159" stroke-width="2">
+    <path d="M0 0h420M0 20h420M0 40h420M0 60h420M0 80h420"/>
+    <path d="M94 -10v76M224 9v74M350 -7v70" stroke="#23211e" stroke-width="5"/>
+    <ellipse cx="77" cy="66" rx="19" ry="13" transform="rotate(-18 77 66)" fill="#23211e" stroke="none"/>
+    <ellipse cx="207" cy="83" rx="19" ry="13" transform="rotate(-18 207 83)" fill="#23211e" stroke="none"/>
+    <ellipse cx="333" cy="63" rx="19" ry="13" transform="rotate(-18 333 63)" fill="#23211e" stroke="none"/>
+  </g>
+  <g transform="translate(650 347)">
+    <text x="0" y="0" fill="#23211e" font-family="Arial, sans-serif" font-size="26" font-weight="700">Free Grade 1 practice</text>
+    <text x="0" y="48" fill="#625b52" font-family="Arial, sans-serif" font-size="24">Original questions and explained answers</text>
+    <text x="0" y="88" fill="#625b52" font-family="Arial, sans-serif" font-size="24">Real piano audio · No subscription</text>
+    <rect x="0" y="128" width="394" height="64" rx="3" fill="#37332e"/>
+    <text x="24" y="170" fill="#fffdf8" font-family="Arial, sans-serif" font-size="24" font-weight="700">music.vensoai.com</text>
+  </g>
+  <text x="128" y="558" fill="#7a7268" font-family="Arial, sans-serif" font-size="17">Independent practice resource · Not affiliated with or endorsed by AMEB</text>
+</svg>

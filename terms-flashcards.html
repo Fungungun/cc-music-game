@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <style>
@@ -67,7 +68,7 @@
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <p>Loading piano sounds... 🎹</p>
+  <p>Loading piano sounds... </p>
 </div>
 
 <header class="page-header">
@@ -75,7 +76,7 @@
   <h1 class="page-title">Terms Flashcards</h1>
   <div class="score-display">
     <span id="score-correct">0/0</span>
-    <span id="score-streak">🔥 0</span>
+    <span id="score-streak"> 0</span>
   </div>
 </header>
 
@@ -92,7 +93,7 @@
 </div>
 
 <div class="main-content" style="text-align:center;">
-  <div class="mastered-count" id="mastered-count">⭐ 0 mastered</div>
+  <div class="mastered-count" id="mastered-count">0 mastered</div>
   <div class="counter-bar" id="counter-bar">Card 1 of 1</div>
 
   <div class="flashcard-area" id="flashcard" onclick="flipCard()">
@@ -104,13 +105,13 @@
           style="display:none;margin-top:12px;background:linear-gradient(90deg,#5B9BD5,#B2EBF2);color:white;border:none;border-radius:20px;padding:8px 20px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
           ▶ Hear example
         </button>
-        <div class="flip-hint">👆 Tap to reveal meaning</div>
+        <div class="flip-hint"> Tap to reveal meaning</div>
       </div>
       <div class="flashcard-face flashcard-back">
         <div class="card-meaning" id="card-meaning">—</div>
         <div class="card-buttons">
-          <button class="btn-got-it"  onclick="event.stopPropagation(); markCard(true)">✓ Got it!</button>
-          <button class="btn-no-idea" onclick="event.stopPropagation(); markCard(false)">✗ Not sure</button>
+          <button class="btn-got-it"  onclick="event.stopPropagation(); markCard(true)">Got it</button>
+          <button class="btn-no-idea" onclick="event.stopPropagation(); markCard(false)">Not sure</button>
         </div>
       </div>
     </div>
@@ -119,8 +120,8 @@
   <div class="feedback-msg" id="feedback-msg"></div>
 
   <div style="margin-top: 12px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-    <button class="btn btn-primary" onclick="nextCard()" style="background:#5B9BD5;">⏭ Skip</button>
-    <button class="btn" onclick="resetProgress()" style="background:#FFB7C5;">🔄 Reset Progress</button>
+    <button class="btn btn-primary" onclick="nextCard()" style="background:#5B9BD5;">Skip</button>
+    <button class="btn" onclick="resetProgress()" style="background:#FFB7C5;"> Reset Progress</button>
   </div>
 </div>
 
@@ -227,7 +228,7 @@ function showCard(idx) {
   document.getElementById('counter-bar').textContent =
     'Card ' + (idx + 1) + ' of ' + queue.length;
   document.getElementById('mastered-count').textContent =
-    '⭐ ' + getMastered() + ' mastered out of ' + filteredTerms.length;
+    getMastered() + ' mastered out of ' + filteredTerms.length;
 
   // Show audio button only if this term has a demo
   var audioBtn = document.getElementById('audio-demo-btn');
@@ -273,7 +274,7 @@ function nextCard() {
 
 function updateMastered() {
   document.getElementById('mastered-count').textContent =
-    '⭐ ' + getMastered() + ' mastered out of ' + filteredTerms.length;
+    getMastered() + ' mastered out of ' + filteredTerms.length;
 }
 
 function showFeedback(msg, type) {
@@ -293,7 +294,8 @@ function resetProgress() {
   buildQueue();
   showCard(0);
   score = new SessionScore('terms-flashcards');
-  showFeedback('Progress reset! Let\'s start fresh 🌟', 'correct');
+  attachMilestoneTracker(score, 10);
+  showFeedback('Progress reset! Let\'s start fresh ', 'correct');
 }
 
 /* ===== GRADE TABS ===== */
@@ -372,6 +374,7 @@ function playTermAudio() {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('terms-flashcards');
+  attachMilestoneTracker(score, 10);
   buildQueue();
   showCard(0);
 

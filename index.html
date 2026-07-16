@@ -4,19 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Music Maestro — AMEB Piano Theory</title>
-  <meta name="description" content="Practise AMEB Piano Grades 1–3 theory, aural skills and general knowledge with interactive exercises, structured lessons and mock exams." />
+  <meta name="description" content="Independent Grade 1–3 piano theory, aural and general-knowledge practice with explained answers, structured lessons and original review questions." />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="canonical" href="https://music.vensoai.com/" />
   <script src="growth.js"></script>
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Music Maestro — AMEB Piano Theory Grades 1–3" />
-  <meta property="og:description" content="Interactive music theory + exam preparation for AMEB Piano Grades 1–3. 12 modules, real piano audio. Grade 1 free forever." />
-  <meta property="og:image" content="https://music.vensoai.com/icon-512.png" />
+  <meta property="og:description" content="Independent Grade 1–3 piano theory, aural and general-knowledge practice. Thirteen activities, explained answers and free Grade 1 access." />
+  <meta property="og:image" content="https://music.vensoai.com/social-card.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Music Maestro AMEB Piano theory practice" />
   <meta property="og:url" content="https://music.vensoai.com/" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://music.vensoai.com/social-card.png" />
   <style>
-    .main-content { max-width: 960px; }
+    body { min-height:100vh; display:flex; flex-direction:column; }
+    .main-content { max-width: 960px; width:100%; flex:1; }
 
     /* Info bar */
     .info-bar {
@@ -32,14 +37,14 @@
     .grade-bar {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
       padding: 10px 20px; background: #f7f8fc; border-bottom: 1px solid #e8ecf4;
-      font-size: 0.88rem;
+      font-size: 0.88rem; min-height:54px;
     }
     .grade-bar-label { color: #888; font-weight: 700; }
 
     /* Upgrade banner */
     .upgrade-banner {
       background: #8f243f;
-      padding: 12px 20px; text-align: center; display: none;
+      padding: 12px 20px; text-align: center; display:block; min-height:48px;
     }
     .upgrade-banner span { color: white; font-weight: 700; font-size: 0.95rem; }
     .upgrade-banner a { color: white; font-weight: 900; text-decoration: underline; cursor: pointer; font-size: 0.95rem; }
@@ -56,14 +61,21 @@
       z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .onboard-box {
-      background: #fffdf8; border-radius: 6px; padding: 36px 28px;
-      max-width: 420px; width: 100%; text-align: center;
+      background:#fffdf8; border-radius:4px; padding:34px 30px;
+      max-width:440px; width:100%; text-align:left;
       box-shadow: 0 20px 60px rgba(0,0,0,0.25); border:1px solid #cfc6b8;
     }
-    .onboard-box h2 { margin: 0 0 10px; font-size: 1.6rem; font-weight: 900; }
-    .onboard-box p  { color: #5a6480; margin: 0 0 14px; line-height: 1.6; font-size: 0.95rem; }
-    .onboard-features { text-align: left; margin: 16px 0; list-style: none; padding: 0; }
-    .onboard-features li { padding: 5px 0; color: #444; font-size: 0.95rem; font-weight: 600; }
+    .onboard-kicker { color:#7e2038; font-size:.7rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+    .onboard-box h2 { margin:10px 0 14px; font:600 2.05rem/1.05 var(--font-display); letter-spacing:-.03em; }
+    .onboard-box p { color:#575149; margin:0 0 18px; line-height:1.55; font-size:.94rem; }
+    .onboard-proof { display:grid; grid-template-columns:repeat(3,1fr); margin:22px 0; border-top:1px solid #cfc6b8; border-left:1px solid #cfc6b8; }
+    .onboard-proof span { padding:13px 10px; border-right:1px solid #cfc6b8; border-bottom:1px solid #cfc6b8; font-size:.76rem; line-height:1.35; color:#625b52; }
+    .onboard-proof strong { display:block; margin-bottom:3px; color:#292724; font-family:var(--font-display); font-size:1rem; }
+    .onboard-actions { display:grid; gap:9px; }
+    .onboard-primary,.onboard-secondary { display:block; width:100%; padding:13px 15px; border-radius:3px; text-align:center; font:700 .9rem var(--font); cursor:pointer; }
+    .onboard-primary { border:1px solid #8f243f; background:#8f243f; color:white; }
+    .onboard-secondary { border:1px solid #b9afa1; background:#fffdf8; color:#37332e; }
+    .onboard-note { margin:15px 0 0!important; color:#746d64!important; font-size:.74rem!important; }
 
     /* Weak area banner */
     .weak-banner {
@@ -73,33 +85,30 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    /* Badges */
-    .badges-section {
-      margin: 14px 0 0; padding: 14px 16px;
-      background: #fffdf8; border-radius: 4px; box-shadow: none; border:1px solid #d3cabc;
+    .practice-record {
+      display:flex; align-items:center; justify-content:space-between; gap:24px;
+      margin:18px 0 28px; padding:20px 22px; background:#fffdf8;
+      border:1px solid #cfc6b8; border-radius:4px;
     }
-    .badges-title { font-size: 0.72rem; color: #aaa; margin-bottom: 8px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
-    .badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .badge-chip {
-      display: flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 2px;
-      font-size: 0.8rem; font-weight: 700;
-      background: #f0f2f7; color: #aaa;
-    }
-    .badge-chip.earned { background: #ded1ad; color: #4f4225; }
+    .practice-record-label { margin:0 0 5px; color:#625b52; font-size:.72rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
+    .practice-record-value { margin:0; color:#23211e; font-family:var(--font-display); font-size:1.15rem; font-weight:600; }
+    .practice-record-detail { margin:4px 0 0; color:#676159; font-size:.84rem; }
+    .practice-record-link { flex:none; color:#7e2038; font-size:.86rem; font-weight:700; text-decoration:none; }
+    .practice-record-link:hover { text-decoration:underline; }
 
-    /* Footer links */
-    .footer-links {
-      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-      padding: 16px 0 8px; font-size: 0.8rem;
-    }
-    .footer-links a { color: #aaa; text-decoration: none; }
-    .footer-links a:hover { color: #888; text-decoration: underline; }
+    .app-footer { margin-top:auto; padding:25px max(24px,calc((100vw - 960px)/2)); background:#37332e; color:#d8d0c5; }
+    .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:22px; max-width:960px; margin:0 auto; }
+    .footer-mark { color:#fffdf8; font-family:var(--font-display); font-size:1rem; white-space:nowrap; }
+    .footer-links { display:flex; gap:18px; justify-content:flex-end; align-items:center; flex-wrap:wrap; font-size:.78rem; }
+    .footer-links a,.footer-share { color:#d8d0c5; text-decoration:none; }
+    .footer-links a:hover,.footer-share:hover { color:#fffdf8; text-decoration:underline; }
+    .footer-share { appearance:none; padding:0; border:0; background:none; font:inherit; cursor:pointer; }
 
-    .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: #ccc; padding: 0 2px; }
-    .icon-btn:hover { color: #FF8FAB; }
+    .icon-btn { background:none; border:none; cursor:pointer; font:600 .72rem/1 'DM Sans',sans-serif; color:#777; padding:8px 2px; }
+    .icon-btn:hover { color:#7e2038; }
     .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-height: unset; border-radius: 12px; }
-    .grade-bar-label,.section-header,.badges-title,.footer-links a { color:#625b52; }
+    .grade-bar-label,.section-header { color:#625b52; }
+    .tagline { min-height:40px; }
     #account-btn { color:#7e2038 !important; border-color:#8f5362 !important; }
     #daily-banner-sub,.module-card .card-score { color:#625b52 !important; }
     .weak-banner a { color:#7e2038 !important; }
@@ -111,14 +120,17 @@
       .lang-btn { max-width:82px; padding:5px 8px; border-radius:3px; }
       #account-btn { padding:5px 9px !important; border-radius:3px !important; }
       .icon-btn { display:none; }
-      .grade-bar { padding:8px 12px; align-items:stretch; }
+      .grade-bar { padding:8px 12px; align-items:stretch; min-height:90px; }
       .grade-bar-label { width:100%; }
       .grade-bar .mode-toggle { width:100%; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
       .grade-bar .mode-btn { min-width:0; padding:9px 4px; white-space:nowrap; }
       .onboard-overlay { padding:16px; align-items:center; }
       .onboard-box { width:calc(100vw - 32px); max-width:none; max-height:calc(100vh - 32px); overflow-y:auto; padding:28px 20px; }
-      .onboard-box p,.onboard-features li { overflow-wrap:anywhere; }
-      .onboard-features { margin:12px 0; }
+      .onboard-box p { overflow-wrap:anywhere; }
+      .onboard-proof { margin:18px 0; }
+      .practice-record { align-items:flex-start; flex-direction:column; gap:12px; padding:17px 16px; }
+      .footer-inner { align-items:flex-start; flex-direction:column; }
+      .footer-links { justify-content:flex-start; gap:14px 18px; }
     }
   </style>
 </head>
@@ -126,17 +138,13 @@
 
   <!-- Onboarding modal (first visit only) -->
   <div class="onboard-overlay" id="onboard-overlay" style="display:none;">
-    <div class="onboard-box">
-      <h2 style="font-size:1.4rem;">Music Maestro</h2>
-      <p>Interactive music theory + exam prep for <strong>AMEB Piano Grades 1–3</strong>. Practice on tablet or desktop, any time.</p>
-      <ul class="onboard-features">
-        <li>12 practice modules + mock exam, aligned to AMEB Piano 2026</li>
-        <li>Real grand piano audio (Salamander Grand) on every question</li>
-        <li>Mock exam with 100+ questions per grade</li>
-        <li>English, Chinese and Spanish interface</li>
-      </ul>
-      <p style="font-size:0.85rem;color:#999;margin-bottom:16px;">Grade 1 is always free · Grade 2–3 unlocks for $14.99 AUD</p>
-      <button class="btn btn-primary" style="width:100%;font-size:1.05rem;padding:14px;" onclick="dismissOnboard()">Get started</button>
+    <div class="onboard-box" role="dialog" aria-modal="true" aria-labelledby="onboard-title">
+      <div class="onboard-kicker">Grade 1 starts free</div>
+      <h2 id="onboard-title">Practise one topic now</h2>
+      <p>Begin without an account. Choose a short Grade 1 activity, answer at your own pace, and use the explanation after each attempt.</p>
+      <div class="onboard-proof" aria-label="Free practice details"><span><strong>13</strong>practice activities</span><span><strong>Grade 1</strong>free access</span><span><strong>$14.99 AUD</strong>Grades 2–3 once</span></div>
+      <div class="onboard-actions"><button class="onboard-primary" type="button" onclick="startFirstPractice()">Start with note reading</button><button class="onboard-secondary" type="button" onclick="dismissOnboard()">Choose another topic</button></div>
+      <p class="onboard-note">Independent practice resource · No subscription · Not affiliated with or endorsed by AMEB</p>
     </div>
   </div>
 
@@ -144,22 +152,20 @@
   <header class="page-header">
     <h1 data-i18n="app-title">Music Maestro</h1>
     <select id="lang-select" class="lang-btn" onchange="setLanguage(this.value)" title="Language / 语言 / Idioma">
-      <option value="en">🌐 English</option>
-      <option value="zh">🌐 中文</option>
-      <option value="es">🌐 Español</option>
+      <option value="en"> English</option>
+      <option value="zh"> 中文</option>
+      <option value="es"> Español</option>
     </select>
     <button id="account-btn" onclick="onAccountBtnClick(this)"
             style="background:none;border:2px solid #FFB7C5;border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:800;color:#FF8FAB;cursor:pointer;white-space:nowrap;">
       Sign in
     </button>
-    <button class="icon-btn" onclick="showResetConfirm()" title="Settings / Reset data">⚙️</button>
+    <button class="icon-btn" onclick="showResetConfirm()" title="Settings / Reset data" aria-label="Settings">Settings</button>
   </header>
 
   <!-- Info bar: greeting -->
   <div class="info-bar">
-    <div class="welcome-pill">
-      Hi, <strong id="greeting-name">there</strong>
-    </div>
+    <div class="welcome-pill"><strong id="greeting-name">Ready to practise</strong></div>
     <div class="info-bar-right">
       <span id="access-badge" style="display:none;"></span>
     </div>
@@ -200,7 +206,7 @@
     <a href="course.html" class="lessons-banner" id="lessons-banner">
       <div class="lessons-banner-left">
         <div class="lessons-banner-title">Theory Lessons</div>
-        <div class="lessons-banner-sub">Structured lessons for every AMEB Piano 2026 topic — Grades 1, 2 and 3</div>
+        <div class="lessons-banner-sub">Structured Grade 1–3 lessons mapped in the public coverage guide</div>
       </div>
       <div class="lessons-banner-right">Start Lessons →</div>
     </a>
@@ -212,50 +218,54 @@
     <!-- Exam banner -->
     <div class="exam-banner" style="margin-top:8px;" id="exam-banner">
       <h2>Mock examination</h2>
-      <p>20-question timed sessions drawn from a bank of 100+ questions per grade — just like the real AMEB theory test.</p>
+      <p>Twenty-question timed sessions drawn from a bank of 100+ questions per grade, with explained answers after every attempt.</p>
       <a href="mock-exam.html" class="btn" style="display:inline-block;margin:0 auto;">Start Practice Exam →</a>
-      <p style="margin-top:12px;font-size:0.83rem;opacity:0.85;">All questions are aligned to the <a href="syllabus.html" style="color:inherit;font-weight:800;text-decoration:underline;">AMEB Piano 2026 Syllabus →</a></p>
+      <p style="margin-top:12px;font-size:0.83rem;opacity:0.85;">Original independent practice questions · <a href="syllabus.html" style="color:inherit;font-weight:800;text-decoration:underline;">See the coverage and limits →</a></p>
     </div>
 
-    <!-- Badges -->
-    <div class="badges-section" id="badges-section" style="display:none;margin-top:14px;">
-      <div class="badges-title">ACHIEVEMENTS</div>
-      <div class="badges-row" id="badges-row"></div>
-    </div>
-
-    <!-- Total stars -->
-    <div class="total-stars" id="total-stars"></div>
-
-    <!-- Footer -->
-    <div class="footer-links">
-      <button class="btn btn-secondary btn-sm" onclick="shareApp()">🔗 Share</button>
-      <a href="progress.html">Parent View</a>
-      <a href="learn.html">Theory Guide</a>
-      <a href="syllabus.html">AMEB Syllabus</a>
-      <a href="teachers.html">For Teachers</a>
-      <a href="landing.html">About</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
-    </div>
+    <section class="practice-record" aria-labelledby="practice-record-heading">
+      <div>
+        <p class="practice-record-label" id="practice-record-heading">Practice record</p>
+        <p class="practice-record-value" id="practice-record-value">No scored modules started</p>
+        <p class="practice-record-detail" id="practice-record-detail">Choose a practice module above to record your first result.</p>
+      </div>
+      <a class="practice-record-link" href="progress.html">View detailed progress →</a>
+    </section>
   </main>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-mark">Music Maestro</div>
+      <div class="footer-links">
+        <button class="footer-share" onclick="shareApp()">Share</button>
+        <a href="progress.html">Parent View</a>
+        <a href="learn.html">Theory Guide</a>
+        <a href="syllabus.html">AMEB Syllabus</a>
+        <a href="teachers.html">For Teachers</a>
+        <a href="landing.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="i18n.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <script>
-    /* ─── Module definitions (12 modules, v5.0) ─── */
+    /* ─── Module definitions ─── */
     var MODULES = [
       { id:'note-namer',       titleKey:'mod-note-namer',       descKey:'desc-note-namer',       abbr:'NN',  accent:'pink',     href:'note-namer.html',       grade:1 },
       { id:'scale-builder',    titleKey:'mod-scale-builder',    descKey:'desc-scale-builder',    abbr:'♯♭', accent:'mint',     href:'scale-builder.html',    grade:1 },
       { id:'key-signatures',   titleKey:'mod-key-signatures',   descKey:'desc-key-signatures',   abbr:'KS',  accent:'teal',     href:'key-signatures.html',   grade:1 },
-      { id:'note-values',      titleKey:'mod-note-values',      descKey:'desc-note-values',      abbr:'♩♪', accent:'coral',    href:'note-values.html',      grade:1 },
+      { id:'note-values',      titleKey:'mod-note-values',      descKey:'desc-note-values',      abbr:'NV',  accent:'coral',    href:'note-values.html',      grade:1 },
       { id:'interval-quiz',    titleKey:'mod-interval-quiz',    descKey:'desc-interval-quiz',    abbr:'P5',  accent:'lavender', href:'interval-quiz.html',    grade:1 },
       { id:'chord-game',       titleKey:'mod-chord-game',       descKey:'desc-chord-game',       abbr:'I–V', accent:'yellow',   href:'chord-game.html',       grade:1 },
       { id:'rhythm-trainer',   titleKey:'mod-rhythm-trainer',   descKey:'desc-rhythm-trainer',   abbr:'4/4', accent:'orange',   href:'rhythm-trainer.html',   grade:1 },
       { id:'terms-flashcards', titleKey:'mod-terms-flashcards', descKey:'desc-terms-flashcards', abbr:'ff',  accent:'sky',      href:'terms-flashcards.html', grade:1 },
-      { id:'aural-training',   titleKey:'mod-aural-training',   descKey:'desc-aural-training',   abbr:'♫',  accent:'mint2',    href:'aural-training.html',   grade:1 },
+      { id:'aural-training',   titleKey:'mod-aural-training',   descKey:'desc-aural-training',   abbr:'Ear', accent:'mint2',    href:'aural-training.html',   grade:1 },
       { id:'form-detective',   titleKey:'mod-form-detective',   descKey:'desc-form-detective',   abbr:'ABA', accent:'purple',   href:'form-detective.html',   grade:2 },
-      { id:'daily-challenge',  titleKey:'mod-daily-challenge',  descKey:'desc-daily-challenge',  abbr:'📅', accent:'orange',   href:'daily-challenge.html',  grade:1 },
+      { id:'daily-challenge',  titleKey:'mod-daily-challenge',  descKey:'desc-daily-challenge',  abbr:'', accent:'orange',   href:'daily-challenge.html',  grade:1 },
       { id:'learn',            titleKey:'mod-learn',            descKey:'desc-learn',            abbr:'ref', accent:'grape',    href:'learn.html',            grade:1, noScore:true },
     ];
 
@@ -266,12 +276,16 @@
       var grid = document.getElementById('cards-grid');
       grid.innerHTML = '';
       var totalScore = 0;
+      var startedCount = 0;
       var currentGrade = getGrade();
 
       MODULES.forEach(function(mod) {
         var data = getModuleData(mod.id);
         var score = data.highScore || 0;
-        if (!mod.noScore) totalScore += score;
+        if (!mod.noScore) {
+          totalScore += score;
+          if (score > 0) startedCount++;
+        }
 
         var locked = mod.grade > 1 && !hasFullAccess();
 
@@ -284,7 +298,7 @@
         var gradeBadge = mod.grade > 1
           ? '<span class="grade-badge grade-' + mod.grade + '" style="font-size:0.62rem;padding:2px 8px;margin-top:2px;display:inline-block;">Grade ' + mod.grade + '+</span>'
           : '';
-        var lockIcon = locked ? '<div style="position:absolute;top:8px;right:8px;font-size:1rem;opacity:0.7;">🔒</div>' : '';
+        var lockIcon = locked ? '<span class="grade-badge" style="position:absolute;top:8px;right:8px;font-size:0.58rem;padding:2px 7px;">Full</span>' : '';
 
         card.innerHTML =
           '<div class="card-band"><span class="card-icon">' + mod.abbr + '</span>' + lockIcon + '</div>' +
@@ -299,15 +313,14 @@
         grid.appendChild(card);
       });
 
-      /* Update total stars */
-      var starsEl = document.getElementById('total-stars');
-      var starStr = '';
-      for (var i = 0; i < Math.min(totalScore, 20); i++) starStr += '⭐';
-      starsEl.innerHTML =
-        '<div style="margin-bottom:6px;font-size:0.9rem;color:#888;font-weight:700;">' +
-          t('overall-progress') + ': ' + totalScore + '</div>' +
-        '<div style="font-size:1.2rem;line-height:1.8;">' +
-          (starStr || '🎵 Start a module to earn stars!') + '</div>';
+      var recordValue = document.getElementById('practice-record-value');
+      var recordDetail = document.getElementById('practice-record-detail');
+      recordValue.textContent = startedCount
+        ? startedCount + ' of ' + SCORED.length + ' scored modules started'
+        : 'No scored modules started';
+      recordDetail.textContent = startedCount
+        ? 'Combined best scores: ' + totalScore + ' correct answers.'
+        : 'Choose a practice module above to record your first result.';
     }
 
     /* ─── Grade selector ─── */
@@ -318,12 +331,12 @@
     /* ─── Greeting ─── */
     function updateGreeting() {
       var name = getPlayerName();
-      document.getElementById('greeting-name').textContent = name || 'there';
+      document.getElementById('greeting-name').textContent = name ? 'Welcome back, ' + name : 'Ready to practise';
 
       var badge = document.getElementById('access-badge');
       if (hasFullAccess()) {
         badge.style.display = 'inline-block';
-        badge.innerHTML = '<span class="grade-badge" style="font-size:0.72rem;padding:3px 10px;">Full Access ✓</span>';
+        badge.innerHTML = '<span class="grade-badge" style="font-size:0.72rem;padding:3px 10px;">Full access</span>';
       } else {
         badge.style.display = 'none';
       }
@@ -346,11 +359,11 @@
       try { daily = JSON.parse(localStorage.getItem('cc-daily')) || {}; } catch(e) {}
 
       if (streak.days > 0) {
-        document.getElementById('daily-banner-title').textContent = '🔥 ' + streak.days + '-day streak';
+        document.getElementById('daily-banner-title').textContent = ' ' + streak.days + '-day streak';
       }
       if (daily.lastPlayed === today) {
         document.getElementById('daily-banner-sub').textContent = 'Done for today — nice work! Back tomorrow for 5 new questions.';
-        document.getElementById('daily-banner-cta').textContent = '✓ Done';
+        document.getElementById('daily-banner-cta').textContent = 'Done';
         document.getElementById('daily-banner-cta').style.background = '#C7F2E3';
         document.getElementById('daily-banner-cta').style.color = '#2E6B52';
       }
@@ -362,7 +375,7 @@
       if (weak.length < 1) {
         /* Zero state: give a brand-new learner a clear first step */
         banner.innerHTML =
-          '<strong>👋 New here? Start with these:</strong>' +
+          '<strong> New here? Start with these:</strong>' +
           '<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">' +
             '<div style="background:white;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
               '<span style="font-size:0.9rem;font-weight:600;color:#444;">1. Read your first theory lesson</span>' +
@@ -380,7 +393,7 @@
         banner.style.display = 'block';
         return;
       }
-      var html = '<strong>💡 Your focus areas (based on your answers):</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">';
+      var html = '<strong> Your focus areas (based on your answers):</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">';
       weak.forEach(function(w) {
         var pct = Math.round(w.accuracy * 100);
         var color = pct >= 70 ? '#4CAF50' : pct >= 40 ? '#FFB74D' : '#FF6B6B';
@@ -402,31 +415,6 @@
       banner.style.display = 'block';
     }
 
-    /* ─── Badges ─── */
-    var BADGE_DEFS = [
-      { id:'first-note',  icon:'🎵', label:'First Note',    check: function(){ return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
-      { id:'perfect-10',  icon:'💯', label:'Perfect 10',    check: function(){ return SCORED.some(function(id){ return (getModuleData(id).highScore||0)>=10; }); } },
-      { id:'all-modules', icon:'🏆', label:'Completionist', check: function(){ return SCORED.every(function(id){ return (getModuleData(id).highScore||0)>0; }); } },
-      { id:'streak-5',    icon:'🔥', label:'On Fire',       check: function(){ return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=5; }); } },
-      { id:'streak-10',   icon:'⭐', label:'Superstar',     check: function(){ return SCORED.some(function(id){ return (getModuleData(id).streak||0)>=10; }); } },
-    ];
-
-    function initBadges() {
-      var row = document.getElementById('badges-row');
-      var section = document.getElementById('badges-section');
-      var earned = 0;
-      row.innerHTML = '';
-      BADGE_DEFS.forEach(function(b) {
-        var ok = b.check();
-        if (ok) earned++;
-        var chip = document.createElement('div');
-        chip.className = 'badge-chip' + (ok ? ' earned' : '');
-        chip.innerHTML = '<span style="font-size:1rem;">' + b.icon + '</span>' + b.label;
-        row.appendChild(chip);
-      });
-      if (earned > 0) section.style.display = 'block';
-    }
-
     /* ─── Onboarding ─── */
     function initOnboard() {
       if (!localStorage.getItem('mm-onboarded')) {
@@ -436,6 +424,10 @@
     function dismissOnboard() {
       localStorage.setItem('mm-onboarded', '1');
       document.getElementById('onboard-overlay').style.display = 'none';
+    }
+    function startFirstPractice() {
+      localStorage.setItem('mm-onboarded', '1');
+      location.href = 'note-namer.html?ref=onboarding';
     }
 
     /* ─── Account button ─── */
@@ -453,7 +445,7 @@
       if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
         var profile = typeof mmGetProfile === 'function' ? mmGetProfile() : null;
         var user    = typeof mmGetUser    === 'function' ? mmGetUser()    : null;
-        var label   = (profile && profile.name) || (user && user.email && user.email.split('@')[0]) || '👤 Account';
+        var label   = (profile && profile.name) || (user && user.email && user.email.split('@')[0]) || ' Account';
         btn.textContent = label;
         btn.style.borderColor = '#4CAF50';
         btn.style.color       = '#2e7d32';
@@ -484,12 +476,12 @@
     /* ─── Share ─── */
     function shareApp() {
       var url = 'https://music.vensoai.com';
-      var text = 'Check out Music Maestro — interactive AMEB piano theory prep for Grades 1–3! 🎹';
+      var text = 'Music Maestro — interactive AMEB piano theory practice for Grades 1–3.';
       if (navigator.share) {
         navigator.share({ title: 'Music Maestro', text: text, url: url }).catch(function(){});
       } else {
         navigator.clipboard.writeText(url).then(function() {
-          alert('Link copied! Share it with a student or teacher 🎵');
+          alert('Link copied.');
         }).catch(function() {
           prompt('Copy this link:', url);
         });
@@ -501,7 +493,6 @@
     updateGreeting();
     initDailyBanner();
     initWeakArea();
-    initBadges();
     initOnboard();
     updateAccountBtn();
 

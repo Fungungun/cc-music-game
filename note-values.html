@@ -7,18 +7,22 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .page-header { background: linear-gradient(90deg, #E07B20, #FFD4A3); }
+    .page-header { background:#24211d; border-bottom:1px solid #4c4740; box-shadow:none; }
+    .page-header::after { display:none; }
     .page-header h1 { color: white; }
-    .back-btn { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); color: white; }
-    .back-btn:hover { background: rgba(255,255,255,0.5); }
+    .page-header .subtitle { color:#c9c1b7; }
+    .ameb-tag-desc { color:#5c506f; }
+    .back-btn { background:transparent; border-color:#777066; color:white; border-radius:3px; }
+    .back-btn:hover { background:#39352f; }
 
     /* Note value display */
     .note-display {
-      background: white;
-      border-radius: var(--radius);
-      padding: 20px;
+      background:#fffdf8;
+      border:1px solid #cfc5b6;
+      border-radius:4px;
+      padding:24px 20px;
       margin: 16px 0;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow:none;
       text-align: center;
     }
     .time-sig-label {
@@ -27,12 +31,10 @@
       font-weight: 700;
       margin-bottom: 8px;
     }
-    .note-symbol {
-      font-size: 5rem;
-      line-height: 1;
-      margin: 8px 0;
-      user-select: none;
-    }
+    .notation-target { display:block!important; width:min(220px,100%)!important; height:150px!important; min-height:0; padding-bottom:0!important; margin:4px auto 0; overflow:hidden; }
+    .notation-target svg { display:block; width:100%; height:auto; }
+    .mini-notation { display:block!important; width:112px!important; min-height:54px; overflow:hidden; }
+    .mini-notation svg { display:block; width:100%; height:auto; }
     .note-name-label {
       font-size: 1rem;
       color: var(--text-light);
@@ -62,18 +64,18 @@
     }
     .beat-btn {
       padding: 16px 8px;
-      border-radius: var(--radius-sm);
+      border-radius:3px;
       font-size: 1.3rem;
       font-weight: 900;
       cursor: pointer;
-      border: 2px solid #ddd;
-      background: white;
+      border:1px solid #cfc5b6;
+      background:#fffdf8;
       transition: all 0.15s;
       font-family: var(--font);
       text-align: center;
     }
     .beat-btn .beat-sub { font-size: 0.72rem; font-weight: 600; color: var(--text-light); display: block; margin-top: 2px; }
-    .beat-btn:hover:not(:disabled) { background: #fff3e0; border-color: #E07B20; transform: translateY(-1px); }
+    .beat-btn:hover:not(:disabled) { background:#eee6da; border-color:#7e2038; transform:translateY(-1px); }
     .beat-btn.correct-ans { background: #c8f7dc; border-color: #4caf50; }
     .beat-btn.wrong-ans   { background: #fdd; border-color: #f44336; }
     .beat-btn:disabled { cursor: default; }
@@ -84,24 +86,25 @@
       margin: 10px 0;
     }
     .note-table {
-      background: white;
-      border-radius: var(--radius-sm);
+      background:#fffdf8;
+      border:1px solid #cfc5b6;
+      border-radius:4px;
       padding: 14px;
       font-size: 0.88rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow:none;
       display: none;
       margin-bottom: 12px;
     }
     .note-table table { width: 100%; border-collapse: collapse; }
     .note-table th, .note-table td { padding: 7px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-    .note-table th { background: #fff3e0; font-weight: 700; }
+    .note-table th { background:#e9e1d5; font-weight:700; }
 
     /* Rest toggle */
     .type-toggle { display: flex; gap: 8px; justify-content: center; margin: 8px 0 14px; flex-wrap: wrap; }
 
     @media (max-width: 480px) {
       .beats-grid { grid-template-columns: repeat(2, 1fr); }
-      .note-symbol { font-size: 3.5rem; }
+      .notation-target { min-height:96px; }
     }
   </style>
 </head>
@@ -109,7 +112,7 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… </div>
   </div>
 
   <header class="page-header">
@@ -137,7 +140,7 @@
     <!-- Score -->
     <div class="score-display">
       <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
-      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak"> 0</span></div>
     </div>
 
     <!-- Progress Bar -->
@@ -149,8 +152,8 @@
     <!-- Grade + Type selectors -->
     <div class="mode-toggle" id="grade-selector"></div>
     <div class="type-toggle">
-      <button class="mode-btn active" id="type-notes" onclick="setType('notes')">♩ Notes</button>
-      <button class="mode-btn" id="type-rests" onclick="setType('rests')">𝄽 Rests</button>
+      <button class="mode-btn active" id="type-notes" onclick="setType('notes')">Notes</button>
+      <button class="mode-btn" id="type-rests" onclick="setType('rests')">Rests</button>
       <button class="mode-btn" id="type-both"  onclick="setType('both')">Mixed</button>
     </div>
 
@@ -171,26 +174,26 @@
 
     <!-- Reference table toggle -->
     <div class="note-table-toggle">
-      <button class="btn btn-secondary" style="font-size:0.85rem;padding:8px 18px;" onclick="toggleTable()">📋 Show Reference Table</button>
+      <button class="btn btn-secondary" style="font-size:0.85rem;padding:8px 18px;" onclick="toggleTable()"> Show Reference Table</button>
     </div>
     <div class="note-table" id="note-table">
       <table>
         <tr><th>Note</th><th>Name</th><th>Beats (in 4/4)</th></tr>
-        <tr><td style="font-size:1.6rem;">𝅝</td><td>Semibreve</td><td>4</td></tr>
-        <tr><td style="font-size:1.6rem;">𝅗𝅥</td><td>Minim</td><td>2</td></tr>
-        <tr><td style="font-size:1.6rem;">♩</td><td>Crotchet</td><td>1</td></tr>
-        <tr><td style="font-size:1.6rem;">♪</td><td>Quaver</td><td>½</td></tr>
-        <tr><td style="font-size:1.6rem; font-size:1.2rem;">𝅘𝅥𝅯</td><td>Semiquaver</td><td>¼</td></tr>
-        <tr><td style="font-size:1.6rem;">𝅗𝅥.</td><td>Dotted minim</td><td>3</td></tr>
-        <tr><td style="font-size:1.6rem;">♩.</td><td>Dotted crotchet</td><td>1½</td></tr>
-        <tr><td style="font-size:1.6rem;">♪.</td><td>Dotted quaver</td><td>¾</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B8" aria-label="Semibreve notation"></div></td><td>Semibreve</td><td>4</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B4" aria-label="Minim notation"></div></td><td>Minim</td><td>2</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B2" aria-label="Crotchet notation"></div></td><td>Crotchet</td><td>1</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B" aria-label="Quaver notation"></div></td><td>Quaver</td><td>½</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B/2" aria-label="Semiquaver notation"></div></td><td>Semiquaver</td><td>¼</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B6" aria-label="Dotted minim notation"></div></td><td>Dotted minim</td><td>3</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B3" aria-label="Dotted crotchet notation"></div></td><td>Dotted crotchet</td><td>1½</td></tr>
+        <tr><td><div class="mini-notation" data-abc="B3/2" aria-label="Dotted quaver notation"></div></td><td>Dotted quaver</td><td>¾</td></tr>
       </table>
       <div style="font-size:0.8rem;color:#888;margin-top:8px;">In compound time (6/8, 9/8), the beat unit changes — a dotted crotchet = 1 beat.</div>
     </div>
 
     <!-- Next button -->
     <div style="text-align:center;margin:10px 0 16px;">
-      <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()" style="display:none;">Next ⏭</button>
+      <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()" style="display:none;">Next</button>
     </div>
 
   </main>
@@ -199,6 +202,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <script>
@@ -218,67 +222,67 @@
     });
 
     /* ---- Note value data ----
-       Using text symbols since music Unicode varies by device.
-       Symbol is a display emoji, abcDur is in L:1/4 units (so 4=semibreve).
+       Notation is rendered to SVG by abcjs so it does not depend on device fonts.
+       ABC durations use L:1/8: B8 is a semibreve, B/2 a semiquaver.
     */
     var NOTE_DATA = [
       {
-        id:'semibreve',      name:'Semibreve',       symbol:'𝅝',
+        id:'semibreve',      name:'Semibreve',       abc:'B8',
         beatsIn44: 4,  fractional: false, isNote: true,
         grade: 1, description: 'A whole note — lasts the whole bar in 4/4 time'
       },
       {
-        id:'semibreve-rest', name:'Semibreve rest',  symbol:'𝄻',
+        id:'semibreve-rest', name:'Semibreve rest',  abc:'z8',
         beatsIn44: 4,  fractional: false, isNote: false,
         grade: 1, description: 'Whole bar rest — also used for a whole bar in any time sig'
       },
       {
-        id:'minim',          name:'Minim',           symbol:'𝅗𝅥',
+        id:'minim',          name:'Minim',           abc:'B4',
         beatsIn44: 2,  fractional: false, isNote: true,
         grade: 1, description: 'A half note — worth 2 crotchet beats'
       },
       {
-        id:'minim-rest',     name:'Minim rest',      symbol:'𝄼',
+        id:'minim-rest',     name:'Minim rest',      abc:'z4',
         beatsIn44: 2,  fractional: false, isNote: false,
         grade: 1, description: 'Half note rest — worth 2 beats'
       },
       {
-        id:'crotchet',       name:'Crotchet',        symbol:'♩',
+        id:'crotchet',       name:'Crotchet',        abc:'B2',
         beatsIn44: 1,  fractional: false, isNote: true,
         grade: 1, description: 'A quarter note — the basic beat unit in simple time'
       },
       {
-        id:'crotchet-rest',  name:'Crotchet rest',   symbol:'𝄽',
+        id:'crotchet-rest',  name:'Crotchet rest',   abc:'z2',
         beatsIn44: 1,  fractional: false, isNote: false,
         grade: 1, description: 'Quarter note rest — one beat of silence'
       },
       {
-        id:'quaver',         name:'Quaver',          symbol:'♪',
+        id:'quaver',         name:'Quaver',          abc:'B',
         beatsIn44: 0.5, fractional: true, isNote: true,
         grade: 1, description: 'An eighth note — worth half a crotchet'
       },
       {
-        id:'quaver-rest',    name:'Quaver rest',     symbol:'𝄾',
+        id:'quaver-rest',    name:'Quaver rest',     abc:'z',
         beatsIn44: 0.5, fractional: true, isNote: false,
         grade: 1, description: 'Eighth rest — half a beat of silence'
       },
       {
-        id:'semiquaver',     name:'Semiquaver',      symbol:'𝅘𝅥𝅯',
+        id:'semiquaver',     name:'Semiquaver',      abc:'B/2',
         beatsIn44: 0.25, fractional: true, isNote: true,
         grade: 1, description: 'A sixteenth note — worth a quarter of a crotchet'
       },
       {
-        id:'dotted-minim',   name:'Dotted minim',    symbol:'𝅗𝅥.',
+        id:'dotted-minim',   name:'Dotted minim',    abc:'B6',
         beatsIn44: 3,  fractional: false, isNote: true,
         grade: 2, description: 'Dotted half note — worth 3 beats (2 + 1)'
       },
       {
-        id:'dotted-crotchet',name:'Dotted crotchet', symbol:'♩.',
+        id:'dotted-crotchet',name:'Dotted crotchet', abc:'B3',
         beatsIn44: 1.5, fractional: true, isNote: true,
         grade: 2, description: 'Dotted quarter note — worth 1½ beats (1 + ½)'
       },
       {
-        id:'dotted-quaver',  name:'Dotted quaver',   symbol:'♪.',
+        id:'dotted-quaver',  name:'Dotted quaver',   abc:'B3/2',
         beatsIn44: 0.75, fractional: true, isNote: true,
         grade: 3, description: 'Dotted eighth note — worth ¾ of a beat'
       },
@@ -297,7 +301,8 @@
     ];
 
     /* ---- State ---- */
-    var noteType = 'notes'; // 'notes', 'rests', 'both'
+    var requestedType = new URLSearchParams(location.search).get('type');
+    var noteType = ['notes','rests','both'].indexOf(requestedType) >= 0 ? requestedType : 'notes';
     var currentNote = null;
     var answered = false;
     var score = new SessionScore('note-values');
@@ -330,6 +335,27 @@
       return v + (v === 1 ? ' beat' : ' beats');
     }
 
+    function renderNotation(target, token, compact) {
+      if (!window.ABCJS || !target) return;
+      var abc = 'X:1\nL:1/8\nM:none\nK:C clef=treble\n' + token + '|]';
+      ABCJS.renderAbc(target, abc, {
+        responsive: 'resize',
+        staffwidth: compact ? 108 : 140,
+        scale: compact ? 0.72 : 1.8,
+        paddingtop: 0,
+        paddingbottom: 0,
+        paddingleft: 0,
+        paddingright: 0,
+        add_classes: true
+      });
+    }
+
+    function renderReferenceNotation() {
+      document.querySelectorAll('.mini-notation[data-abc]').forEach(function(el) {
+        renderNotation(el, el.dataset.abc, true);
+      });
+    }
+
     /* ---- Render question ---- */
     function nextQuestion() {
       answered = false;
@@ -344,13 +370,16 @@
         return;
       }
 
-      currentNote = pool[Math.floor(Math.random() * pool.length)];
+      var requestedId = new URLSearchParams(location.search).get('item') || '';
+      currentNote = pool.find(function(n) { return n.id === requestedId; }) ||
+        pool[Math.floor(Math.random() * pool.length)];
 
       /* Display note */
       document.getElementById('note-display').innerHTML =
         '<div class="time-sig-label">Time signature: 4/4</div>' +
-        '<div class="note-symbol">' + currentNote.symbol + '</div>' +
+        '<div id="question-notation" class="notation-target" role="img" aria-label="' + currentNote.name + ' notation"></div>' +
         '<div class="note-name-label">' + currentNote.name + '</div>';
+      renderNotation(document.getElementById('question-notation'), currentNote.abc, false);
 
       /* Question prompt */
       document.getElementById('q-prompt').textContent =
@@ -424,6 +453,10 @@
     /* ---- Init ---- */
     initSampler(function() {
       buildGradeSelector('grade-selector', function() { nextQuestion(); });
+      ['notes','rests','both'].forEach(function(id) {
+        document.getElementById('type-' + id).classList.toggle('active', id === noteType);
+      });
+      renderReferenceNotation();
       nextQuestion();
     });
   </script>

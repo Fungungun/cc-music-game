@@ -1,67 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Piano Teachers — Music Maestro</title>
-  <meta name="description" content="Free AMEB Piano Grade 1–3 practice checklist and transparent Music Maestro resources for piano teachers and families." />
-  <link rel="canonical" href="https://music.vensoai.com/teachers" />
-  <link rel="manifest" href="manifest.json" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="For Piano Teachers — Music Maestro" />
-  <meta property="og:description" content="A free printable weekly AMEB practice checklist plus transparent Grade 1–3 learning resources." />
-  <meta property="og:image" content="https://music.vensoai.com/icon-512.png" />
-  <meta property="og:url" content="https://music.vensoai.com/teachers" />
+  <meta name="description" content="Free AMEB Piano Grade 1–3 practice checklist and transparent Music Maestro resources for piano teachers and families.">
+  <link rel="canonical" href="https://music.vensoai.com/teachers">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="For Piano Teachers — Music Maestro">
+  <meta property="og:description" content="A free printable weekly AMEB practice checklist plus transparent Grade 1–3 learning resources.">
+  <meta property="og:image" content="https://music.vensoai.com/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Music Maestro AMEB Piano theory practice">
+  <meta property="og:url" content="https://music.vensoai.com/teachers">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://music.vensoai.com/social-card.png">
+  <script src="growth.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; color: #333; background: white; }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600&display=swap');
+    body { font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif; color: #292724; background: #f7f3eb; overflow-x:hidden; }
 
     /* ── Nav ── */
     .nav {
-      background: white; border-bottom: 1px solid #eee;
+      background: #f7f3eb; border-bottom: 1px solid #d6ccbd;
       padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
     }
-    .nav-logo { font-weight: 900; font-size: 1.1rem; color: #333; text-decoration: none; }
-    .nav-logo span { color: #FF8FAB; }
+    .nav-logo { font-family:'Lora',serif; font-weight: 600; font-size: 1.1rem; color: #292724; text-decoration: none; }
+    .nav-logo span { color: #7e2038; }
     .nav-cta {
-      background: linear-gradient(90deg, #FF8FAB, #FFB74D);
-      color: white; padding: 8px 20px; border-radius: 20px;
-      text-decoration: none; font-weight: 800; font-size: 0.9rem;
+      background: #7e2038; color: white; padding: 9px 18px; border-radius: 3px;
+      text-decoration: none; font-weight: 700; font-size: 0.86rem;
     }
 
     /* ── Hero ── */
     .hero {
-      background: linear-gradient(135deg, #5B9BD5 0%, #7B52C9 50%, #FF8FAB 100%);
-      padding: 70px 24px 60px; text-align: center;
+      background: #211f1c; padding: 76px 24px 68px; text-align: left;
     }
     .hero-tag {
-      display: inline-block; background: rgba(255,255,255,0.2);
-      color: white; font-size: 0.82rem; font-weight: 800; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
+      display:block; max-width:900px; margin:0 auto 22px; color:#d6bd77;
+      font-size:0.76rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
     }
-    .hero h1 { font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 900; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 16px; line-height: 1.2; }
-    .hero p  { font-size: clamp(1rem, 2.5vw, 1.2rem); color: rgba(255,255,255,0.92); max-width: 580px; margin: 0 auto 30px; line-height: 1.6; }
-    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .hero h1 { max-width:900px; margin:0 auto 18px; font-family:'Lora',serif; font-size:clamp(2.25rem,6vw,4.4rem); font-weight:600; color:#fff; line-height:1.05; }
+    .hero p { font-size:clamp(1rem,2.5vw,1.14rem); color:#d8d2c9; max-width:650px; margin:0 calc((100% - min(900px, 100%))/2) 30px; line-height:1.6; }
+    .hero-btns { max-width:900px; margin:0 auto; display:flex; gap:12px; justify-content:flex-start; flex-wrap:wrap; }
     .btn-primary {
-      display: inline-block; background: white; color: #7B52C9;
-      padding: 15px 36px; border-radius: 50px;
-      font-size: 1.05rem; font-weight: 800; text-decoration: none;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
-      transition: transform 0.15s, box-shadow 0.15s;
+      display:inline-block; background:#f7f3eb; color:#7e2038; padding:14px 26px;
+      border-radius:3px; font-size:1rem; font-weight:700; text-decoration:none;
     }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.2); }
+    .btn-primary:hover { background:#fff; }
     .btn-secondary {
-      display: inline-block; background: rgba(255,255,255,0.15); color: white;
-      padding: 15px 32px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.5);
+      display:inline-block; background:transparent; color:white; padding:13px 25px; border-radius:3px; border:1px solid #706a61;
       font-size: 1rem; font-weight: 700; text-decoration: none;
       transition: background 0.15s;
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.25); }
 
     /* ── Sections ── */
-    section { padding: 60px 24px; max-width: 900px; margin: 0 auto; }
-    section h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; color: #222; margin-bottom: 8px; }
-    .section-sub { color: #777; margin-bottom: 36px; font-size: 1rem; line-height: 1.6; }
+    section { padding: 68px 24px; max-width: 900px; margin: 0 auto; }
+    section h2 { font-family:'Lora',serif; font-size:clamp(1.65rem,4vw,2.45rem); font-weight:600; color:#292724; margin-bottom:10px; }
+    .section-sub { color:#625e58; margin-bottom:36px; font-size:1rem; line-height:1.6; }
 
     /* ── Why grid ── */
     .why-grid {
@@ -69,8 +70,7 @@
       gap: 20px; margin-top: 32px;
     }
     .why-card {
-      background: #F9F7FF; border-radius: 18px; padding: 24px 20px;
-      border: 1px solid rgba(123,82,201,0.12);
+      background:transparent; border-radius:0; padding:24px 20px; border:1px solid #d6ccbd;
     }
     .why-icon  { font-size: 2.4rem; margin-bottom: 10px; }
     .why-title { font-weight: 800; font-size: 1rem; margin-bottom: 6px; color: #333; }
@@ -81,49 +81,50 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 10px; margin-top: 24px;
     }
+    .module-band { background:#ede5d8; border-top:1px solid #d6ccbd; border-bottom:1px solid #d6ccbd; max-width:none; padding:52px 24px; }
+    .module-inner { max-width:900px; margin:0 auto; }
+    .module-note { font-size:.8rem; color:#625e58; margin-top:14px; }
     .module-item {
       display: flex; align-items: center; gap: 10px;
-      background: #F0F5FF; border-radius: 12px; padding: 12px 14px;
+      background:#f7f3eb; border-radius:0; border-bottom:1px solid #d6ccbd; padding:13px 10px;
       font-size: 0.88rem; font-weight: 600; color: #444;
     }
-    .module-item span { font-size: 1.3rem; }
+    .module-item > span:first-child { font-size:.72rem; letter-spacing:.08em; color:#9b233f; }
     .grade-tag {
-      margin-left: auto; font-size: 0.7rem; font-weight: 800;
-      background: #FFB7C5; color: white; border-radius: 8px; padding: 2px 7px;
+      margin-left:auto; font-size:.67rem; font-weight:800; letter-spacing:.06em;
+      background:transparent; color:#625e58; border:1px solid #b9afa1; border-radius:2px; padding:3px 6px;
     }
-    .grade-tag.g1 { background: #C7F2E3; color: #2E6B52; }
-    .grade-tag.g23 { background: #E0D4F7; color: #5B2CA8; }
+    .grade-tag.g1,.grade-tag.g23 { background:transparent; color:#625e58; }
 
     /* ── Offer box ── */
     .offer-box {
-      background: linear-gradient(135deg, #F0E8FF, #E8F5FF);
-      border-radius: 24px; padding: 40px 32px; text-align: center;
-      border: 2px solid rgba(123,82,201,0.15);
+      background:#ede5d8; border-radius:0; padding:44px 34px; text-align:center; border:1px solid #d6ccbd;
     }
-    .offer-box h2 { color: #5B2CA8; margin-bottom: 10px; }
+    .offer-box h2 { color:#292724; margin-bottom:10px; }
     .offer-box p  { color: #555; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
     .offer-steps  { text-align: left; max-width: 420px; margin: 0 auto 28px; }
     .offer-steps li { padding: 8px 0; font-size: 0.95rem; color: #444; border-bottom: 1px solid rgba(123,82,201,0.1); }
     .offer-steps li:last-child { border: none; }
-    .offer-steps li strong { color: #5B2CA8; }
+    .offer-steps li strong { color:#7e2038; }
+    .offer-primary { display:inline-block; margin-bottom:10px; }
+    .resource-row { margin:8px 0 0; }
+    .resource-link { color:#7e2038; font-weight:700; }
+    .offer-fine { font-size:.78rem; color:#514d47; margin:0; }
 
     /* ── Template box ── */
     .template-box {
-      background: #FFFDF0; border: 2px solid #FFE066;
-      border-radius: 18px; padding: 28px 24px; margin-top: 28px;
+      background:#fffaf1; border:1px solid #d6ccbd; border-radius:0; padding:32px 26px; margin-top:28px;
       position: relative;
     }
     .template-label {
       position: absolute; top: -12px; left: 20px;
-      background: #FFE066; color: #7A5700; font-size: 0.75rem; font-weight: 800;
-      padding: 3px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.06em;
+      background:#7e2038; color:white; font-size:.7rem; font-weight:700; padding:4px 10px; border-radius:0; text-transform:uppercase; letter-spacing:.08em;
     }
     .template-box p { font-size: 0.92rem; color: #555; line-height: 1.7; }
     .copy-btn {
-      margin-top: 14px; background: #FFE066; border: none; border-radius: 10px;
-      padding: 8px 18px; font-size: 0.85rem; font-weight: 800; cursor: pointer; color: #7A5700;
+      margin-top:14px; background:#7e2038; border:none; border-radius:3px; padding:10px 18px; font-size:.85rem; font-weight:700; cursor:pointer; color:white;
     }
-    .copy-btn:hover { background: #FFD700; }
+    .copy-btn:hover { background:#64182d; }
 
     /* ── FAQ ── */
     .faq-list { margin-top: 28px; }
@@ -133,36 +134,47 @@
 
     /* ── CTA strip ── */
     .cta-strip {
-      background: linear-gradient(135deg, #7B52C9, #FF8FAB);
-      border-radius: 24px; padding: 48px 32px; text-align: center; margin: 0 0 56px;
+      background:#211f1c; border-radius:0; padding:48px 32px; text-align:center; margin:0 0 56px;
     }
     .cta-strip h2 { color: white; font-size: 1.8rem; margin-bottom: 12px; }
     .cta-strip p  { color: rgba(255,255,255,0.88); margin-bottom: 24px; }
+    .cta-primary { margin-bottom:12px; display:inline-block; }
+    .cta-resource { color:rgba(255,255,255,.8); font-size:.9rem; text-decoration:underline; }
 
     /* ── Footer ── */
-    footer {
-      background: #222; color: #aaa; padding: 28px 24px; text-align: center; font-size: 0.85rem;
-    }
-    footer a { color: #FF8FAB; text-decoration: none; }
+    footer { background:#211f1c; color:#aaa; padding:28px 24px; text-align:center; font-size:.85rem; }
+    footer a { color:#e0c7ae; text-decoration:none; }
     footer a:hover { text-decoration: underline; }
     .footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+    @media (max-width:600px) {
+      .nav { padding:12px 16px; }
+      .hero { padding:54px 20px 48px; }
+      .hero h1 { font-size:2.45rem; }
+      .hero p { margin:0 0 26px; }
+      .hero-btns a { width:100%; text-align:center; }
+      section { padding:50px 20px; }
+      .why-grid, .module-grid { grid-template-columns:1fr; }
+      .offer-box, .template-box { padding:30px 20px; }
+    }
   </style>
 </head>
 <body>
 
   <!-- Nav -->
   <nav class="nav">
-    <a href="index.html" class="nav-logo">🎹 Music <span>Maestro</span></a>
+    <a href="index.html" class="nav-logo"> Music <span>Maestro</span></a>
     <a href="index.html" class="nav-cta">Start free →</a>
   </nav>
 
+  <main>
+
   <!-- Hero -->
   <div class="hero">
-    <div class="hero-tag">👩‍🏫 For Piano Teachers</div>
+    <div class="hero-tag">For Piano Teachers</div>
     <h1>Your students will love practising theory</h1>
     <p>Music Maestro supports AMEB Grade 1–3 theory practice between lessons, with a free printable routine teachers can share with families.</p>
     <div class="hero-btns">
-      <a href="ameb-practice-checklist.html?ref=teachers" class="btn-primary">Get the free checklist 📋</a>
+      <a href="ameb-practice-checklist.html?ref=teachers" class="btn-primary">Get the free checklist</a>
       <a href="index.html" class="btn-secondary">Preview the app →</a>
     </div>
   </div>
@@ -170,69 +182,62 @@
   <!-- Why section -->
   <section>
     <h2>Why teachers recommend Music Maestro</h2>
-    <p class="section-sub">Built by a parent of an AMEB student — every module maps directly to the exam syllabus.</p>
+    <p class="section-sub">Built for focused practice between lessons, with a public coverage map that distinguishes interactive practice from teacher-dependent preparation.</p>
     <div class="why-grid">
       <div class="why-card">
-        <div class="why-icon">🎯</div>
         <div class="why-title">Syllabus-aligned</div>
-        <div class="why-desc">Covers every topic in AMEB Grade 1, 2 & 3 theory: notes, scales, intervals, chords, time signatures, cadences, form analysis, aural training.</div>
+        <div class="why-desc">Provides focused Grade 1–3 practice across notes, scales, intervals, chords, time signatures, cadences, form and aural work. The public coverage map identifies limits.</div>
       </div>
       <div class="why-card">
-        <div class="why-icon">🎧</div>
         <div class="why-title">Real aural training</div>
         <div class="why-desc">Interval identification by ear using Salamander Grand Piano samples — the same high-quality sound students hear in lessons.</div>
       </div>
       <div class="why-card">
-        <div class="why-icon">📱</div>
         <div class="why-title">iPad-first design</div>
         <div class="why-desc">Designed for tablet. Students can practise on the family iPad between lessons — no app download required, works in Safari.</div>
       </div>
       <div class="why-card">
-        <div class="why-icon">📊</div>
         <div class="why-title">Weak-area tracking</div>
         <div class="why-desc">The app tracks which concepts a student misses most and surfaces them as focus areas on the home screen, so practice targets real weaknesses.</div>
       </div>
       <div class="why-card">
-        <div class="why-icon">🔥</div>
-        <div class="why-title">Kids actually do it</div>
-        <div class="why-desc">Game mechanics, streaks, badges, and encouraging feedback keep students coming back. Theory homework that doesn't feel like homework.</div>
+        <div class="why-title">Short practice sessions</div>
+        <div class="why-desc">Daily mixed questions, visible progress and explained answers make it easier to assign a specific between-lesson task.</div>
       </div>
       <div class="why-card">
-        <div class="why-icon">💰</div>
         <div class="why-title">Affordable for families</div>
-        <div class="why-desc">Grade 1 is free forever. Full Grade 2 & 3 access is a one-time $14.99 AUD — comparable to one lesson's cost for years of practice.</div>
+        <div class="why-desc">Grade 1 is free forever. Full Grade 2 &amp; 3 access is a one-time $14.99 AUD — comparable to one lesson's cost for years of practice.</div>
       </div>
     </div>
   </section>
 
   <!-- Modules -->
-  <section style="background:#F9F7FF;border-radius:24px;max-width:none;padding:52px 24px;">
-    <div style="max-width:900px;margin:0 auto;">
-      <h2>13 modules, full exam coverage</h2>
-      <p class="section-sub">Every module in Music Maestro maps to a specific skill assessed in the AMEB exam.</p>
+  <section class="module-band">
+    <div class="module-inner">
+      <h2>13 focused practice modules</h2>
+      <p class="section-sub">Interactive support for theory, aural and general-knowledge skills alongside—not instead of—the current syllabus, repertoire work and teacher guidance.</p>
       <div class="module-grid">
-        <div class="module-item"><span>📖</span>Theory Lessons<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>📅</span>Daily Challenge<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🎵</span>Note Namer<span class="grade-tag g1">G1</span></div>
-        <div class="module-item"><span>🎼</span>Scale Builder<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🔑</span>Key Signatures<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>♩</span>Note Values<span class="grade-tag g1">G1</span></div>
-        <div class="module-item"><span>🎶</span>Interval Quiz<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🎹</span>Chord Game<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🥁</span>Rhythm Trainer<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>📚</span>Terms Flashcards<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🎧</span>Aural Training<span class="grade-tag g1">G1+</span></div>
-        <div class="module-item"><span>🔍</span>Form Detective<span class="grade-tag g23">G2–3</span></div>
-        <div class="module-item"><span>📝</span>Mock Exam<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>01</span>Theory Lessons<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>02</span>Daily Challenge<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>03</span>Note Namer<span class="grade-tag g1">G1</span></div>
+        <div class="module-item"><span>04</span>Scale Builder<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>05</span>Key Signatures<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>06</span>Note Values<span class="grade-tag g1">G1</span></div>
+        <div class="module-item"><span>07</span>Interval Quiz<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>08</span>Chord Game<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>09</span>Rhythm Trainer<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>10</span>Terms Flashcards<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>11</span>Aural Training<span class="grade-tag g1">G1+</span></div>
+        <div class="module-item"><span>12</span>Form Detective<span class="grade-tag g23">G2–3</span></div>
+        <div class="module-item"><span>13</span>Mock Exam<span class="grade-tag g1">G1+</span></div>
       </div>
-      <p style="font-size:0.8rem;color:#999;margin-top:14px;">G1 = fully free · G1+ = free at Grade 1, more content unlocks with Grades 2–3 · G2–3 = paid content</p>
+      <p class="module-note">G1 = fully free · G1+ = free at Grade 1, more content unlocks with Grades 2–3 · G2–3 = paid content</p>
     </div>
   </section>
 
   <!-- Get access -->
   <section id="get-access">
     <div class="offer-box">
-      <div style="font-size:3.5rem;margin-bottom:14px;">🎓</div>
       <h2>A free weekly practice handout</h2>
       <p>Print or share a one-page routine that helps Grade 1–3 students balance repertoire, theory, aural work and reflection between lessons.</p>
       <ol class="offer-steps">
@@ -240,9 +245,11 @@
         <li><strong>2.</strong> Tick each short repertoire, theory and aural task</li>
         <li><strong>3.</strong> Bring the reflection prompt to the next lesson</li>
       </ol>
-      <a href="ameb-practice-checklist.html?ref=teachers" class="btn-primary" style="display:inline-block;margin-bottom:10px;">Open printable checklist →</a>
-      <p style="margin:8px 0 0;"><a href="ameb-grade-1-theory-practice.html?ref=teachers" style="color:#7e2038;font-weight:700;">Share the Grade 1 practice questions →</a></p>
-      <p style="font-size:0.78rem;color:#777;margin:0;">No signup, email address or payment required</p>
+      <a href="ameb-practice-checklist.html?ref=teachers" class="btn-primary offer-primary">Open printable checklist →</a>
+      <p class="resource-row"><a href="ameb-grade-1-theory-practice.html?ref=teachers" class="resource-link">Share the Grade 1 practice questions →</a></p>
+      <p class="resource-row"><a href="ameb-grade-2-piano-theory-practice.html?ref=teachers" class="resource-link">Share the Grade 2 diagnostic →</a></p>
+      <p class="resource-row"><a href="ameb-piano-general-knowledge-questions.html?ref=teachers" class="resource-link">Open the general-knowledge question sheet →</a> <span aria-hidden="true">·</span> <a href="downloads/ameb-piano-general-knowledge-practice-sheet.pdf" class="resource-link" onclick="if(window.mmTrack)mmTrack('resource_download',{channel:'organic-teacher-resource'});">Direct PDF</a></p>
+      <p class="offer-fine">No signup, email address or payment required</p>
     </div>
   </section>
 
@@ -251,9 +258,9 @@
     <h2>Ready to recommend it? Here's a template</h2>
     <p class="section-sub">Copy and paste this into your next newsletter, group chat, or student note.</p>
     <div class="template-box">
-      <div class="template-label">📋 Copy this message</div>
-      <p id="template-text">Hi,<br><br>I wanted to share a great resource for theory exam preparation: <strong>Music Maestro</strong> (music.vensoai.com). It covers the full AMEB Grade 1–3 theory syllabus in a game format — note reading, scales, intervals, chords, aural training, and more. It runs on iPad and phone, so your child can practise between lessons.<br><br>Grade 1 is completely free. Grades 2 & 3 unlock for a one-time $14.99 AUD.<br><br>Worth a look!</p>
-      <button class="copy-btn" onclick="copyTemplate()">📋 Copy to clipboard</button>
+      <div class="template-label">Copy this message</div>
+      <p id="template-text">Hi,<br><br>I wanted to share an independent between-lesson practice resource: <strong>Music Maestro</strong> (music.vensoai.com). It provides short Grade 1–3 activities for note reading, scales, intervals, chords, rhythm, terms and aural work, with a public coverage map showing what still needs the current syllabus and teacher guidance.<br><br>Grade 1 is free without an account. Grade 2 &amp; 3 access is a one-time $14.99 AUD purchase, not a subscription.<br><br>Please use it alongside the pieces and priorities we set in lessons.</p>
+      <button class="copy-btn" type="button" onclick="copyTemplate()">Copy to clipboard</button>
     </div>
   </section>
 
@@ -263,7 +270,7 @@
     <div class="faq-list">
       <div class="faq-item">
         <div class="faq-q">Which exam boards does it cover?</div>
-        <div class="faq-a">Primarily AMEB for now. Since Grade 1–3 theory content is largely universal, most content is also relevant for ABRSM, RCM, and Trinity students. Board-specific modules are planned for later.</div>
+        <div class="faq-a">Music Maestro is designed around Australian AMEB Piano Grade 1–3 supporting skills. Some concepts are transferable, but it does not claim alignment with ABRSM, RCM or Trinity requirements.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">Can I see my students' progress?</div>
@@ -283,7 +290,7 @@
       </div>
       <div class="faq-item">
         <div class="faq-q">How do I refer multiple students? Is there a class code?</div>
-        <div class="faq-a">Not yet, but teacher referral codes are coming. For now, sharing the URL (music.vensoai.com) is all that's needed — Grade 1 requires no account, and the paid upgrade is simple for parents.</div>
+        <div class="faq-a">There is no class-code or teacher dashboard feature. Share the exact free resource or Music Maestro URL; Grade 1 requires no account. Families control their own account and any purchase.</div>
       </div>
     </div>
   </section>
@@ -291,12 +298,14 @@
   <!-- CTA strip -->
   <section>
     <div class="cta-strip">
-      <h2>Try it yourself first 🎹</h2>
+      <h2>Try it yourself first</h2>
       <p>Explore the full app — Grade 1 is always free, no account needed.</p>
-      <a href="index.html" class="btn-primary" style="margin-bottom:12px;display:inline-block;">Open Music Maestro →</a><br>
-      <a href="ameb-practice-checklist.html?ref=teachers" style="color:rgba(255,255,255,0.8);font-size:0.9rem;text-decoration:underline;">Or open the free practice checklist ↑</a>
+      <a href="index.html" class="btn-primary cta-primary">Open Music Maestro →</a><br>
+      <a href="ameb-practice-checklist.html?ref=teachers" class="cta-resource">Or open the free practice checklist ↑</a>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer>
@@ -311,11 +320,11 @@
 
   <script>
     function copyTemplate() {
-      var text = "Hi,\n\nI wanted to share a great resource for theory exam preparation: Music Maestro (music.vensoai.com). It covers the full AMEB Grade 1–3 theory syllabus in a game format — note reading, scales, intervals, chords, aural training, and more. It runs on iPad and phone, so your child can practise between lessons.\n\nGrade 1 is completely free. Grades 2 & 3 unlock for a one-time $14.99 AUD.\n\nWorth a look!";
+      var text = "Hi,\n\nI wanted to share an independent between-lesson practice resource: Music Maestro (music.vensoai.com). It provides short Grade 1–3 activities for note reading, scales, intervals, chords, rhythm, terms and aural work, with a public coverage map showing what still needs the current syllabus and teacher guidance.\n\nGrade 1 is free without an account. Grade 2 & 3 access is a one-time $14.99 AUD purchase, not a subscription.\n\nPlease use it alongside the pieces and priorities we set in lessons.";
       navigator.clipboard.writeText(text).then(function() {
         var btn = document.querySelector('.copy-btn');
-        btn.textContent = '✅ Copied!';
-        setTimeout(function() { btn.textContent = '📋 Copy to clipboard'; }, 2500);
+        btn.textContent = 'Copied';
+        setTimeout(function() { btn.textContent = 'Copy to clipboard'; }, 2500);
       }).catch(function() {
         var el = document.createElement('textarea');
         el.value = text;
@@ -324,8 +333,8 @@
         document.execCommand('copy');
         document.body.removeChild(el);
         var btn = document.querySelector('.copy-btn');
-        btn.textContent = '✅ Copied!';
-        setTimeout(function() { btn.textContent = '📋 Copy to clipboard'; }, 2500);
+        btn.textContent = 'Copied';
+        setTimeout(function() { btn.textContent = 'Copy to clipboard'; }, 2500);
       });
     }
 
@@ -335,6 +344,9 @@
         e.preventDefault();
         document.getElementById('get-access').scrollIntoView({ behavior: 'smooth' });
       });
+    });
+    window.addEventListener('DOMContentLoaded',function(){
+      if(window.mmTrack)mmTrack('landing_visit',{channel:'organic-teacher-resource'});
     });
   </script>
 </body>

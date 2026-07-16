@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <style>
@@ -85,7 +86,7 @@
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <p>Loading piano sounds... 🎹</p>
+  <p>Loading piano sounds... </p>
 </div>
 
 <header class="page-header">
@@ -93,7 +94,7 @@
   <h1 class="page-title">Form Detective</h1>
   <div class="score-display">
     <span id="score-correct">0/0</span>
-    <span id="score-streak">🔥 0</span>
+    <span id="score-streak"> 0</span>
   </div>
 </header>
 
@@ -126,7 +127,7 @@
     <div class="answer-opts" id="answer-opts"></div>
     <div class="feedback" id="feedback"></div>
     <div class="explanation" id="explanation"></div>
-    <button class="next-q-btn" id="next-btn" onclick="nextQuestion()">Next Question ⏭</button>
+    <button class="next-q-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
   </div>
 </div>
 
@@ -421,6 +422,7 @@ document.querySelectorAll('.mode-tab').forEach(btn => {
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {
   score = new SessionScore('form-detective');
+  attachMilestoneTracker(score, 10);
   buildGradeSelector('grade-selector', function() { buildQueue(); if (questionQueue.length) showQuestion(questionQueue[0]); });
   buildQueue();
   showQuestion(questionQueue[0]);

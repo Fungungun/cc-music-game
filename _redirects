@@ -8,10 +8,6 @@
 /guitar-chords / 301
 /favicon.ico /icon.svg 302
 
-# Block backend/internal files from being served as static assets
-/functions/* / 301
-/migrations/* / 301
-/reports/* /404.html 404
-/growth-experiments.md /404.html 404
-/wrangler.toml / 301
-/CLAUDE.md / 301
+# Repository-only files are available on GitHub, not on the product domain.
+/tests/* /404.html 404
+/README.md /404.html 404

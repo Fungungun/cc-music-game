@@ -109,8 +109,26 @@ function mmSyncProgress(module, concept, isCorrect) {
 }
 
 /* ── Auth modal ── */
+function _mmEnsureDialogStyles() {
+  if (document.getElementById('mm-dialog-styles')) return;
+  var style = document.createElement('style');
+  style.id = 'mm-dialog-styles';
+  style.textContent =
+    '#mm-auth-modal{background:rgba(24,22,19,.72)!important}' +
+    '#mm-auth-modal>div{background:#f7f3eb!important;border:1px solid #cfc5b6!important;border-radius:4px!important;box-shadow:0 18px 54px rgba(0,0,0,.28)!important}' +
+    '#mm-auth-modal input{border:1px solid #aaa094!important;border-radius:3px!important;background:#fffdf8!important;color:#292724!important}' +
+    '#mm-auth-modal input:focus{border-color:#7e2038!important;box-shadow:0 0 0 2px rgba(126,32,56,.14)!important}' +
+    '#mm-auth-btn,#mm-reset-btn{background:#7e2038!important;border-radius:3px!important;font-weight:700!important}' +
+    '#mm-tab-signin,#mm-tab-signup{border-radius:2px!important}' +
+    '#mm-auth-main>div:first-child>div:first-child,#mm-auth-forgot-panel>div:first-child>div:first-child{display:none!important}' +
+    '#mm-auth-title,#mm-auth-forgot-panel h2{font-family:Georgia,serif!important;color:#292724!important}' +
+    '#mm-auth-sub,#mm-auth-forgot-panel p{color:#625b52!important}';
+  document.head.appendChild(style);
+}
+
 function showAuthModal(opts) {
   opts = opts || {};
+  _mmEnsureDialogStyles();
   var onSuccess  = opts.onSuccess;
   var allowGuest = opts.allowGuest !== false;
   var initMode   = opts.mode || 'signin';
@@ -131,7 +149,7 @@ function showAuthModal(opts) {
     ? '<button onclick="_mmAuthGuest()" style="display:block;width:100%;background:none;border:2px solid #ddd;border-radius:14px;padding:12px;font-size:0.93rem;font-weight:600;cursor:pointer;color:#888;margin-bottom:8px;box-sizing:border-box;">Continue without account</button>'
     : '';
 
-  var inputStyle = 'width:100%;box-sizing:border-box;border:2px solid #FFB7C5;border-radius:12px;padding:11px 14px;font-size:1rem;outline:none;font-family:inherit;';
+  var inputStyle = 'width:100%;box-sizing:border-box;border:1px solid #aaa094;border-radius:3px;padding:12px 14px;font-size:1rem;outline:none;font-family:inherit;';
 
   modal.innerHTML =
     '<div style="background:white;border-radius:24px;padding:32px 28px;max-width:380px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.25);">' +
@@ -139,7 +157,7 @@ function showAuthModal(opts) {
       /* ── Main sign-in / sign-up panel ── */
       '<div id="mm-auth-main">' +
         '<div style="text-align:center;margin-bottom:18px;">' +
-          '<div style="font-size:3rem;margin-bottom:6px;">🎹</div>' +
+          '<div style="font-size:3rem;margin-bottom:6px;"></div>' +
           '<h2 id="mm-auth-title" style="margin:0 0 4px;color:#1a2233;font-size:1.4rem;font-weight:900;">Sign in</h2>' +
           '<p  id="mm-auth-sub"   style="color:#888;font-size:0.87rem;margin:0;">Save your progress across devices</p>' +
         '</div>' +
@@ -166,15 +184,15 @@ function showAuthModal(opts) {
 
         '<div id="mm-auth-err" style="display:none;border-radius:10px;padding:10px 14px;font-size:0.87rem;margin-bottom:12px;"></div>' +
 
-        '<button id="mm-auth-btn" onclick="_mmAuthSubmit()" style="display:block;width:100%;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:14px;font-size:1.05rem;font-weight:800;cursor:pointer;margin-bottom:8px;box-sizing:border-box;font-family:inherit;">Sign in 🎵</button>' +
+        '<button id="mm-auth-btn" onclick="_mmAuthSubmit()" style="display:block;width:100%;background:#7e2038;color:white;border:none;border-radius:3px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-bottom:8px;box-sizing:border-box;font-family:inherit;">Sign in</button>' +
         guestBtn +
-        '<button onclick="document.getElementById(\'mm-auth-modal\').style.display=\'none\'" style="display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;font-size:0.84rem;padding:4px;font-family:inherit;">✕ Close</button>' +
+        '<button onclick="document.getElementById(\'mm-auth-modal\').style.display=\'none\'" style="display:block;width:100%;background:none;border:none;color:#777;cursor:pointer;font-size:0.84rem;padding:4px;font-family:inherit;">Close</button>' +
       '</div>' +
 
       /* ── Forgot password panel (hidden by default) ── */
       '<div id="mm-auth-forgot-panel" style="display:none;">' +
         '<div style="text-align:center;margin-bottom:20px;">' +
-          '<div style="font-size:2.5rem;margin-bottom:8px;">🔑</div>' +
+          '<div style="font-size:2.5rem;margin-bottom:8px;"></div>' +
           '<h2 style="margin:0 0 4px;color:#1a2233;font-size:1.3rem;font-weight:900;">Reset password</h2>' +
           '<p style="color:#888;font-size:0.87rem;margin:0;">We\'ll send a reset link to your email</p>' +
         '</div>' +
@@ -182,7 +200,7 @@ function showAuthModal(opts) {
           '<input id="mm-reset-email" type="email" placeholder="Your email address" style="' + inputStyle + '" onkeydown="if(event.key===\'Enter\')_mmAuthSendReset()" />' +
         '</div>' +
         '<div id="mm-reset-msg" style="display:none;border-radius:10px;padding:10px 14px;font-size:0.87rem;margin-bottom:12px;"></div>' +
-        '<button id="mm-reset-btn" onclick="_mmAuthSendReset()" style="display:block;width:100%;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:14px;font-size:1.05rem;font-weight:800;cursor:pointer;margin-bottom:10px;box-sizing:border-box;font-family:inherit;">Send reset link 📧</button>' +
+        '<button id="mm-reset-btn" onclick="_mmAuthSendReset()" style="display:block;width:100%;background:#7e2038;color:white;border:none;border-radius:3px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-bottom:10px;box-sizing:border-box;font-family:inherit;">Send reset link</button>' +
         '<button onclick="_mmAuthShowMain()" style="display:block;width:100%;background:none;border:none;color:#aaa;cursor:pointer;font-size:0.85rem;padding:4px;font-family:inherit;">← Back to sign in</button>' +
       '</div>' +
 
@@ -219,7 +237,7 @@ function _mmAuthTab(mode) {
   var btn   = document.getElementById('mm-auth-btn');
   if (title) title.textContent = isSignup ? 'Create account' : 'Sign in';
   if (sub)   sub.textContent   = isSignup ? 'Free · Sync progress across devices' : 'Save your progress across devices';
-  if (btn)   btn.textContent   = isSignup ? 'Create account 🎹' : 'Sign in 🎵';
+  if (btn)   btn.textContent   = isSignup ? 'Create account' : 'Sign in';
 
   var errEl = document.getElementById('mm-auth-err');
   if (errEl) errEl.style.display = 'none';
@@ -270,12 +288,12 @@ async function _mmAuthSendReset() {
 
   var r = await _mmApi('auth/reset-request', 'POST', { email: email });
 
-  if (btn) { btn.disabled = false; btn.textContent = 'Send reset link 📧'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Send reset link '; }
 
   if (r.status !== 200) {
     show(r.data.error || 'Something went wrong. Try again.', true);
   } else {
-    show('✅ Reset link sent! Check your inbox (and spam folder).', false);
+    show('Reset link sent. Check your inbox and spam folder.', false);
     if (btn) btn.style.display = 'none';
   }
 }
@@ -302,7 +320,7 @@ async function _mmAuthSubmit() {
 
   if (result.error) {
     _mmAuthError(result.error.message || 'Something went wrong. Please try again.');
-    if (btn) btn.textContent = mode === 'signup' ? 'Create account 🎹' : 'Sign in 🎵';
+    if (btn) btn.textContent = mode === 'signup' ? 'Create account' : 'Sign in';
     return;
   }
 
@@ -335,17 +353,17 @@ function showAccountMenu(anchorEl) {
   var rect = anchorEl ? anchorEl.getBoundingClientRect() : { left: 0, bottom: 40 };
   menu.style.cssText = 'position:fixed;top:' + (rect.bottom + 8) + 'px;right:16px;background:white;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:16px;min-width:200px;z-index:5000;';
   menu.innerHTML =
-    '<div style="font-weight:700;color:#333;margin-bottom:2px;">' + (name || '🎹 Music Maestro') + '</div>' +
+    '<div style="font-weight:700;color:#333;margin-bottom:2px;">' + (name || ' Music Maestro') + '</div>' +
     '<div style="font-size:0.8rem;color:#aaa;margin-bottom:12px;">' + email + '</div>' +
     '<div style="font-size:0.85rem;padding:6px 0;border-top:1px solid #f0f0f0;color:' + (unlocked ? '#4CAF50' : '#FF8FAB') + ';font-weight:700;">' +
-      (unlocked ? '✅ Full access unlocked' : '🔒 Grade 1 (free)') +
+      (unlocked ? 'Full access' : 'Grade 1 (free)') +
     '</div>' +
     (unlocked ? '' :
       '<button onclick="document.getElementById(\'mm-account-menu\').remove();if(typeof gotoPayment===\'function\')gotoPayment();" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:10px;padding:8px 12px;font-size:0.88rem;font-weight:800;cursor:pointer;box-sizing:border-box;">Unlock Grade 2 &amp; 3 →</button>'
     ) +
-    '<button onclick="document.getElementById(\'mm-account-menu\').remove();_mmChangePassword();" style="display:block;width:100%;margin-top:10px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#666;cursor:pointer;font-family:inherit;">🔑 Change password</button>' +
+    '<button onclick="document.getElementById(\'mm-account-menu\').remove();_mmChangePassword();" style="display:block;width:100%;margin-top:10px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#666;cursor:pointer;font-family:inherit;"> Change password</button>' +
     '<button onclick="mmSignOut().then(function(){location.reload();})" style="display:block;width:100%;margin-top:6px;background:none;border:1px solid #eee;border-radius:10px;padding:8px;font-size:0.85rem;color:#999;cursor:pointer;font-family:inherit;">Sign out</button>' +
-    '<button onclick="document.getElementById(\'mm-account-menu\').remove()" style="display:block;width:100%;margin-top:4px;background:none;border:none;color:#ccc;font-size:0.8rem;cursor:pointer;font-family:inherit;">✕ Close</button>';
+    '<button onclick="document.getElementById(\'mm-account-menu\').remove()" style="display:block;width:100%;margin-top:4px;background:none;border:none;color:#777;font-size:0.8rem;cursor:pointer;font-family:inherit;">Close</button>';
   document.body.appendChild(menu);
 
   /* Close on outside click */
@@ -369,7 +387,7 @@ async function _mmChangePassword() {
   if (r.status !== 200) {
     alert('Could not send reset email: ' + (r.data.error || 'unknown error'));
   } else {
-    alert('📧 Password reset link sent to ' + user.email + '\n\nCheck your inbox and follow the link to set a new password.');
+    alert(' Password reset link sent to ' + user.email + '\n\nCheck your inbox and follow the link to set a new password.');
   }
 }
 

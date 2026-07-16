@@ -111,7 +111,7 @@ function genInterval(grade) {
     abcStr:abc,
     answer:label,
     choices:choices4(label, allLabels),
-    explanation:'This is a <strong>' + iv.name + '</strong> (' + iv.semitones + ' semitones). ' + (iv.song ? '🎵 Think: ' + iv.song : ''),
+    explanation:'This is a <strong>' + iv.name + '</strong> (' + iv.semitones + ' semitones). ' + (iv.song ? ' Think: ' + iv.song : ''),
     concept:'interval-' + iv.id,
   };
 }

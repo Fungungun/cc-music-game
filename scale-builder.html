@@ -65,7 +65,7 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… </div>
   </div>
 
   <header class="page-header">
@@ -93,7 +93,7 @@
     <!-- Score -->
     <div class="score-display">
       <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
-      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak"> 0</span></div>
     </div>
 
     <!-- Progress Bar -->
@@ -106,7 +106,7 @@
     <div class="mode-toggle" id="grade-selector"></div>
 
     <!-- Scale Title -->
-    <div class="scale-title" id="scale-title">Build: C Major 🎼</div>
+    <div class="scale-title" id="scale-title">Build: C Major </div>
     <div class="scale-hint-text" id="scale-hint-text">Click the 8 notes of C Major on the keyboard below</div>
 
     <!-- Note progress pips -->
@@ -117,7 +117,7 @@
     <div class="feedback empty" id="feedback"></div>
 
     <!-- Celebration Box -->
-    <div class="celebration" id="celebration">⭐⭐⭐ Scale complete! Well done! ⭐⭐⭐</div>
+    <div class="celebration" id="celebration">Scale complete. Well done.</div>
 
     <!-- Piano Keyboard -->
     <div class="keyboard-scroll">
@@ -126,8 +126,8 @@
 
     <!-- Actions -->
     <div class="action-row">
-      <button class="btn btn-mint" onclick="showMeScale()" data-i18n="show-me">👁 Show Me</button>
-      <button class="btn btn-secondary" onclick="nextScale()" data-i18n="try-another">Try Another Scale 🎲</button>
+      <button class="btn btn-mint" onclick="showMeScale()" data-i18n="show-me"> Show Me</button>
+      <button class="btn btn-secondary" onclick="nextScale()" data-i18n="try-another">Try Another Scale </button>
       <button class="btn btn-secondary" onclick="playCurrentScale()" data-i18n="play-scale">▶ Play Scale</button>
     </div>
 
@@ -137,6 +137,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <script>
@@ -265,7 +266,7 @@
       scaleComplete = false;
       showMode = false;
       clearPianoHighlights();
-      document.getElementById('scale-title').textContent = 'Build: ' + scale.name + ' 🎼';
+      document.getElementById('scale-title').textContent = 'Build: ' + scale.name + ' ';
       document.getElementById('scale-hint-text').textContent = 'Click the 8 notes of ' + scale.name + ' on the keyboard below';
       document.getElementById('note-counter').textContent = 'Note 1 of 8';
       document.getElementById('celebration').style.display = 'none';
@@ -291,7 +292,7 @@
         }
       });
       playCurrentScale();
-      setFeedback('Here are the notes of ' + currentScale.name + '! 🎵', 'correct');
+      setFeedback('Here are the notes of ' + currentScale.name + '! ', 'correct');
     }
 
     function playCurrentScale() {
@@ -302,10 +303,10 @@
       scaleComplete = true;
       trackAnswer('scale-builder', currentScale.name, true);
       score.onCorrect();
-      document.getElementById('note-counter').textContent = 'All 8 notes done! 🎉';
+      document.getElementById('note-counter').textContent = 'All 8 notes done! ';
       var cel = document.getElementById('celebration');
       var pn = getPlayerName();
-      cel.textContent = '⭐⭐⭐ Scale complete! Well done' + (pn ? ', ' + pn : '') + '! ⭐⭐⭐';
+      cel.textContent = 'Scale complete. Well done' + (pn ? ', ' + pn : '') + '.';
       cel.style.display = 'block';
       triggerStarburst(cel);
       setFeedback(randomCorrect(), 'correct');

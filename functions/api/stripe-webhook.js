@@ -88,13 +88,7 @@ export async function onRequestPost(context) {
   if (userId) matched = await env.DB.prepare('SELECT id FROM users WHERE id=?').bind(userId).first();
   if (!matched && email) matched = await env.DB.prepare('SELECT id FROM users WHERE email=?').bind(email).first();
 
-  if (!matched) {
-    /* Return 200 so Stripe doesn't retry forever; reconcile manually from the receipt */
-    console.log('stripe-webhook: no matching user', session.id, 'ref=', userId, 'email=', email);
-    return new Response('No matching user — manual reconciliation needed', { status: 200 });
-  }
-
-  await env.DB.batch([
+  const paymentStatements = [
     env.DB.prepare('INSERT OR IGNORE INTO stripe_events (event_id,event_type,livemode) VALUES (?,?,?)')
       .bind(eventId, event.type, event.livemode ? 1 : 0),
     env.DB.prepare(`INSERT INTO stripe_payments
@@ -104,11 +98,23 @@ export async function onRequestPost(context) {
         payment_intent_id=excluded.payment_intent_id,user_id=excluded.user_id,customer_id=excluded.customer_id,
         customer_email=excluded.customer_email,amount_total=excluded.amount_total,currency=excluded.currency,
         livemode=excluded.livemode,payment_status=excluded.payment_status,updated_at=datetime('now')`)
-      .bind(session.id, paymentIntentId || null, matched.id, customerId, email, Number(session.amount_total || 0), String(session.currency || 'aud'), event.livemode ? 1 : 0, 'paid'),
-    env.DB.prepare('UPDATE users SET is_unlocked=1,stripe_customer_id=? WHERE id=?').bind(customerId, matched.id),
-    env.DB.prepare(`INSERT INTO funnel_events (id,event_name,user_id,page,channel) VALUES (?,?,?,?,?)`)
-      .bind('stripe-' + eventId, 'successful_payment', matched.id, '/checkout', 'stripe')
-  ]);
+      .bind(session.id, paymentIntentId || null, matched && matched.id || null, customerId, email, Number(session.amount_total || 0), String(session.currency || 'aud'), event.livemode ? 1 : 0, 'paid'),
+    env.DB.prepare(`INSERT OR IGNORE INTO funnel_events (id,event_name,user_id,page,channel) VALUES (?,?,?,?,?)`)
+      .bind('stripe-' + eventId, 'successful_payment', matched && matched.id || null, '/checkout', 'stripe')
+  ];
+
+  if (!matched) {
+    /* Preserve the payment as financial truth even when account matching fails.
+       The owner report surfaces it for manual reconciliation. */
+    await env.DB.batch(paymentStatements);
+    console.log('stripe-webhook: payment recorded without matching user', session.id, 'ref=', userId, 'email=', email);
+    return new Response('Payment recorded — account reconciliation needed', { status: 200 });
+  }
+
+  paymentStatements.push(
+    env.DB.prepare('UPDATE users SET is_unlocked=1,stripe_customer_id=? WHERE id=?').bind(customerId, matched.id)
+  );
+  await env.DB.batch(paymentStatements);
   console.log('stripe-webhook: unlocked', userId || email, 'session', session.id);
   return new Response('OK', { status: 200 });
 }

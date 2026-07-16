@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <style>
@@ -92,7 +93,7 @@
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <p>Loading piano sounds... 🎹</p>
+  <p>Loading piano sounds... </p>
 </div>
 
 <header class="page-header">
@@ -100,7 +101,7 @@
   <h1 class="page-title">Rhythm Trainer</h1>
   <div class="score-display">
     <span id="score-correct">0/0</span>
-    <span id="score-streak">🔥 0</span>
+    <span id="score-streak"> 0</span>
   </div>
 </header>
 
@@ -131,7 +132,7 @@
 
   <!-- TAP button -->
   <button id="tap-btn" onclick="handleTap()">
-    🥁
+
     <span class="tap-label">TAP</span>
   </button>
 
@@ -144,8 +145,8 @@
   <!-- Controls -->
   <div class="controls-row">
     <button class="btn btn-primary" id="start-btn" onclick="startRhythm()" style="background:#E07B20;">▶ Start</button>
-    <button class="btn" id="next-btn" onclick="nextPattern()" style="background:#FFD4A3; display:none;">⏭ Next Pattern</button>
-    <button class="btn" id="again-btn" onclick="startRhythm()" style="background:#C7F2E3; display:none;">🔄 Try Again</button>
+    <button class="btn" id="next-btn" onclick="nextPattern()" style="background:#FFD4A3; display:none;">Next Pattern</button>
+    <button class="btn" id="again-btn" onclick="startRhythm()" style="background:#C7F2E3; display:none;"> Try Again</button>
   </div>
 </div>
 
@@ -349,7 +350,7 @@ async function startRhythm() {
     clearInterval(countInterval);
     // Remove countInterval from array
     phase = 'tapping';
-    phaseEl.textContent = '🎵 Tap along! (spacebar or the button)';
+    phaseEl.textContent = ' Tap along! (spacebar or the button)';
     patternStartTime = performance.now();
 
     // Schedule beat dots and metronome clicks
@@ -437,14 +438,14 @@ function gradeAccuracy(p, taps) {
 function showResult(p) {
   const { stars, pct } = gradeAccuracy(p, tapTimes);
 
-  const starStr = ['', '⭐', '⭐⭐', '⭐⭐⭐'][stars] || '⭐';
+  const starStr = stars + ' / 3';
   var pn = getPlayerName();
   var pn2 = pn ? ', ' + pn : '';
   const msgs = [
     '',
-    'Good try' + pn2 + '! Keep practising! 💪',
-    'Well done' + pn2 + '! You\'re getting it! 🎵',
-    'Perfect timing' + pn2 + '! You\'re a rhythm star! 🌟'
+    'Good try' + pn2 + '. Keep practising.',
+    'Well done' + pn2 + '. You\'re getting it.',
+    'Perfect timing' + pn2 + '. Excellent control.'
   ];
 
   document.getElementById('result-stars').textContent = starStr;

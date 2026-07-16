@@ -64,7 +64,7 @@
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <p>Loading piano sounds... 🎹</p>
+  <p>Loading piano sounds... </p>
 </div>
 
 <header class="page-header">
@@ -78,11 +78,11 @@
 <!-- ═══ START / ALREADY-DONE SCREEN ═══ -->
 <div id="screen-start">
   <div class="start-screen">
-    <div class="start-title">Daily Challenge 📅</div>
+    <div class="start-title">Daily Challenge </div>
     <div class="start-sub">5 mixed questions from your grade — once a day, every day</div>
 
     <div class="streak-hero">
-      <span class="streak-flame">🔥</span>
+      <span class="streak-flame"></span>
       <div class="streak-days"><span id="streak-count">0</span>-day streak</div>
       <div class="streak-cal" id="streak-cal"></div>
     </div>
@@ -101,7 +101,7 @@
   <div class="q-header">
     <span class="q-progress-text">Q&nbsp;<span id="q-num">1</span>/5</span>
     <div class="q-bar-wrap"><div class="q-bar-fill" id="q-bar" style="width:0%"></div></div>
-    <div class="q-score-chip">✓&nbsp;<span id="q-correct-count">0</span></div>
+    <div class="q-score-chip">Correct&nbsp;<span id="q-correct-count">0</span></div>
   </div>
 
   <div class="q-card">
@@ -128,18 +128,18 @@
 <!-- ═══ RESULTS SCREEN ═══ -->
 <div id="screen-results" style="display:none;">
   <div class="results-screen">
-    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-emoji" id="result-emoji"></div>
     <div class="result-title" id="result-title"></div>
     <div class="result-sub" id="result-sub"></div>
 
     <div class="streak-hero">
-      <span class="streak-flame">🔥</span>
+      <span class="streak-flame"></span>
       <div class="streak-days"><span id="result-streak">0</span>-day streak</div>
       <div class="streak-cal" id="result-cal"></div>
     </div>
 
     <p style="font-size:0.9rem;color:#888;">Come back tomorrow for 5 new questions!</p>
-    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+    <button class="home-btn" onclick="window.location.href='index.html'"> Home</button>
   </div>
 </div>
 
@@ -147,6 +147,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/abcjs/dist/abcjs-basic-min.js"></script>
+<script src="growth.js"></script>
 <script src="auth.js"></script>
 <script src="game.js"></script>
 <script src="exam-questions.js"></script>
@@ -179,7 +180,7 @@ function buildCalendar(elId) {
     dot.className = 'cal-dot';
     dot.innerHTML =
       '<div class="d-label">' + labels[d.getDay()] + '</div>' +
-      '<div class="d-mark' + (done ? ' done' : '') + '">' + (done ? '✓' : '·') + '</div>';
+      '<div class="d-mark' + (done ? ' done' : '') + '">' + (done ? 'Done' : 'Open') + '</div>';
     el.appendChild(dot);
   }
 }
@@ -195,7 +196,7 @@ function refreshStartScreen() {
   var startBtn = document.getElementById('start-btn');
   if (daily.lastPlayed === today) {
     var scoreToday = daily.history && daily.history[today];
-    statusEl.innerHTML = '<p style="color:#4CAF50;font-weight:800;margin:8px 0;">✅ Done for today — you scored ' +
+    statusEl.innerHTML = '<p style="color:#315c45;font-weight:800;margin:8px 0;">Done for today — you scored ' +
       scoreToday + '/' + QUESTIONS_PER_DAY + '. Come back tomorrow!</p>';
     startBtn.style.display = 'none';
   } else {
@@ -298,7 +299,7 @@ function checkAnswer(chosen, btn, q) {
   expEl.style.display = 'block';
 
   var nextBtn = document.getElementById('q-next-btn');
-  nextBtn.textContent = session.current < QUESTIONS_PER_DAY - 1 ? 'Next Question →' : 'Finish 🎉';
+  nextBtn.textContent = session.current < QUESTIONS_PER_DAY - 1 ? 'Next Question →' : 'Finish ';
   nextBtn.style.display = 'block';
   document.getElementById('q-correct-count').textContent = session.correct;
   document.getElementById('header-score-text').textContent = session.correct + '/' + (session.current + 1);
@@ -350,18 +351,19 @@ function showResults() {
   daily.history[today] = session.correct;
   saveDailyData(daily);
   var streak = recordDailyActivity();
+  if (typeof window.mmTrack === 'function') window.mmTrack('practice_complete');
 
   document.getElementById('screen-question').style.display = 'none';
   document.getElementById('screen-results').style.display = 'block';
   document.getElementById('header-score').style.display = 'none';
 
   var pct = session.correct / QUESTIONS_PER_DAY;
-  var emoji = pct === 1 ? '🏆' : pct >= 0.8 ? '🌟' : pct >= 0.6 ? '💪' : '🌱';
+  var emoji = pct === 1 ? '' : pct >= 0.8 ? '' : pct >= 0.6 ? '' : '';
   var title = pct === 1 ? 'Perfect 5/5!' : session.correct + '/' + QUESTIONS_PER_DAY + ' today';
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
   document.getElementById('result-sub').textContent =
-    pct === 1 ? 'Flawless! See you tomorrow 🎹' : 'Every day makes you stronger. See you tomorrow!';
+    pct === 1 ? 'Flawless! See you tomorrow ' : 'Every day makes you stronger. See you tomorrow!';
   document.getElementById('result-streak').textContent = streak.days || 1;
   buildCalendar('result-cal');
 }

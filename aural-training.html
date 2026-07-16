@@ -52,7 +52,7 @@
 
   <div id="loading-overlay">
     <div class="spinner"></div>
-    <div data-i18n="loading">Loading piano sounds… 🎹</div>
+    <div data-i18n="loading">Loading piano sounds… </div>
   </div>
 
   <header class="page-header">
@@ -80,7 +80,7 @@
 
     <div class="score-display">
       <div class="score-item"><span data-i18n="score-label">Score</span> <span id="score-correct">0/0</span></div>
-      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak">🔥 0</span></div>
+      <div class="score-item"><span data-i18n="streak-label">Streak</span> <span id="score-streak"> 0</span></div>
     </div>
 
     <div class="progress-section">
@@ -93,9 +93,9 @@
 
     <!-- Exercise mode toggle -->
     <div class="mode-toggle">
-      <button class="mode-btn active" id="btn-mode-hl"        onclick="setExercise('higherlower')">👂 Higher or Lower</button>
-      <button class="mode-btn"        id="btn-mode-intervals" onclick="setExercise('intervals')">🎶 Intervals</button>
-      <button class="mode-btn"        id="btn-mode-beat"      onclick="setExercise('beat')">👏 Tap the Beat</button>
+      <button class="mode-btn active" id="btn-mode-hl"        onclick="setExercise('higherlower')"> Higher or Lower</button>
+      <button class="mode-btn"        id="btn-mode-intervals" onclick="setExercise('intervals')"> Intervals</button>
+      <button class="mode-btn"        id="btn-mode-beat"      onclick="setExercise('beat')"> Tap the Beat</button>
     </div>
 
     <!-- Play/hear mode toggle (intervals only) -->
@@ -114,7 +114,7 @@
     <div id="beat-area" style="display:none;text-align:center;padding:4px 16px 10px;">
       <button id="tap-btn" onclick="onTap()" disabled
         style="width:150px;height:150px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;font-weight:900;color:white;background:linear-gradient(135deg,#F57C00,#FFB74D);box-shadow:0 6px 24px rgba(245,124,0,0.35);font-family:inherit;">
-        👏<br>TAP
+        <br>TAP
       </button>
       <div id="beat-dots" style="margin-top:12px;font-size:1.1rem;letter-spacing:3px;min-height:24px;"></div>
     </div>
@@ -136,6 +136,7 @@
   <script src="i18n.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+  <script src="growth.js"></script>
   <script src="auth.js"></script>
   <script src="game.js"></script>
   <script>
@@ -287,7 +288,7 @@
     function buildHLButtons() {
       var grid = document.getElementById('answer-grid');
       grid.innerHTML = '';
-      [{ id:'higher', label:'⬆️ Higher' }, { id:'lower', label:'⬇️ Lower' }].forEach(function(opt) {
+      [{ id:'higher', label:'⬆ Higher' }, { id:'lower', label:'⬇ Lower' }].forEach(function(opt) {
         var btn = document.createElement('button');
         btn.className = 'answer-btn';
         btn.textContent = opt.label;
@@ -317,7 +318,7 @@
           if (b.dataset.dir === currentDirection) b.classList.add('correct-ans');
         });
         document.getElementById('note-reveal').textContent =
-          '🎵 ' + currentRoot + ' → ' + currentUpper + ' — the second note was ' + currentDirection + '.';
+          ' ' + currentRoot + ' → ' + currentUpper + ' — the second note was ' + currentDirection + '.';
         setFeedback(randomWrong() + ' Listen for where the sound moves.', 'wrong');
         trackAnswer('aural-training', 'higher-lower', false);
         score.onWrong();
@@ -403,10 +404,10 @@
       var totalBeats = beat.expected.length;
       var ok = hits >= Math.ceil(totalBeats * 0.6) && beat.taps.length >= totalBeats * 0.5;
       document.getElementById('beat-dots').textContent =
-        '🎯 ' + hits + ' of ' + totalBeats + ' beats on time';
+        ' ' + hits + ' of ' + totalBeats + ' beats on time';
 
       if (ok) {
-        setFeedback(randomCorrect() + ' Great steady beat! 👏', 'correct');
+        setFeedback(randomCorrect() + ' Great steady beat! ', 'correct');
         trackAnswer('aural-training', 'beat-tap', true);
         score.onCorrect();
         triggerStarburst(document.getElementById('tap-btn'));
@@ -462,9 +463,9 @@
     function updateAttemptDots() {
       var dots = '';
       for (var i = 0; i < 3; i++) {
-        dots += i < wrongAttempts ? '❌' : '⬜';
+        dots += i < wrongAttempts ? 'Used ' : 'Available ';
       }
-      document.getElementById('attempts-dots').textContent = dots;
+      document.getElementById('attempts-dots').textContent = dots.trim();
     }
 
     function isCorrect(iv) {
@@ -479,7 +480,7 @@
         btn.classList.add('correct-ans');
         /* Song hints describe a melodic shape — only show when notes play one by one */
         var hint = playMode === 'melodic' ? (INTERVAL_SONGS[currentInterval.short] || '') : '';
-        setFeedback(randomCorrect() + (hint ? ' 🎵 Think: ' + hint : ''), 'correct');
+        setFeedback(randomCorrect() + (hint ? '  Think: ' + hint : ''), 'correct');
         triggerStarburst(btn);
         trackAnswer('aural-training', currentInterval.short, true);
         score.onCorrect();
@@ -498,7 +499,7 @@
             if (b.dataset.short === currentInterval.short) b.classList.add('correct-ans');
           });
           document.getElementById('note-reveal').textContent =
-            '🎵 Notes: ' + currentRoot + ' → ' + currentUpper +
+            ' Notes: ' + currentRoot + ' → ' + currentUpper +
             ' (' + currentInterval.name + ', ' + currentInterval.semitones + ' semitones)';
           var hint = playMode === 'melodic' ? (INTERVAL_SONGS[currentInterval.short] || '') : '';
           setFeedback(randomWrong() + (hint ? ' Hint: ' + hint : ' Try "One by one" mode to hear the shape.'), 'wrong');
