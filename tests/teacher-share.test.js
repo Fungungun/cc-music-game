@@ -10,7 +10,7 @@ const context = {
 vm.runInNewContext(source, context);
 
 const share = context.window.mmTeacherShare;
-assert.equal(Object.keys(share.choices).length, 8);
+assert.equal(Object.keys(share.choices).length, 9);
 
 for (const key of Object.keys(share.choices)) {
   const result = share.build(key, 'https://music.vensoai.com');
@@ -28,12 +28,13 @@ for (const key of ['note-reading', 'note-values', 'key-signatures', 'aural-train
   assert.equal(new URL(share.build(key, 'https://music.vensoai.com').url).searchParams.get('grade'), '1');
 }
 
-for (const key of ['grade2-diagnostic', 'general-knowledge', 'weekly-checklist']) {
+for (const key of ['grade2-diagnostic', 'general-knowledge', 'weekly-checklist', 'note-values-sheet']) {
   assert.equal(new URL(share.build(key, 'https://music.vensoai.com').url).searchParams.has('grade'), false);
 }
 
 const html = fs.readFileSync(new URL('../teachers.html', `file://${__filename}`), 'utf8');
 assert.match(html, /<script src="teacher-share\.js" defer><\/script>/);
-assert.equal((html.match(/<option value=/g) || []).length, 8);
+assert.equal((html.match(/<option value=/g) || []).length, 9);
+assert.match(html, /ameb-grade-1-note-values-practice\.html\?ref=teachers/);
 
 console.log('teacher share tests passed');
