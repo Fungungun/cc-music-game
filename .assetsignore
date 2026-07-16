@@ -1,0 +1,10 @@
+# Internal operational material must never be published as static assets.
+reports/
+growth-experiments.md
+
+# Source and deployment configuration are not public site content.
+.github/
+migrations/
+CLAUDE.md
+README.md
+wrangler.toml
