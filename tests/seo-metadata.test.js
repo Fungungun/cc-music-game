@@ -33,4 +33,10 @@ for (const route of routes) {
 }
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 
+const indexNowKey = 'a8eb59ee77ba35e0d503b2521e062f7c';
+assert.equal(fs.readFileSync(path.join(root, `${indexNowKey}.txt`), 'utf8').trim(), indexNowKey);
+const indexNowScript = fs.readFileSync(path.join(root, 'scripts/indexnow-submit.mjs'), 'utf8');
+assert.match(indexNowScript, new RegExp(`const key = '${indexNowKey}'`));
+assert.match(indexNowScript, /const host = 'music\.vensoai\.com'/);
+
 console.log('SEO metadata tests passed');
