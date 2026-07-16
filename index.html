@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Music Maestro — AMEB Piano Theory</title>
+  <meta name="description" content="Practise AMEB Piano Grades 1–3 theory, aural skills and general knowledge with interactive exercises, structured lessons and mock exams." />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="canonical" href="https://music.vensoai.com/" />
@@ -98,6 +99,11 @@
     .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: #ccc; padding: 0 2px; }
     .icon-btn:hover { color: #FF8FAB; }
     .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-height: unset; border-radius: 12px; }
+    .grade-bar-label,.section-header,.badges-title,.footer-links a { color:#625b52; }
+    #account-btn { color:#7e2038 !important; border-color:#8f5362 !important; }
+    #daily-banner-sub,.module-card .card-score { color:#625b52 !important; }
+    .weak-banner a { color:#7e2038 !important; }
+    .upgrade-link { appearance:none; border:0; padding:0; background:none; color:white; font:900 .95rem var(--font); text-decoration:underline; cursor:pointer; }
 
     @media (max-width: 480px) {
       .page-header { padding:0 12px; gap:8px; }
@@ -168,7 +174,7 @@
   <!-- Upgrade banner -->
   <div class="upgrade-banner" id="upgrade-banner">
     <span>Continue beyond Grade 1. </span>
-    <a onclick="gotoPayment()">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
+    <button class="upgrade-link" onclick="gotoPayment()">Unlock Grade 2 &amp; 3 — $14.99 AUD →</button>
   </div>
 
   <!-- Main content -->
@@ -271,7 +277,7 @@
 
         var card = document.createElement('a');
         card.className = 'module-card';
-        card.href = locked ? 'javascript:void(0)' : mod.href;
+        card.href = locked ? '#upgrade' : mod.href;
         card.dataset.accent = mod.accent;
         if (locked) card.onclick = function(e){ e.preventDefault(); showUpgradeModal(); };
 

@@ -6,6 +6,7 @@
 /barline-quiz /note-values 301
 /barline-quiz.html /note-values.html 301
 /guitar-chords / 301
+/favicon.ico /icon.svg 302
 
 # Block backend/internal files from being served as static assets
 /functions/* / 301
