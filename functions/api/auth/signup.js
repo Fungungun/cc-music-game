@@ -11,6 +11,10 @@ export async function onRequestPost(context) {
   const email = normalizeEmail(body.email);
   const password = String(body.password || '');
   const name = String(body.name || '').trim().slice(0, 20);
+  const clean = (value, max) => String(value || '').replace(/[^a-zA-Z0-9._:\/-]/g, '').slice(0, max);
+  const visitorId = clean(body.visitor_id, 64);
+  const channel = clean(body.channel, 60) || 'direct';
+  const experiment = clean(body.experiment, 60);
 
   if (!EMAIL_RE.test(email)) return json({ error: 'Please enter a valid email address.' }, 400);
   if (password.length < 6) return json({ error: 'Password must be at least 6 characters.' }, 400);
@@ -25,8 +29,9 @@ export async function onRequestPost(context) {
   await env.DB.batch([
     env.DB.prepare('INSERT INTO users (id, email, password_hash, salt, name) VALUES (?, ?, ?, ?, ?)')
       .bind(id, email, hash, salt, name),
-    env.DB.prepare(`INSERT INTO funnel_events (id,event_name,user_id,page,channel) VALUES (?,?,?,?,?)`)
-      .bind(randomHex(16), 'signup_complete', id, '/signup', 'product')
+    env.DB.prepare(`INSERT INTO funnel_events (id,event_name,user_id,visitor_id,page,channel,experiment) VALUES (?,?,?,?,?,?,?)`)
+      .bind(randomHex(16), 'signup_complete', id, /^[0-9a-f]{32}$/.test(visitorId) ? visitorId : null,
+        '/signup', channel, experiment)
   ]);
 
   const token = await createSession(env, id);

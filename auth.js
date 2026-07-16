@@ -79,7 +79,12 @@ async function mmSignIn(email, password) {
 }
 
 async function mmSignUp(email, password, name) {
-  var r = await _mmApi('auth/signup', 'POST', { email: email, password: password, name: name || '' });
+  var attribution = typeof mmAttribution === 'function' ? mmAttribution() : {};
+  var r = await _mmApi('auth/signup', 'POST', {
+    email: email, password: password, name: name || '',
+    visitor_id: attribution.visitor_id || '', channel: attribution.channel || 'direct',
+    experiment: attribution.experiment || ''
+  });
   if (r.status !== 200) return { error: { message: r.data.error || 'Sign up failed.' } };
   if (name) localStorage.setItem('player-name', String(name).trim().slice(0, 20));
   _mmApplyAuth(r.data);
@@ -111,7 +116,12 @@ function showAuthModal(opts) {
   var initMode   = opts.mode || 'signin';
 
   var existing = document.getElementById('mm-auth-modal');
-  if (existing) { existing.style.display = 'flex'; return; }
+  if (existing) {
+    existing.style.display = 'flex';
+    window._mmAuthOnSuccess = onSuccess;
+    _mmAuthTab(initMode);
+    return;
+  }
 
   var modal = document.createElement('div');
   modal.id = 'mm-auth-modal';

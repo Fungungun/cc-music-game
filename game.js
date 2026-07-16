@@ -575,14 +575,18 @@ function _paymentUrl() {
 }
 
 function gotoPayment() {
-  if (typeof mmTrack === 'function') mmTrack('checkout_start');
   if (typeof mmIsSignedIn === 'function' && mmIsSignedIn()) {
-    window.location.href = _paymentUrl();
+    _startStripeCheckout();
   } else {
     if (typeof showAuthModal === 'function') {
-      showAuthModal({ allowGuest: false, onSuccess: function() { window.location.href = _paymentUrl(); } });
+      showAuthModal({ allowGuest: false, mode: 'signup', onSuccess: _startStripeCheckout });
     }
   }
+}
+
+function _startStripeCheckout() {
+  if (typeof mmTrack === 'function') mmTrack('checkout_start');
+  window.location.href = _paymentUrl();
 }
 
 function showUpgradeModal() {
