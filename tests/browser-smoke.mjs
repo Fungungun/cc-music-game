@@ -6,6 +6,12 @@ import { spawn } from 'node:child_process';
 import { extname, join, normalize } from 'node:path';
 import { tmpdir } from 'node:os';
 
+if (typeof WebSocket === 'undefined' && !process.execArgv.includes('--experimental-websocket')) {
+  const child = spawn(process.execPath, ['--experimental-websocket', ...process.execArgv, ...process.argv.slice(1)], { stdio:'inherit' });
+  const code = await new Promise(resolve => child.once('exit', resolve));
+  process.exit(code || 0);
+}
+
 const root = new URL('../', import.meta.url).pathname;
 const routes = [
   'index.html', 'note-namer.html', 'scale-builder.html', 'key-signatures.html',
@@ -124,8 +130,31 @@ try {
       if (failures.length > start) failures.splice(start, failures.length - start, ...failures.slice(start).map(item => `${viewport.name} ${route}: ${item}`));
     }
   }
+
+  await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true}, sessionId);
+  {
+    const loaded = waitFor('Page.loadEventFired', sessionId);
+    await send('Page.navigate', {url:`${origin}/index.html`}, sessionId);
+    await loaded;
+    await send('Runtime.evaluate', { expression:`localStorage.setItem('mm-onboarded','1')` }, sessionId);
+    await new Promise(resolve => setTimeout(resolve, 450));
+    await send('Runtime.evaluate', { expression:`document.querySelector('.upgrade-link').click()` }, sessionId);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    const { result } = await send('Runtime.evaluate', { expression:`({
+      title: document.getElementById('mm-auth-title') && document.getElementById('mm-auth-title').textContent,
+      sub: document.getElementById('mm-auth-sub') && document.getElementById('mm-auth-sub').textContent,
+      button: document.getElementById('mm-auth-btn') && document.getElementById('mm-auth-btn').textContent,
+      width: document.documentElement.scrollWidth,
+      viewport: document.documentElement.clientWidth
+    })`, returnByValue:true }, sessionId);
+    assert.equal(result.value.title, 'Create account to unlock');
+    assert.match(result.value.sub, /Stripe unlocks Grade 2 and 3/);
+    assert.equal(result.value.button, 'Create account and continue');
+    assert.ok(result.value.width <= result.value.viewport + 1, `mobile upgrade auth overflows horizontally (${result.value.width}px > ${result.value.viewport}px)`);
+  }
+
   assert.deepEqual(failures, []);
-  console.log(`browser smoke passed: ${routes.length} product routes on desktop and mobile`);
+  console.log(`browser smoke passed: ${routes.length} product routes on desktop and mobile, plus upgrade auth path`);
 } finally {
   ws.close();
   const exited = new Promise(resolve => chrome.once('exit', resolve));

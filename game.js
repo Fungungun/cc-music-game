@@ -585,7 +585,7 @@ function gotoPayment() {
     _startStripeCheckout();
   } else {
     if (typeof showAuthModal === 'function') {
-      showAuthModal({ allowGuest: false, mode: 'signup', onSuccess: _startStripeCheckout });
+      showAuthModal({ allowGuest: false, mode: 'signup', intent: 'unlock', onSuccess: _startStripeCheckout });
     }
   }
 }
@@ -1038,7 +1038,7 @@ function showSessionSummary(opts) {
   };
   var next = NEXT[module];
   var nextHtml = next
-    ? '<a href="' + next.href + '" style="display:block;margin-top:4px;background:#f5f0ff;color:#7B52C9;border-radius:12px;padding:11px 16px;text-decoration:none;font-weight:700;font-size:0.9rem;">Next up: ' + next.label + ' →</a>'
+    ? '<a href="' + next.href + '" style="display:block;margin-top:4px;background:#fffdf8;color:#7e2038;border:1px solid #cfc5b6;border-radius:3px;padding:11px 16px;text-decoration:none;font-weight:700;font-size:0.9rem;">Next up: ' + next.label + ' →</a>'
     : '';
 
   var existing = document.getElementById('session-summary-modal');
@@ -1046,23 +1046,22 @@ function showSessionSummary(opts) {
 
   var modal = document.createElement('div');
   modal.id = 'session-summary-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(24,22,19,0.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;';
   modal.innerHTML =
-    '<div style="background:white;border-radius:24px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.2);">' +
-      '<div style="text-align:center;margin-bottom:4px;font-size:2rem;">' + star + '</div>' +
-      '<h2 style="text-align:center;margin:0 0 4px;color:#333;font-size:1.4rem;">' + headline + '</h2>' +
-      '<p style="text-align:center;color:#888;font-size:0.9rem;margin:0 0 14px;">' + sub + '</p>' +
-      (getDayStreak().days > 1 ? '<p style="text-align:center;color:#E65100;font-weight:800;font-size:0.9rem;margin:0 0 12px;"> ' + getDayStreak().days + '-day practice streak!</p>' : '') +
-      '<div style="background:linear-gradient(135deg,#f5f0ff,#fff0f5);border-radius:16px;padding:14px 16px;text-align:center;margin-bottom:12px;">' +
-        '<span style="font-size:2rem;font-weight:900;color:#7B52C9;">' + correct + '</span>' +
-        '<span style="color:#aaa;font-size:1rem;"> / ' + total + ' correct</span>' +
-        '<div style="background:#e8e0ff;border-radius:8px;height:10px;margin-top:10px;">' +
-          '<div style="background:linear-gradient(90deg,#9b7ee8,#FF8FAB);width:' + pct + '%;height:100%;border-radius:8px;"></div>' +
+    '<div style="background:#f7f3eb;border:1px solid #cfc5b6;border-radius:4px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 18px 54px rgba(0,0,0,0.28);">' +
+      '<h2 style="text-align:left;margin:0 0 4px;color:#292724;font:600 1.45rem/1.15 Georgia,serif;">' + headline + '</h2>' +
+      '<p style="text-align:left;color:#625b52;font-size:0.9rem;margin:0 0 14px;">' + sub + '</p>' +
+      (getDayStreak().days > 1 ? '<p style="color:#7e2038;font-weight:800;font-size:0.9rem;margin:0 0 12px;">' + getDayStreak().days + '-day practice streak</p>' : '') +
+      '<div style="background:#fffdf8;border:1px solid #cfc5b6;border-radius:3px;padding:14px 16px;text-align:left;margin-bottom:12px;">' +
+        '<span style="font-size:2rem;font-weight:900;color:#292724;">' + correct + '</span>' +
+        '<span style="color:#625b52;font-size:1rem;"> / ' + total + ' correct</span>' +
+        '<div style="background:#e1dbd2;border-radius:2px;height:8px;margin-top:10px;overflow:hidden;">' +
+          '<div style="background:#7e2038;width:' + pct + '%;height:100%;border-radius:2px;"></div>' +
         '</div>' +
       '</div>' +
       weakHtml + nextHtml +
-      '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:linear-gradient(90deg,#FF8FAB,#FFB74D);color:white;border:none;border-radius:14px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;">Keep practising </button>' +
-      '<a href="index.html" style="display:block;text-align:center;margin-top:10px;color:#aaa;font-size:0.85rem;text-decoration:none;">← Back to home</a>' +
+      '<button onclick="(function(){var m=document.getElementById(\'session-summary-modal\');if(m)m.remove();' + (onContinue ? 'window._summaryOnContinue&&window._summaryOnContinue();' : '') + '})()" style="display:block;width:100%;margin-top:10px;background:#7e2038;color:white;border:none;border-radius:3px;padding:13px;font-size:1rem;cursor:pointer;font-weight:700;font-family:inherit;">Keep practising</button>' +
+      '<a href="index.html" style="display:block;text-align:center;margin-top:10px;color:#625b52;font-size:0.85rem;text-decoration:none;">Back to home</a>' +
     '</div>';
 
   if (onContinue) window._summaryOnContinue = onContinue;

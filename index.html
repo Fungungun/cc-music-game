@@ -109,7 +109,7 @@
     .btn-sm { padding: 6px 14px; font-size: 0.88rem; min-height: unset; border-radius: 12px; }
     .grade-bar-label,.section-header { color:#625b52; }
     .tagline { min-height:40px; }
-    #account-btn { color:#7e2038 !important; border-color:#8f5362 !important; }
+    #account-btn { color:#7e2038 !important; border-color:#8f5362 !important; border-radius:3px !important; }
     #daily-banner-sub,.module-card .card-score { color:#625b52 !important; }
     .weak-banner a { color:#7e2038 !important; }
     .upgrade-link { appearance:none; border:0; padding:0; background:none; color:white; font:900 .95rem var(--font); text-decoration:underline; cursor:pointer; }
@@ -157,7 +157,7 @@
       <option value="es"> Español</option>
     </select>
     <button id="account-btn" onclick="onAccountBtnClick(this)"
-            style="background:none;border:2px solid #FFB7C5;border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:800;color:#FF8FAB;cursor:pointer;white-space:nowrap;">
+            style="background:none;border:1px solid #8f5362;border-radius:3px;padding:7px 14px;font-size:0.82rem;font-weight:800;color:#7e2038;cursor:pointer;white-space:nowrap;">
       Sign in
     </button>
     <button class="icon-btn" onclick="showResetConfirm()" title="Settings / Reset data" aria-label="Settings">Settings</button>
@@ -190,7 +190,7 @@
     </div>
 
     <!-- Daily challenge / streak banner -->
-    <a href="daily-challenge.html" id="daily-banner" style="display:flex;align-items:center;gap:12px;background:white;border-radius:16px;padding:12px 16px;margin:10px 0 0;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #F57C00;">
+    <a href="daily-challenge.html" id="daily-banner" style="display:flex;align-items:center;gap:12px;background:#fffdf8;border-radius:4px;padding:12px 16px;margin:10px 0 0;text-decoration:none;border:1px solid #cfc6b8;border-left:3px solid #8f243f;">
       <span style="font-family:var(--font-display);font-size:1.5rem;color:#8f243f;">01</span>
       <span style="flex:1;">
         <span id="daily-banner-title" style="display:block;font-weight:800;color:#1a2233;font-size:0.95rem;">Daily Challenge</span>
@@ -377,17 +377,17 @@
         banner.innerHTML =
           '<strong> New here? Start with these:</strong>' +
           '<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">' +
-            '<div style="background:white;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
+            '<div style="background:#fffdf8;border:1px solid #cfc6b8;border-radius:3px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
               '<span style="font-size:0.9rem;font-weight:600;color:#444;">1. Read your first theory lesson</span>' +
-              '<a href="course.html" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Lesson 1 →</a>' +
+              '<a href="course.html" style="font-size:0.8rem;color:#7e2038;font-weight:700;text-decoration:none;">Lesson 1 →</a>' +
             '</div>' +
-            '<div style="background:white;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
+            '<div style="background:#fffdf8;border:1px solid #cfc6b8;border-radius:3px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
               '<span style="font-size:0.9rem;font-weight:600;color:#444;">2. Practise naming notes on the staff</span>' +
-              '<a href="note-namer.html" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Note Namer →</a>' +
+              '<a href="note-namer.html" style="font-size:0.8rem;color:#7e2038;font-weight:700;text-decoration:none;">Note Namer →</a>' +
             '</div>' +
-            '<div style="background:white;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
+            '<div style="background:#fffdf8;border:1px solid #cfc6b8;border-radius:3px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">' +
               '<span style="font-size:0.9rem;font-weight:600;color:#444;">3. Try today\'s Daily Challenge</span>' +
-              '<a href="daily-challenge.html" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Play →</a>' +
+              '<a href="daily-challenge.html" style="font-size:0.8rem;color:#7e2038;font-weight:700;text-decoration:none;">Play →</a>' +
             '</div>' +
           '</div>';
         banner.style.display = 'block';
@@ -399,11 +399,11 @@
         var color = pct >= 70 ? '#4CAF50' : pct >= 40 ? '#FFB74D' : '#FF6B6B';
         var href = w.module + '.html';
         var modLabel = MODULE_LABELS[w.module] || w.module;
-        html += '<div style="background:white;border-radius:10px;padding:8px 12px;">' +
+        html += '<div style="background:#fffdf8;border:1px solid #cfc6b8;border-radius:3px;padding:8px 12px;">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
             '<span style="font-size:0.9rem;font-weight:600;color:#444;">' + w.concept +
               ' <span style="font-weight:400;color:#aaa;font-size:0.8rem;">(' + modLabel + ')</span></span>' +
-            '<a href="' + href + '" style="font-size:0.8rem;color:#FF8FAB;font-weight:700;text-decoration:none;">Practise →</a>' +
+            '<a href="' + href + '" style="font-size:0.8rem;color:#7e2038;font-weight:700;text-decoration:none;">Practise →</a>' +
           '</div>' +
           '<div style="background:#f0f0f0;border-radius:4px;height:6px;">' +
             '<div style="background:' + color + ';width:' + pct + '%;height:100%;border-radius:4px;"></div>' +
@@ -451,8 +451,8 @@
         btn.style.color       = '#2e7d32';
       } else {
         btn.textContent = 'Sign in';
-        btn.style.borderColor = '#FFB7C5';
-        btn.style.color       = '#FF8FAB';
+        btn.style.borderColor = '#8f5362';
+        btn.style.color       = '#7e2038';
       }
       document.getElementById('upgrade-banner').style.display = hasFullAccess() ? 'none' : 'block';
     }

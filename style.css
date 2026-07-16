@@ -54,7 +54,7 @@ body {
   content: '';
   position: absolute;
   bottom: -3px; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, #FF8FAB, #a78bfa, #60c8ff);
+  background: #cfc5b6;
 }
 
 .page-header h1 {
@@ -118,7 +118,7 @@ body {
 .btn:focus-visible { outline: 3px solid #4a90e2; outline-offset: 3px; }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FF8FAB, #FF6B9D);
+  background: #7e2038;
   color: white;
 }
 .btn-secondary {
@@ -171,7 +171,7 @@ body {
 }
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FF8FAB, #FFB74D);
+  background: #7e2038;
   border-radius: 20px;
   transition: width 0.4s ease;
   min-width: 4px;
@@ -321,18 +321,18 @@ body {
 .module-card .card-score  { font-size: 0.82rem; font-weight: 700; color: #888; }
 
 /* Accent colours → band background */
-.module-card[data-accent="pink"]     .card-band { background: linear-gradient(135deg, #FF8FAB, #FFB7C5); }
-.module-card[data-accent="mint"]     .card-band { background: linear-gradient(135deg, #2E8B6E, #7FD9B5); }
-.module-card[data-accent="lavender"] .card-band { background: linear-gradient(135deg, #7B52C9, #C4B5F5); }
-.module-card[data-accent="yellow"]   .card-band { background: linear-gradient(135deg, #D4A017, #FFE066); }
-.module-card[data-accent="coral"]    .card-band { background: linear-gradient(135deg, #E07B20, #FFD4A3); }
-.module-card[data-accent="sky"]      .card-band { background: linear-gradient(135deg, #3a7bd5, #80C4F0); }
-.module-card[data-accent="purple"]   .card-band { background: linear-gradient(135deg, #8B2FC9, #D4AAFF); }
-.module-card[data-accent="grape"]    .card-band { background: linear-gradient(135deg, #6d3fc9, #C4AAFF); }
-.module-card[data-accent="mint2"]    .card-band { background: linear-gradient(135deg, #00897B, #80CBC4); }
-.module-card[data-accent="brown"]    .card-band { background: linear-gradient(135deg, #bf7a30, #FFD4A3); }
-.module-card[data-accent="teal"]     .card-band { background: linear-gradient(135deg, #0097A7, #80DEEA); }
-.module-card[data-accent="orange"]   .card-band { background: linear-gradient(135deg, #F57C00, #FFCC80); }
+.module-card[data-accent="pink"]     .card-band { background: #8f5362; }
+.module-card[data-accent="mint"]     .card-band { background: #3e6f5d; }
+.module-card[data-accent="lavender"] .card-band { background: #5b5874; }
+.module-card[data-accent="yellow"]   .card-band { background: #8b7b3f; }
+.module-card[data-accent="coral"]    .card-band { background: #9a653f; }
+.module-card[data-accent="sky"]      .card-band { background: #375f74; }
+.module-card[data-accent="purple"]   .card-band { background: #5c476f; }
+.module-card[data-accent="grape"]    .card-band { background: #514a72; }
+.module-card[data-accent="mint2"]    .card-band { background: #3f716e; }
+.module-card[data-accent="brown"]    .card-band { background: #7b654c; }
+.module-card[data-accent="teal"]     .card-band { background: #3f6f76; }
+.module-card[data-accent="orange"]   .card-band { background: #9a6a3f; }
 
 .total-stars {
   text-align: center;
@@ -470,7 +470,7 @@ body {
   width: 52px;
   height: 52px;
   border: 5px solid #e0e0e0;
-  border-top-color: #FF8FAB;
+  border-top-color: #7e2038;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -561,7 +561,7 @@ body {
   background: #ddd;
   transition: background 0.1s, transform 0.1s;
 }
-.beat-dot.active { background: #FF8FAB; transform: scale(1.3); }
+.beat-dot.active { background: #7e2038; transform: scale(1.3); }
 
 /* Terms flashcards specifics */
 .terms-meta {
@@ -827,7 +827,7 @@ body {
   transition: background 0.2s, transform 0.15s;
 }
 .step-dot.done    { background: #4caf50; }
-.step-dot.current { background: #FF8FAB; transform: scale(1.3); }
+.step-dot.current { background: #7e2038; transform: scale(1.3); }
 .step-dot.wrong   { background: #f44336; }
 
 /* ============ Interval / Note display ============ */
@@ -886,17 +886,17 @@ body {
 /* ============ Grade Badge ============ */
 .grade-badge {
   display: inline-block;
-  background: linear-gradient(135deg, #7B52C9, #C4B5F5);
+  background: #37332e;
   color: white;
-  border-radius: 20px;
+  border-radius: 3px;
   padding: 4px 14px;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
-.grade-badge.grade-1 { background: linear-gradient(135deg, #FF8FAB, #FFD4A3); }
-.grade-badge.grade-2 { background: linear-gradient(135deg, #3a7bd5, #80C4F0); }
-.grade-badge.grade-3 { background: linear-gradient(135deg, #7B52C9, #C4B5F5); }
+.grade-badge.grade-1 { background: #8b7b63; }
+.grade-badge.grade-2 { background: #375f74; }
+.grade-badge.grade-3 { background: #4f5068; }
 
 /* ============ Correct/Wrong overlay flash ============ */
 @keyframes flash-correct { 0%,100%{background:transparent;} 40%{background:rgba(76,175,80,0.12);} }
