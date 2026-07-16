@@ -149,6 +149,23 @@
     section > a[style*="background:#FF8FAB"] { background:#7e2038 !important; border-radius:3px !important; }
     .pricing-price span,.pricing-card p[style*="color:#aaa"] { color:#655e55 !important; }
     .pricing-card.featured > a { background:#7e2038 !important; border-radius:3px !important; }
+    .sample-wrap { max-width:900px; margin:0 auto; padding:72px 24px 0; }
+    .sample { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.72fr); border:1px solid var(--rule); background:#fbf8f2; }
+    .sample-copy,.sample-question { padding:38px; }
+    .sample-copy { border-right:1px solid var(--rule); }
+    .sample-kicker { color:var(--wine); font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin-bottom:14px; }
+    .sample h2 { font:600 clamp(1.8rem,4vw,2.7rem)/1.08 Georgia,'Times New Roman',serif; letter-spacing:-.025em; margin-bottom:15px; }
+    .sample-copy p { color:#5f584f; line-height:1.65; }
+    .sample-question h3 { font:600 1.2rem/1.4 Georgia,'Times New Roman',serif; margin-bottom:20px; }
+    .sample-options { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .sample-option { appearance:none; border:1px solid #9c9183; background:transparent; color:var(--ink); padding:12px 8px; font:700 1rem Inter,ui-sans-serif,sans-serif; cursor:pointer; }
+    .sample-option:hover,.sample-option:focus-visible { border-color:var(--wine); outline:2px solid transparent; background:#f0e8dc; }
+    .sample-option[aria-pressed="true"] { border-color:var(--wine); box-shadow:inset 0 0 0 1px var(--wine); }
+    .sample-result { min-height:52px; margin-top:16px; color:#5f584f; font-size:.9rem; line-height:1.5; }
+    .sample-result strong { color:var(--ink); }
+    .sample-next { display:none; color:var(--wine); font-weight:750; text-underline-offset:3px; }
+    .sample-next.visible { display:inline-block; }
+    @media (max-width:700px) { .sample { grid-template-columns:1fr; } .sample-copy { border-right:0; border-bottom:1px solid var(--rule); } .sample-copy,.sample-question { padding:28px; } }
   </style>
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Music Maestro — Interactive Music Theory for Grade 1–3" />
@@ -188,6 +205,27 @@
     <div class="trust-item"><a href="ameb-grade-1-theory-practice.html?ref=landing" style="color:inherit;"><strong>Free</strong> Grade 1 practice guide</a></div>
     <div class="trust-item"><a href="ameb-grade-2-piano-theory-practice.html?ref=landing" style="color:inherit;"><strong>Free</strong> Grade 2 diagnostic</a></div>
     <div class="trust-item"><a href="ameb-piano-general-knowledge-questions.html?ref=landing" style="color:inherit;"><strong>Printable</strong> general-knowledge questions</a></div>
+  </div>
+
+  <div class="sample-wrap">
+    <div class="sample" aria-labelledby="sample-title">
+      <div class="sample-copy">
+        <div class="sample-kicker">Try the practice</div>
+        <h2 id="sample-title">One question. No sign-up.</h2>
+        <p>This is the kind of short, focused review students can use between lessons. Choose an answer to see the explanation.</p>
+      </div>
+      <div class="sample-question">
+        <div class="sample-kicker">Grade 1 · Note values</div>
+        <h3>In 4/4 time, how many beats is a dotted minim worth?</h3>
+        <div class="sample-options" role="group" aria-label="Answer choices">
+          <button class="sample-option" type="button" data-answer="2" aria-pressed="false">2</button>
+          <button class="sample-option" type="button" data-answer="3" aria-pressed="false">3</button>
+          <button class="sample-option" type="button" data-answer="4" aria-pressed="false">4</button>
+        </div>
+        <div class="sample-result" id="sample-result" aria-live="polite">Choose 2, 3 or 4 beats.</div>
+        <a class="sample-next" id="sample-next" href="note-values.html?grade=1&amp;ref=landing-sample">Continue with free note-value practice →</a>
+      </div>
+    </div>
   </div>
 
   <!-- Features -->
@@ -331,6 +369,6 @@
     <p style="margin-top:6px;font-size:0.78rem;">Piano samples: Salamander Grand Piano (CC BY 3.0) · Theory libraries: Tone.js, Tonal.js, abcjs</p>
   </footer>
 
+  <script src="landing-demo.js"></script>
 </body>
-<script>window.addEventListener('DOMContentLoaded',function(){ if(window.mmTrack) mmTrack('landing_visit'); });</script>
 </html>
