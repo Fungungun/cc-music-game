@@ -4,7 +4,8 @@ export async function onRequest(context) {
     .split('/')
     .some((segment) => segment.startsWith('.') && segment !== '.well-known');
   const hasPrivateRoot = pathname === '/growth-experiments.md' ||
-    pathname === '/wrangler.toml' || pathname === '/CLAUDE.md' ||
+    pathname === '/wrangler.toml' || pathname === '/CLAUDE.md' || pathname === '/README.md' ||
+    pathname.startsWith('/tests/') ||
     pathname.startsWith('/reports/') || pathname.startsWith('/migrations/') ||
     pathname.startsWith('/functions/');
 

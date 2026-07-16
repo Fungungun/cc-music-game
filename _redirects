@@ -7,7 +7,3 @@
 /barline-quiz.html /note-values.html 301
 /guitar-chords / 301
 /favicon.ico /icon.svg 302
-
-# Repository-only files are available on GitHub, not on the product domain.
-/tests/* /404.html 404
-/README.md /404.html 404
