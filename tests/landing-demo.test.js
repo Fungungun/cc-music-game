@@ -16,7 +16,11 @@ const html = fs.readFileSync(new URL('../landing.html', `file://${__filename}`),
 assert.match(html, /One question\. No sign-up\./);
 assert.match(html, /aria-live="polite"/);
 assert.match(html, /landing-demo\.js/);
+assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-hero/);
+assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-free-plan/);
+assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-bottom/);
 assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-sample/);
+assert.doesNotMatch(html, /href="index\.html\?ref=landing"/);
 assert.doesNotMatch(html, /[\u{1F300}-\u{1FAFF}]/u);
 
 console.log('landing demo tests passed');
