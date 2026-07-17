@@ -34,6 +34,8 @@ assert.match(noteValuesResource, /utm_source=family-note&utm_medium=referral&utm
 assert.match(noteValuesResource, /mmTrack\('resource_share',\{channel:'organic-note-values',experiment:'family-note'\}\)/);
 
 const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+assert.match(readme, /parents\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-primary/);
+assert.match(readme, /music\.vensoai\.com\/\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-app/);
 assert.match(readme, /ameb-grade-1-note-values-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values/);
 assert.match(readme, /ameb-grade-2-dotted-notes-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2-dotted/);
 
