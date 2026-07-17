@@ -18,7 +18,7 @@ for (const route of routes) {
   assert.match(canonicals[0], new RegExp(`https://music\\.vensoai\\.com/${route}`));
 }
 
-for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-1-aural-test-practice', 'ameb-grade-2-dotted-notes-practice', 'ameb-grade-2-piano-theory-practice']) {
+for (const route of ['family-practice-handout', 'ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-1-aural-test-practice', 'ameb-grade-2-dotted-notes-practice', 'ameb-grade-2-piano-theory-practice']) {
   const html = fs.readFileSync(path.join(root, `${route}.html`), 'utf8');
   assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${route} must have one primary heading`);
 }
@@ -73,6 +73,14 @@ assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-gra
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
 assert.match(teachers, /ameb-grade-1-aural-test-practice\.html\?ref=teachers/);
+assert.match(teachers, /family-practice-handout\.html\?ref=teachers/);
+
+const handout = fs.readFileSync(path.join(root, 'family-practice-handout.html'), 'utf8');
+assert.match(handout, /"@type":"LearningResource"/);
+assert.match(handout, /music\.vensoai\.com\/parents\?utm_source=teacher-handout&amp;utm_medium=print&amp;utm_campaign=family-practice/);
+assert.match(handout, /mmTrack\('landing_visit',\{channel:'teacher-handout'\}\)/);
+assert.match(handout, /mmTrack\('resource_print',\{channel:'teacher-handout',experiment:'family-practice'\}\)/);
+assert.match(handout, /mmTrack\('resource_share',\{channel:'teacher-handout',experiment:'family-practice'\}\)/);
 
 const landing = fs.readFileSync(path.join(root, 'landing.html'), 'utf8');
 assert.match(landing, /"@type":"SoftwareApplication"/);
@@ -93,6 +101,7 @@ assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resour
 assert.match(parents, /data-parent-click="hero-start-free"/);
 assert.match(parents, /data-parent-click="resource-grade2-diagnostic"/);
 assert.match(parents, /data-parent-click="resource-grade1-aural"/);
+assert.match(parents, /data-parent-click="resource-family-handout"/);
 assert.match(parents, /data-parent-click="parents-paid-unlock"/);
 assert.match(parents, /mmTrack\('resource_click',\{channel:'organic-parent-resource',experiment:link\.getAttribute\('data-parent-click'\)\}\)/);
 assert.match(parents, /id="copy-parent-note"/);
@@ -105,6 +114,7 @@ for (const route of routes) {
   assert.match(sitemap, new RegExp(`<loc>https://music\\.vensoai\\.com/${route}</loc><lastmod>2026-07-17</lastmod>`));
 }
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/parents<\/loc><lastmod>2026-07-18<\/lastmod>/);
+assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/family-practice-handout<\/loc><lastmod>2026-07-18<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-aural-test-practice<\/loc><lastmod>2026-07-18<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-2-dotted-notes-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);

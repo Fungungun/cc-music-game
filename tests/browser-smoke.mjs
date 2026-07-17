@@ -19,6 +19,7 @@ const routes = [
   'terms-flashcards.html', 'aural-training.html', 'form-detective.html',
   'daily-challenge.html', 'learn.html', 'mock-exam.html', 'progress.html',
   'parents.html',
+  'family-practice-handout.html',
   'ameb-grade-1-note-values-practice.html',
   'ameb-grade-1-aural-test-practice.html',
   'ameb-grade-2-dotted-notes-practice.html'
