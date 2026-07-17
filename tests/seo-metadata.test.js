@@ -47,8 +47,12 @@ const grade2Dotted = fs.readFileSync(path.join(root, 'ameb-grade-2-dotted-notes-
 assert.match(grade2Dotted, /"@type":"LearningResource"/);
 assert.match(grade2Dotted, /index\.html\?unlock=1&amp;ref=organic-grade2-dotted-notes/);
 assert.match(grade2Dotted, /data-paid-click="grade2-dotted-unlock"/);
+assert.match(grade2Dotted, /id="copy-family-note"/);
+assert.match(grade2Dotted, /id="copy-family-note-bottom"/);
+assert.match(grade2Dotted, /utm_source=family-note&utm_medium=referral&utm_campaign=grade2-dotted-notes/);
 assert.match(grade2Dotted, /mmTrack\('landing_visit',\{channel:'organic-grade2-dotted-notes'\}\)/);
 assert.match(grade2Dotted, /mmTrack\('resource_click',\{channel:'organic-grade2-dotted-notes',experiment:link\.getAttribute\('data-paid-click'\)\}\)/);
+assert.match(grade2Dotted, /mmTrack\('resource_share',\{channel:'organic-grade2-dotted-notes',experiment:'family-note'\}\)/);
 
 const grade2Diagnostic = fs.readFileSync(path.join(root, 'ameb-grade-2-piano-theory-practice.html'), 'utf8');
 assert.match(grade2Diagnostic, /ameb-grade-2-dotted-notes-practice\.html\?ref=grade2-diagnostic/);
