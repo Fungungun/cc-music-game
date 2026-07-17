@@ -29,6 +29,7 @@ export async function onRequestGet({ request, env }) {
   const funnel = {};
   for (const row of events.results || []) funnel[row.event_name] = { events: row.count, people: row.people };
   const visits = funnel.landing_visit && funnel.landing_visit.people || 0;
+  const resourceClicks = funnel.resource_click && funnel.resource_click.people || 0;
   const practiceStarts = funnel.practice_start && funnel.practice_start.people || 0;
   const practiceCompletes = funnel.practice_complete && funnel.practice_complete.people || 0;
   const signups = funnel.signup_complete && funnel.signup_complete.people || 0;
@@ -37,6 +38,8 @@ export async function onRequestGet({ request, env }) {
   return json({
     generated_at: new Date().toISOString(), period_days: 30, funnel,
     conversion: {
+      visit_to_resource_click: visits ? resourceClicks / visits : null,
+      resource_click_to_practice: resourceClicks ? practiceStarts / resourceClicks : null,
       visit_to_practice: visits ? practiceStarts / visits : null,
       practice_to_complete: practiceStarts ? practiceCompletes / practiceStarts : null,
       visit_to_signup: visits ? signups / visits : null,

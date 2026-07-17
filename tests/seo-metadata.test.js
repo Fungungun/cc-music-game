@@ -25,6 +25,9 @@ for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-p
 
 const noteValuesResource = fs.readFileSync(path.join(root, 'ameb-grade-1-note-values-practice.html'), 'utf8');
 assert.match(noteValuesResource, /note-values\.html\?grade=1&amp;ref=organic-note-values/);
+assert.match(noteValuesResource, /note-values\.html\?grade=1&amp;ref=organic-note-values-top/);
+assert.match(noteValuesResource, /data-resource-click="note-values-drill-top"/);
+assert.match(noteValuesResource, /mmTrack\('resource_click',\{channel:'organic-note-values',experiment:link\.getAttribute\('data-resource-click'\)\}\)/);
 assert.match(noteValuesResource, /"@type":"LearningResource"/);
 assert.match(noteValuesResource, /id="copy-family-note"/);
 assert.match(noteValuesResource, /utm_source=family-note&utm_medium=referral&utm_campaign=note-values-sheet/);
@@ -50,5 +53,12 @@ assert.equal(fs.readFileSync(path.join(root, `${indexNowKey}.txt`), 'utf8').trim
 const indexNowScript = fs.readFileSync(path.join(root, 'scripts/indexnow-submit.mjs'), 'utf8');
 assert.match(indexNowScript, new RegExp(`const key = '${indexNowKey}'`));
 assert.match(indexNowScript, /const host = 'music\.vensoai\.com'/);
+
+const eventsApi = fs.readFileSync(path.join(root, 'functions/api/events.js'), 'utf8');
+assert.match(eventsApi, /resource_click/);
+
+const ownerReport = fs.readFileSync(path.join(root, 'functions/api/owner-report.js'), 'utf8');
+assert.match(ownerReport, /visit_to_resource_click/);
+assert.match(ownerReport, /resource_click_to_practice/);
 
 console.log('SEO metadata tests passed');

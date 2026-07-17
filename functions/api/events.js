@@ -1,6 +1,6 @@
 import { getSessionUser, json, randomHex } from '../_shared/util.js';
 
-const ALLOWED = new Set(['landing_visit', 'resource_print', 'resource_download', 'resource_share', 'practice_start', 'practice_complete', 'signup_complete', 'upgrade_view', 'checkout_start']);
+const ALLOWED = new Set(['landing_visit', 'resource_click', 'resource_print', 'resource_download', 'resource_share', 'practice_start', 'practice_complete', 'signup_complete', 'upgrade_view', 'checkout_start']);
 const clean = (value, max) => String(value || '').replace(/[^a-zA-Z0-9._:\/-]/g, '').slice(0, max);
 
 export async function onRequestPost({ request, env }) {
