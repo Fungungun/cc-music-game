@@ -340,7 +340,7 @@
           <li>Grade 2 & 3 mock exams</li>
           <li>All 27 structured theory lessons</li>
         </ul>
-        <a href="index.html?unlock=1&amp;ref=landing" style="display:block;background:#7e2038;color:white;padding:14px;border-radius:3px;text-decoration:none;font-weight:800;font-size:1.05rem;">Unlock Full Access — $14.99 AUD</a>
+        <a href="index.html?unlock=1&amp;ref=landing" data-paid-click="landing-pricing-unlock" style="display:block;background:#7e2038;color:white;padding:14px;border-radius:3px;text-decoration:none;font-weight:800;font-size:1.05rem;">Unlock Full Access — $14.99 AUD</a>
         <p style="font-size:0.75rem;color:#aaa;margin:8px 0 0;text-align:center;">One-time · Secure checkout via Stripe</p>
       </div>
     </div>
@@ -351,7 +351,7 @@
     <div class="cta-section">
       <h2>Ready to start?</h2>
       <p>Start with a real Grade 1 practice set. Unlock higher-grade content when it is useful.</p>
-      <a href="note-values.html?grade=1&amp;ref=landing-bottom" class="hero-cta" style="font-size:1rem;padding:14px 32px;margin-bottom:12px;display:inline-block;">Try free Grade 1 practice</a><br><a href="index.html?unlock=1&amp;ref=landing" style="font-size:0.95rem;color:white;opacity:0.85;text-decoration:underline;">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
+      <a href="note-values.html?grade=1&amp;ref=landing-bottom" class="hero-cta" style="font-size:1rem;padding:14px 32px;margin-bottom:12px;display:inline-block;">Try free Grade 1 practice</a><br><a href="index.html?unlock=1&amp;ref=landing" data-paid-click="landing-bottom-unlock" style="font-size:0.95rem;color:white;opacity:0.85;text-decoration:underline;">Unlock Grade 2 &amp; 3 — $14.99 AUD →</a>
     </div>
   </section>
 
@@ -369,6 +369,15 @@
     <p style="margin-top:6px;font-size:0.78rem;">Piano samples: Salamander Grand Piano (CC BY 3.0) · Theory libraries: Tone.js, Tonal.js, abcjs</p>
   </footer>
 
+  <script>
+    window.addEventListener('DOMContentLoaded',function(){
+      document.querySelectorAll('[data-paid-click]').forEach(function(link){
+        link.addEventListener('click',function(){
+          if(window.mmTrack)window.mmTrack('resource_click',{channel:'landing',experiment:link.getAttribute('data-paid-click')});
+        });
+      });
+    });
+  </script>
   <script src="landing-demo.js"></script>
 </body>
 </html>

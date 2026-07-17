@@ -46,10 +46,14 @@ assert.match(generalKnowledge, /ameb-grade-1-note-values-practice\.html\?ref=gen
 const grade2Dotted = fs.readFileSync(path.join(root, 'ameb-grade-2-dotted-notes-practice.html'), 'utf8');
 assert.match(grade2Dotted, /"@type":"LearningResource"/);
 assert.match(grade2Dotted, /index\.html\?unlock=1&amp;ref=organic-grade2-dotted-notes/);
+assert.match(grade2Dotted, /data-paid-click="grade2-dotted-unlock"/);
 assert.match(grade2Dotted, /mmTrack\('landing_visit',\{channel:'organic-grade2-dotted-notes'\}\)/);
+assert.match(grade2Dotted, /mmTrack\('resource_click',\{channel:'organic-grade2-dotted-notes',experiment:link\.getAttribute\('data-paid-click'\)\}\)/);
 
 const grade2Diagnostic = fs.readFileSync(path.join(root, 'ameb-grade-2-piano-theory-practice.html'), 'utf8');
 assert.match(grade2Diagnostic, /ameb-grade-2-dotted-notes-practice\.html\?ref=grade2-diagnostic/);
+assert.match(grade2Diagnostic, /data-paid-click="grade2-diagnostic-unlock"/);
+assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-grade2-diagnostic',experiment:link\.getAttribute\('data-paid-click'\)\}\)/);
 
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
