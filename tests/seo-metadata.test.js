@@ -65,7 +65,10 @@ assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/)
 const parents = fs.readFileSync(path.join(root, 'parents.html'), 'utf8');
 assert.match(parents, /<link rel="canonical" href="https:\/\/music\.vensoai\.com\/parents">/);
 assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resource'\}\)/);
-assert.match(parents, /data-paid-click="parents-paid-unlock"/);
+assert.match(parents, /data-parent-click="hero-start-free"/);
+assert.match(parents, /data-parent-click="resource-grade2-diagnostic"/);
+assert.match(parents, /data-parent-click="parents-paid-unlock"/);
+assert.match(parents, /mmTrack\('resource_click',\{channel:'organic-parent-resource',experiment:link\.getAttribute\('data-parent-click'\)\}\)/);
 assert.match(parents, /ameb-grade-2-piano-theory-practice\.html\?ref=parents-resources/);
 
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');

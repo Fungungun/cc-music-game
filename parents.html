@@ -80,7 +80,7 @@
     <div class="nav-links">
       <a href="teachers.html">For teachers</a>
       <a href="syllabus.html">Coverage map</a>
-      <a href="note-values.html?grade=1&amp;ref=parents-nav" class="primary">Start free</a>
+      <a href="note-values.html?grade=1&amp;ref=parents-nav" class="primary" data-parent-click="nav-start-free">Start free</a>
     </div>
   </nav>
 
@@ -91,8 +91,8 @@
         <h1>Know what to practise between lessons.</h1>
         <p class="lede">Music Maestro gives families short, focused practice for the theory, aural and general-knowledge skills that often get squeezed between repertoire work and school weeks.</p>
         <div class="hero-actions">
-          <a class="btn light" href="note-values.html?grade=1&amp;ref=parents-hero">Try free Grade 1 practice</a>
-          <a class="btn secondary" href="ameb-grade-2-piano-theory-practice.html?ref=parents-hero">Check Grade 2 readiness</a>
+          <a class="btn light" href="note-values.html?grade=1&amp;ref=parents-hero" data-parent-click="hero-start-free">Try free Grade 1 practice</a>
+          <a class="btn secondary" href="ameb-grade-2-piano-theory-practice.html?ref=parents-hero" data-parent-click="hero-grade2-diagnostic">Check Grade 2 readiness</a>
         </div>
         <p class="fine">Independent practice resource · Not affiliated with or endorsed by AMEB · Follow your teacher and current syllabus first</p>
       </div>
@@ -136,8 +136,8 @@
               <li><strong>Day 5</strong> Try a mixed review and write down one topic to ask the teacher about.</li>
             </ul>
             <div class="actions" style="margin-top:24px">
-              <a class="btn" href="ameb-practice-checklist.html?ref=parents-plan">Open printable checklist</a>
-              <a class="btn secondary" href="progress.html?ref=parents-plan">Review device progress</a>
+              <a class="btn" href="ameb-practice-checklist.html?ref=parents-plan" data-parent-click="plan-checklist">Open printable checklist</a>
+              <a class="btn secondary" href="progress.html?ref=parents-plan" data-parent-click="plan-progress">Review device progress</a>
             </div>
           </div>
           <aside class="plan-side">
@@ -156,11 +156,11 @@
         <h2>Free resources to use before paying</h2>
         <p class="section-sub">These are the pages to send to a parent, print before a lesson, or use when the student is unsure where to begin.</p>
         <div class="resource-list">
-          <a class="resource" href="ameb-grade-1-note-values-practice.html?ref=parents-resources"><strong>Grade 1 note-values sheet and interactive drill</strong><span>Best first task for rhythm-value confusion.</span></a>
-          <a class="resource" href="ameb-grade-1-theory-practice.html?ref=parents-resources"><strong>Grade 1 practice questions</strong><span>Ten original questions with explained answers and a study plan.</span></a>
-          <a class="resource" href="ameb-grade-2-dotted-notes-practice.html?ref=parents-resources"><strong>Grade 2 dotted notes and 6/8 worksheet</strong><span>Focused worksheet for a common Grade 2 rhythm gap.</span></a>
-          <a class="resource" href="ameb-grade-2-piano-theory-practice.html?ref=parents-resources"><strong>Grade 2 readiness diagnostic</strong><span>Twelve questions to check whether paid Grade 2 practice is likely to help.</span></a>
-          <a class="resource" href="ameb-piano-general-knowledge-questions.html?ref=parents-resources"><strong>General-knowledge question sheet</strong><span>Questions parents can ask about the student’s own pieces.</span></a>
+          <a class="resource" href="ameb-grade-1-note-values-practice.html?ref=parents-resources" data-parent-click="resource-note-values"><strong>Grade 1 note-values sheet and interactive drill</strong><span>Best first task for rhythm-value confusion.</span></a>
+          <a class="resource" href="ameb-grade-1-theory-practice.html?ref=parents-resources" data-parent-click="resource-grade1-questions"><strong>Grade 1 practice questions</strong><span>Ten original questions with explained answers and a study plan.</span></a>
+          <a class="resource" href="ameb-grade-2-dotted-notes-practice.html?ref=parents-resources" data-parent-click="resource-grade2-dotted"><strong>Grade 2 dotted notes and 6/8 worksheet</strong><span>Focused worksheet for a common Grade 2 rhythm gap.</span></a>
+          <a class="resource" href="ameb-grade-2-piano-theory-practice.html?ref=parents-resources" data-parent-click="resource-grade2-diagnostic"><strong>Grade 2 readiness diagnostic</strong><span>Twelve questions to check whether paid Grade 2 practice is likely to help.</span></a>
+          <a class="resource" href="ameb-piano-general-knowledge-questions.html?ref=parents-resources" data-parent-click="resource-general-knowledge"><strong>General-knowledge question sheet</strong><span>Questions parents can ask about the student’s own pieces.</span></a>
         </div>
       </div>
     </section>
@@ -182,7 +182,7 @@
           </div>
           <div>
             <div class="price">$14.99 <small>AUD one-time</small></div>
-            <a class="btn" href="index.html?unlock=1&amp;ref=parents-paid" data-paid-click="parents-paid-unlock">Unlock Grade 2–3</a>
+            <a class="btn" href="index.html?unlock=1&amp;ref=parents-paid" data-parent-click="parents-paid-unlock">Unlock Grade 2–3</a>
           </div>
         </div>
       </div>
@@ -203,9 +203,9 @@
   <script>
     window.addEventListener('DOMContentLoaded',function(){
       if(window.mmTrack)mmTrack('landing_visit',{channel:'organic-parent-resource'});
-      document.querySelectorAll('[data-paid-click]').forEach(function(link){
+      document.querySelectorAll('[data-parent-click]').forEach(function(link){
         link.addEventListener('click',function(){
-          if(window.mmTrack)mmTrack('resource_click',{channel:'organic-parent-resource',experiment:link.getAttribute('data-paid-click')});
+          if(window.mmTrack)mmTrack('resource_click',{channel:'organic-parent-resource',experiment:link.getAttribute('data-parent-click')});
         });
       });
     });
