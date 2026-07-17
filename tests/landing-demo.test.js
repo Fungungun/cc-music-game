@@ -20,6 +20,8 @@ assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-hero/);
 assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-free-plan/);
 assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-bottom/);
 assert.match(html, /note-values\.html\?grade=1&amp;ref=landing-sample/);
+assert.match(html, /ameb-grade-2-dotted-notes-practice\.html\?ref=landing/);
+assert.equal((html.match(/class="sample-options" role="group" aria-label="Answer choices"/g) || []).length, 1);
 assert.match(html, /data-paid-click="landing-pricing-unlock"/);
 assert.match(html, /data-paid-click="landing-bottom-unlock"/);
 assert.match(html, /mmTrack\('resource_click',\{channel:'landing',experiment:link\.getAttribute\('data-paid-click'\)\}\)/);
