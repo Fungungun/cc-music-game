@@ -64,6 +64,11 @@ assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-gra
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
 
+const landing = fs.readFileSync(path.join(root, 'landing.html'), 'utf8');
+assert.match(landing, /"@type":"SoftwareApplication"/);
+assert.match(landing, /"applicationCategory":"EducationalApplication"/);
+assert.match(landing, /"name":"Grade 2-3 unlock","price":"14\.99","priceCurrency":"AUD"/);
+
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 assert.match(index, /parents\.html">For Parents<\/a>/);
 assert.match(index, /https:\/\/music\.vensoai\.com\/parents\?utm_source=app-share&utm_medium=referral&utm_campaign=parent-guide/);
@@ -71,6 +76,9 @@ assert.match(index, /mmTrack\('resource_share', \{ channel:'app-share', experime
 
 const parents = fs.readFileSync(path.join(root, 'parents.html'), 'utf8');
 assert.match(parents, /<link rel="canonical" href="https:\/\/music\.vensoai\.com\/parents">/);
+assert.match(parents, /"@type":"SoftwareApplication"/);
+assert.match(parents, /"applicationCategory":"EducationalApplication"/);
+assert.match(parents, /"name":"Grade 1 access","price":"0","priceCurrency":"AUD"/);
 assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resource'\}\)/);
 assert.match(parents, /data-parent-click="hero-start-free"/);
 assert.match(parents, /data-parent-click="resource-grade2-diagnostic"/);
