@@ -74,13 +74,20 @@ const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
 assert.match(teachers, /ameb-grade-1-aural-test-practice\.html\?ref=teachers/);
 assert.match(teachers, /family-practice-handout\.html\?ref=teachers/);
+assert.match(teachers, /downloads\/music-maestro-family-practice-handout\.pdf/);
 
 const handout = fs.readFileSync(path.join(root, 'family-practice-handout.html'), 'utf8');
 assert.match(handout, /"@type":"LearningResource"/);
 assert.match(handout, /music\.vensoai\.com\/parents\?utm_source=teacher-handout&amp;utm_medium=print&amp;utm_campaign=family-practice/);
+assert.match(handout, /downloads\/music-maestro-family-practice-handout\.pdf/);
+assert.match(handout, /mmTrack\('resource_download',\{channel:'teacher-handout',experiment:'family-practice-pdf'\}\)/);
 assert.match(handout, /mmTrack\('landing_visit',\{channel:'teacher-handout'\}\)/);
 assert.match(handout, /mmTrack\('resource_print',\{channel:'teacher-handout',experiment:'family-practice'\}\)/);
 assert.match(handout, /mmTrack\('resource_share',\{channel:'teacher-handout',experiment:'family-practice'\}\)/);
+
+const handoutPdf = fs.readFileSync(path.join(root, 'downloads/music-maestro-family-practice-handout.pdf'));
+assert.equal(handoutPdf.subarray(0, 4).toString(), '%PDF');
+assert.ok(handoutPdf.length > 200000, 'family handout PDF should be a real generated PDF asset');
 
 const landing = fs.readFileSync(path.join(root, 'landing.html'), 'utf8');
 assert.match(landing, /"@type":"SoftwareApplication"/);
