@@ -1041,11 +1041,11 @@ function showSessionSummary(opts) {
     ? '<a href="' + next.href + '" style="display:block;margin-top:4px;background:#fffdf8;color:#7e2038;border:1px solid #cfc5b6;border-radius:3px;padding:11px 16px;text-decoration:none;font-weight:700;font-size:0.9rem;">Next up: ' + next.label + ' →</a>'
     : '';
   var upgradeHtml = '';
-  if (module === 'note-values' && !hasFullAccess()) {
+  if (!hasFullAccess()) {
     upgradeHtml =
       '<div style="margin:12px 0 0;padding:13px 14px;background:#fffdf8;border:1px solid #cfc5b6;border-radius:3px;text-align:left;">' +
-        '<div style="font-weight:800;color:#292724;font-size:0.92rem;margin-bottom:4px;">Practising beyond Grade 1?</div>' +
-        '<div style="color:#625b52;font-size:0.84rem;line-height:1.45;margin-bottom:10px;">Grade 2 and 3 add dotted rhythms, compound time and mixed review.</div>' +
+        '<div style="font-weight:800;color:#292724;font-size:0.92rem;margin-bottom:4px;">Ready for Grade 2 or 3?</div>' +
+        '<div style="color:#625b52;font-size:0.84rem;line-height:1.45;margin-bottom:10px;">Unlock higher-grade keys, intervals, chords, compound time and mixed review when Grade 1 feels secure.</div>' +
         '<button onclick="if(typeof showUpgradeModal===\'function\')showUpgradeModal();" style="display:block;width:100%;background:#7e2038;color:white;border:none;border-radius:3px;padding:10px 12px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;">Unlock Grade 2 &amp; 3 - $14.99 AUD</button>' +
       '</div>';
   }

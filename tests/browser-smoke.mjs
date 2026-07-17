@@ -170,13 +170,33 @@ try {
         viewport: document.documentElement.clientWidth
       };
     })()`, returnByValue:true }, sessionId);
-    assert.match(result.value.text, /Practising beyond Grade 1/);
+    assert.match(result.value.text, /Ready for Grade 2 or 3/);
     assert.match(result.value.text, /Unlock Grade 2 & 3 - \$14\.99 AUD/);
     assert.ok(result.value.width <= result.value.viewport + 1, `mobile note-values summary overflows horizontally (${result.value.width}px > ${result.value.viewport}px)`);
   }
 
+  await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true}, sessionId);
+  {
+    const loaded = waitFor('Page.loadEventFired', sessionId);
+    await send('Page.navigate', {url:`${origin}/note-namer.html?grade=1&ref=smoke`}, sessionId);
+    await loaded;
+    await new Promise(resolve => setTimeout(resolve, 650));
+    const { result } = await send('Runtime.evaluate', { expression:`(function(){
+      localStorage.removeItem('mm-unlocked');
+      showSessionSummary({module:'note-namer',correct:8,total:10});
+      return {
+        text: document.getElementById('session-summary-modal').innerText,
+        width: document.documentElement.scrollWidth,
+        viewport: document.documentElement.clientWidth
+      };
+    })()`, returnByValue:true }, sessionId);
+    assert.match(result.value.text, /Ready for Grade 2 or 3/);
+    assert.match(result.value.text, /Unlock Grade 2 & 3 - \$14\.99 AUD/);
+    assert.ok(result.value.width <= result.value.viewport + 1, `mobile generic summary upgrade overflows horizontally (${result.value.width}px > ${result.value.viewport}px)`);
+  }
+
   assert.deepEqual(failures, []);
-  console.log(`browser smoke passed: ${routes.length} product routes on desktop and mobile, plus upgrade auth and note-values summary paths`);
+  console.log(`browser smoke passed: ${routes.length} product routes on desktop and mobile, plus upgrade auth and summary upgrade paths`);
 } finally {
   ws.close();
   const exited = new Promise(resolve => chrome.once('exit', resolve));
