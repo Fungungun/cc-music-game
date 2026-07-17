@@ -69,6 +69,9 @@ assert.match(parents, /data-parent-click="hero-start-free"/);
 assert.match(parents, /data-parent-click="resource-grade2-diagnostic"/);
 assert.match(parents, /data-parent-click="parents-paid-unlock"/);
 assert.match(parents, /mmTrack\('resource_click',\{channel:'organic-parent-resource',experiment:link\.getAttribute\('data-parent-click'\)\}\)/);
+assert.match(parents, /id="copy-parent-note"/);
+assert.match(parents, /utm_source=family-note&utm_medium=referral&utm_campaign=parent-guide/);
+assert.match(parents, /mmTrack\('resource_share',\{channel:'organic-parent-resource',experiment:method\}\)/);
 assert.match(parents, /ameb-grade-2-piano-theory-practice\.html\?ref=parents-resources/);
 
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');

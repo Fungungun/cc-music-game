@@ -62,6 +62,12 @@
     .resource{display:block;border:1px solid #d6ccbd;background:#f7f3eb;text-decoration:none;padding:15px;color:#292724}
     .resource strong{display:block;color:#7e2038;margin-bottom:3px}
     .resource span{font-size:.86rem;color:#625e58}
+    .share-box{border:1px solid #d6ccbd;background:#fffaf1;padding:28px;margin-top:28px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+    .share-box h3{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;font-weight:600;margin-bottom:6px}
+    .share-box p{font-size:.9rem;color:#625e58}
+    .share-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .share-btn{appearance:none;border:1px solid #7e2038;border-radius:3px;background:#7e2038;color:white;font:800 .9rem Inter,ui-sans-serif,sans-serif;padding:11px 16px;cursor:pointer}
+    .share-btn.secondary{background:transparent;color:#7e2038}
     .price-box{background:#fffaf1;border:2px solid #7e2038;padding:30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center}
     .price{font-size:2.3rem;font-weight:900;color:#7e2038;white-space:nowrap}
     .price small{display:block;font-size:.78rem;color:#625e58;font-weight:700}
@@ -71,7 +77,7 @@
     footer{background:#211f1c;color:#aaa;padding:28px 24px;text-align:center;font-size:.85rem}
     .footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
     footer a{color:#e0c7ae;text-decoration:none}
-    @media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.plan,.price-box{grid-template-columns:1fr}.plan-main{border-right:0;border-bottom:1px solid #d6ccbd}.price{white-space:normal}.hero-actions .btn,.actions .btn{width:100%;text-align:center}}
+    @media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.plan,.price-box,.share-box{grid-template-columns:1fr}.plan-main{border-right:0;border-bottom:1px solid #d6ccbd}.price{white-space:normal}.hero-actions .btn,.actions .btn,.share-btn{width:100%;text-align:center}.share-actions{justify-content:stretch}}
   </style>
 </head>
 <body>
@@ -126,6 +132,16 @@
       <div class="section-inner">
         <h2>A realistic five-day plan</h2>
         <p class="section-sub">Use this as a between-lesson routine. Keep repertoire work with the teacher, then add one short supporting-skill task each day.</p>
+        <div class="share-box">
+          <div>
+            <h3>Send this plan to a family</h3>
+            <p>Copy a plain-text note with the parent guide link, free-start instruction and independent-resource disclosure.</p>
+          </div>
+          <div class="share-actions">
+            <button class="share-btn" id="copy-parent-note" type="button">Copy family note</button>
+            <button class="share-btn secondary" id="share-parent-note" type="button">Share</button>
+          </div>
+        </div>
         <div class="plan">
           <div class="plan-main">
             <ul class="week">
@@ -208,6 +224,46 @@
           if(window.mmTrack)mmTrack('resource_click',{channel:'organic-parent-resource',experiment:link.getAttribute('data-parent-click')});
         });
       });
+      var shareUrl='https://music.vensoai.com/parents?utm_source=family-note&utm_medium=referral&utm_campaign=parent-guide';
+      var shareText='For this week, try one short AMEB piano support task each day:\\n'+shareUrl+'\\n\\nStart with the free Grade 1 practice or Grade 2 readiness diagnostic. Music Maestro is an independent practice resource and is not affiliated with or endorsed by AMEB; please follow your teacher and current syllabus first.';
+      function fallbackCopy(value){
+        var area=document.createElement('textarea');
+        area.value=value;
+        area.setAttribute('readonly','');
+        area.style.position='fixed';
+        area.style.opacity='0';
+        document.body.appendChild(area);
+        area.select();
+        var ok=document.execCommand('copy');
+        document.body.removeChild(area);
+        return ok;
+      }
+      function trackShare(method){
+        if(window.mmTrack)mmTrack('resource_share',{channel:'organic-parent-resource',experiment:method});
+      }
+      var copy=document.getElementById('copy-parent-note');
+      if(copy){
+        copy.addEventListener('click',function(){
+          var operation=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(shareText).then(function(){return true;}):Promise.resolve(fallbackCopy(shareText));
+          operation.then(function(ok){
+            if(!ok)throw new Error('copy failed');
+            copy.textContent='Copied';
+            trackShare('family-note');
+            setTimeout(function(){copy.textContent='Copy family note';},2200);
+          }).catch(function(){
+            copy.textContent='Copy unavailable';
+            setTimeout(function(){copy.textContent='Copy family note';},2200);
+          });
+        });
+      }
+      var nativeShare=document.getElementById('share-parent-note');
+      if(nativeShare){
+        if(!navigator.share)nativeShare.style.display='none';
+        nativeShare.addEventListener('click',function(){
+          if(!navigator.share)return;
+          navigator.share({title:'AMEB piano parent practice plan',text:shareText,url:shareUrl}).then(function(){trackShare('native-share');}).catch(function(){});
+        });
+      }
     });
   </script>
 </body>
