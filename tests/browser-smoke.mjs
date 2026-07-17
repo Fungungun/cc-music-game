@@ -20,6 +20,7 @@ const routes = [
   'daily-challenge.html', 'learn.html', 'mock-exam.html', 'progress.html',
   'parents.html',
   'ameb-grade-1-note-values-practice.html',
+  'ameb-grade-1-aural-test-practice.html',
   'ameb-grade-2-dotted-notes-practice.html'
 ];
 const interactions = {

@@ -18,7 +18,7 @@ for (const route of routes) {
   assert.match(canonicals[0], new RegExp(`https://music\\.vensoai\\.com/${route}`));
 }
 
-for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-2-dotted-notes-practice', 'ameb-grade-2-piano-theory-practice']) {
+for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-1-aural-test-practice', 'ameb-grade-2-dotted-notes-practice', 'ameb-grade-2-piano-theory-practice']) {
   const html = fs.readFileSync(path.join(root, `${route}.html`), 'utf8');
   assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${route} must have one primary heading`);
 }
@@ -37,6 +37,7 @@ const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 assert.match(readme, /parents\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-primary/);
 assert.match(readme, /music\.vensoai\.com\/\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-app/);
 assert.match(readme, /ameb-grade-1-note-values-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values/);
+assert.match(readme, /ameb-grade-1-aural-test-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade1-aural/);
 assert.match(readme, /ameb-grade-2-dotted-notes-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2-dotted/);
 
 const checklist = fs.readFileSync(path.join(root, 'ameb-practice-checklist.html'), 'utf8');
@@ -56,6 +57,14 @@ assert.match(grade2Dotted, /mmTrack\('landing_visit',\{channel:'organic-grade2-d
 assert.match(grade2Dotted, /mmTrack\('resource_click',\{channel:'organic-grade2-dotted-notes',experiment:link\.getAttribute\('data-paid-click'\)\}\)/);
 assert.match(grade2Dotted, /mmTrack\('resource_share',\{channel:'organic-grade2-dotted-notes',experiment:'family-note'\}\)/);
 
+const grade1Aural = fs.readFileSync(path.join(root, 'ameb-grade-1-aural-test-practice.html'), 'utf8');
+assert.match(grade1Aural, /"@type":"LearningResource"/);
+assert.match(grade1Aural, /aural-training\.html\?grade=1&amp;ref=organic-grade1-aural/);
+assert.match(grade1Aural, /mmTrack\('landing_visit',\{channel:'organic-grade1-aural'\}\)/);
+assert.match(grade1Aural, /mmTrack\('resource_click',\{channel:'organic-grade1-aural',experiment:link\.getAttribute\('data-resource-click'\)\}\)/);
+assert.match(grade1Aural, /utm_source=family-note&utm_medium=referral&utm_campaign=grade1-aural/);
+assert.match(grade1Aural, /mmTrack\('resource_share',\{channel:'organic-grade1-aural',experiment:'family-note'\}\)/);
+
 const grade2Diagnostic = fs.readFileSync(path.join(root, 'ameb-grade-2-piano-theory-practice.html'), 'utf8');
 assert.match(grade2Diagnostic, /ameb-grade-2-dotted-notes-practice\.html\?ref=grade2-diagnostic/);
 assert.match(grade2Diagnostic, /data-paid-click="grade2-diagnostic-unlock"/);
@@ -63,6 +72,7 @@ assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-gra
 
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
+assert.match(teachers, /ameb-grade-1-aural-test-practice\.html\?ref=teachers/);
 
 const landing = fs.readFileSync(path.join(root, 'landing.html'), 'utf8');
 assert.match(landing, /"@type":"SoftwareApplication"/);
@@ -82,6 +92,7 @@ assert.match(parents, /"name":"Grade 1 access","price":"0","priceCurrency":"AUD"
 assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resource'\}\)/);
 assert.match(parents, /data-parent-click="hero-start-free"/);
 assert.match(parents, /data-parent-click="resource-grade2-diagnostic"/);
+assert.match(parents, /data-parent-click="resource-grade1-aural"/);
 assert.match(parents, /data-parent-click="parents-paid-unlock"/);
 assert.match(parents, /mmTrack\('resource_click',\{channel:'organic-parent-resource',experiment:link\.getAttribute\('data-parent-click'\)\}\)/);
 assert.match(parents, /id="copy-parent-note"/);
@@ -95,6 +106,7 @@ for (const route of routes) {
 }
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/parents<\/loc><lastmod>2026-07-18<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
+assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-aural-test-practice<\/loc><lastmod>2026-07-18<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-2-dotted-notes-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 
 const indexNowKey = 'a8eb59ee77ba35e0d503b2521e062f7c';
