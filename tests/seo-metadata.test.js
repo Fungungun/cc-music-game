@@ -18,7 +18,7 @@ for (const route of routes) {
   assert.match(canonicals[0], new RegExp(`https://music\\.vensoai\\.com/${route}`));
 }
 
-for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-2-piano-theory-practice']) {
+for (const route of ['ameb-grade-1-theory-practice', 'ameb-grade-1-note-values-practice', 'ameb-grade-2-dotted-notes-practice', 'ameb-grade-2-piano-theory-practice']) {
   const html = fs.readFileSync(path.join(root, `${route}.html`), 'utf8');
   assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${route} must have one primary heading`);
 }
@@ -42,11 +42,23 @@ assert.match(checklist, /ameb-grade-1-note-values-practice\.html\?ref=practice-c
 const generalKnowledge = fs.readFileSync(path.join(root, 'ameb-piano-general-knowledge-questions.html'), 'utf8');
 assert.match(generalKnowledge, /ameb-grade-1-note-values-practice\.html\?ref=general-knowledge-sheet/);
 
+const grade2Dotted = fs.readFileSync(path.join(root, 'ameb-grade-2-dotted-notes-practice.html'), 'utf8');
+assert.match(grade2Dotted, /"@type":"LearningResource"/);
+assert.match(grade2Dotted, /index\.html\?unlock=1&amp;ref=organic-grade2-dotted-notes/);
+assert.match(grade2Dotted, /mmTrack\('landing_visit',\{channel:'organic-grade2-dotted-notes'\}\)/);
+
+const grade2Diagnostic = fs.readFileSync(path.join(root, 'ameb-grade-2-piano-theory-practice.html'), 'utf8');
+assert.match(grade2Diagnostic, /ameb-grade-2-dotted-notes-practice\.html\?ref=grade2-diagnostic/);
+
+const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
+assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
+
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
 for (const route of routes) {
   assert.match(sitemap, new RegExp(`<loc>https://music\\.vensoai\\.com/${route}</loc><lastmod>2026-07-17</lastmod>`));
 }
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
+assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-2-dotted-notes-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 
 const indexNowKey = 'a8eb59ee77ba35e0d503b2521e062f7c';
 assert.equal(fs.readFileSync(path.join(root, `${indexNowKey}.txt`), 'utf8').trim(), indexNowKey);
