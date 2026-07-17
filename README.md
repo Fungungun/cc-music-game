@@ -18,6 +18,7 @@ Music Maestro is a supplementary practice tool. It is not an official examinatio
 
 - [Grade 1 theory practice guide](https://music.vensoai.com/ameb-grade-1-theory-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade1)
 - [Grade 1 note-values and rhythm practice](https://music.vensoai.com/ameb-grade-1-note-values-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values)
+- [Grade 2 dotted notes and 6/8 practice](https://music.vensoai.com/ameb-grade-2-dotted-notes-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2-dotted)
 - [Grade 2 readiness diagnostic](https://music.vensoai.com/ameb-grade-2-piano-theory-practice?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2)
 - [Piano general-knowledge questions](https://music.vensoai.com/ameb-piano-general-knowledge-questions?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-general-knowledge)
 - [Weekly practice checklist](https://music.vensoai.com/ameb-practice-checklist?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-checklist)

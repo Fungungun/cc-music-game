@@ -35,6 +35,7 @@ assert.match(noteValuesResource, /mmTrack\('resource_share',\{channel:'organic-n
 
 const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 assert.match(readme, /ameb-grade-1-note-values-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-note-values/);
+assert.match(readme, /ameb-grade-2-dotted-notes-practice\?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-grade2-dotted/);
 
 const checklist = fs.readFileSync(path.join(root, 'ameb-practice-checklist.html'), 'utf8');
 assert.match(checklist, /ameb-grade-1-note-values-practice\.html\?ref=practice-checklist/);

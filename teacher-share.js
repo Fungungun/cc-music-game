@@ -5,6 +5,7 @@
     'key-signatures': { path: 'key-signatures', grade: '1', label: 'Grade 1 key signatures' },
     'aural-training': { path: 'aural-training', grade: '1', label: 'Grade 1 aural practice' },
     'daily-review': { path: 'daily-challenge', grade: '1', label: 'Grade 1 mixed daily review' },
+    'grade2-dotted-notes': { path: 'ameb-grade-2-dotted-notes-practice', label: 'Free Grade 2 dotted-notes worksheet' },
     'grade2-diagnostic': { path: 'ameb-grade-2-piano-theory-practice', label: 'Free Grade 2 readiness diagnostic' },
     'general-knowledge': { path: 'ameb-piano-general-knowledge-questions', label: 'Free general-knowledge question sheet' },
     'weekly-checklist': { path: 'ameb-practice-checklist', label: 'Free weekly practice checklist' },
