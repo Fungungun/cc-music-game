@@ -138,5 +138,11 @@ assert.match(eventsApi, /resource_click/);
 const ownerReport = fs.readFileSync(path.join(root, 'functions/api/owner-report.js'), 'utf8');
 assert.match(ownerReport, /visit_to_resource_click/);
 assert.match(ownerReport, /resource_click_to_practice/);
+assert.match(ownerReport, /visit_to_resource_download/);
+assert.match(ownerReport, /resource_download_to_practice/);
+assert.match(ownerReport, /visit_to_resource_share/);
+assert.match(ownerReport, /practice_to_upgrade_view/);
+assert.match(ownerReport, /upgrade_view_to_checkout/);
+assert.match(ownerReport, /teacher_outreach/);
 
 console.log('SEO metadata tests passed');
