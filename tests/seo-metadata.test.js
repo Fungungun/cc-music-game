@@ -64,6 +64,11 @@ assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-gra
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
 
+const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+assert.match(index, /parents\.html">For Parents<\/a>/);
+assert.match(index, /https:\/\/music\.vensoai\.com\/parents\?utm_source=app-share&utm_medium=referral&utm_campaign=parent-guide/);
+assert.match(index, /mmTrack\('resource_share', \{ channel:'app-share', experiment:method \}\)/);
+
 const parents = fs.readFileSync(path.join(root, 'parents.html'), 'utf8');
 assert.match(parents, /<link rel="canonical" href="https:\/\/music\.vensoai\.com\/parents">/);
 assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resource'\}\)/);
