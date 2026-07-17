@@ -62,10 +62,17 @@ assert.match(grade2Diagnostic, /mmTrack\('resource_click',\{channel:'organic-gra
 const teachers = fs.readFileSync(path.join(root, 'teachers.html'), 'utf8');
 assert.match(teachers, /ameb-grade-2-dotted-notes-practice\.html\?ref=teachers/);
 
+const parents = fs.readFileSync(path.join(root, 'parents.html'), 'utf8');
+assert.match(parents, /<link rel="canonical" href="https:\/\/music\.vensoai\.com\/parents">/);
+assert.match(parents, /mmTrack\('landing_visit',\{channel:'organic-parent-resource'\}\)/);
+assert.match(parents, /data-paid-click="parents-paid-unlock"/);
+assert.match(parents, /ameb-grade-2-piano-theory-practice\.html\?ref=parents-resources/);
+
 const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
 for (const route of routes) {
   assert.match(sitemap, new RegExp(`<loc>https://music\\.vensoai\\.com/${route}</loc><lastmod>2026-07-17</lastmod>`));
 }
+assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/parents<\/loc><lastmod>2026-07-18<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-1-note-values-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 assert.match(sitemap, /<loc>https:\/\/music\.vensoai\.com\/ameb-grade-2-dotted-notes-practice<\/loc><lastmod>2026-07-17<\/lastmod>/);
 

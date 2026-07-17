@@ -2,7 +2,7 @@
 
 Music Maestro is an independent browser-based practice resource for Australian piano students working around AMEB Grades 1–3. It provides short theory, aural and general-knowledge activities that fit between lessons.
 
-[Open Music Maestro](https://music.vensoai.com/landing?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-primary) · [View the coverage and limits](https://music.vensoai.com/syllabus?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-coverage) · [Teacher resources](https://music.vensoai.com/teachers?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-teachers)
+[Open Music Maestro](https://music.vensoai.com/landing?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-primary) · [Parent guide](https://music.vensoai.com/parents?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-parents) · [View the coverage and limits](https://music.vensoai.com/syllabus?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-coverage) · [Teacher resources](https://music.vensoai.com/teachers?utm_source=github&utm_medium=repository&utm_campaign=owned-repo&utm_content=readme-teachers)
 
 ## Product scope
 
