@@ -1042,6 +1042,7 @@ function showSessionSummary(opts) {
     : '';
   var upgradeHtml = '';
   if (!hasFullAccess()) {
+    if (typeof mmTrack === 'function') mmTrack('upgrade_view', { experiment: 'summary:' + module });
     upgradeHtml =
       '<div style="margin:12px 0 0;padding:13px 14px;background:#fffdf8;border:1px solid #cfc5b6;border-radius:3px;text-align:left;">' +
         '<div style="font-weight:800;color:#292724;font-size:0.92rem;margin-bottom:4px;">Ready for Grade 2 or 3?</div>' +

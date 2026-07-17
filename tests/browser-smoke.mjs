@@ -163,15 +163,19 @@ try {
     await new Promise(resolve => setTimeout(resolve, 650));
     const { result } = await send('Runtime.evaluate', { expression:`(function(){
       localStorage.removeItem('mm-unlocked');
+      window.__tracked = [];
+      window.mmTrack = function(eventName, extra){ window.__tracked.push({eventName, extra}); };
       showSessionSummary({module:'note-values',correct:8,total:10});
       return {
         text: document.getElementById('session-summary-modal').innerText,
+        tracked: window.__tracked,
         width: document.documentElement.scrollWidth,
         viewport: document.documentElement.clientWidth
       };
     })()`, returnByValue:true }, sessionId);
     assert.match(result.value.text, /Ready for Grade 2 or 3/);
     assert.match(result.value.text, /Unlock Grade 2 & 3 - \$14\.99 AUD/);
+    assert.ok(result.value.tracked.some(item => item.eventName === 'upgrade_view' && item.extra && item.extra.experiment === 'summary:note-values'));
     assert.ok(result.value.width <= result.value.viewport + 1, `mobile note-values summary overflows horizontally (${result.value.width}px > ${result.value.viewport}px)`);
   }
 
@@ -183,15 +187,19 @@ try {
     await new Promise(resolve => setTimeout(resolve, 650));
     const { result } = await send('Runtime.evaluate', { expression:`(function(){
       localStorage.removeItem('mm-unlocked');
+      window.__tracked = [];
+      window.mmTrack = function(eventName, extra){ window.__tracked.push({eventName, extra}); };
       showSessionSummary({module:'note-namer',correct:8,total:10});
       return {
         text: document.getElementById('session-summary-modal').innerText,
+        tracked: window.__tracked,
         width: document.documentElement.scrollWidth,
         viewport: document.documentElement.clientWidth
       };
     })()`, returnByValue:true }, sessionId);
     assert.match(result.value.text, /Ready for Grade 2 or 3/);
     assert.match(result.value.text, /Unlock Grade 2 & 3 - \$14\.99 AUD/);
+    assert.ok(result.value.tracked.some(item => item.eventName === 'upgrade_view' && item.extra && item.extra.experiment === 'summary:note-namer'));
     assert.ok(result.value.width <= result.value.viewport + 1, `mobile generic summary upgrade overflows horizontally (${result.value.width}px > ${result.value.viewport}px)`);
   }
 
