@@ -462,7 +462,7 @@ function initSampler(onReady) {
   if (overlay) overlay.style.display = 'flex';
 
   try {
-    var base = "https://tonejs.github.io/audio/salamander/";
+    var base = "audio/salamander/";
     sampler = new Tone.Sampler({
       urls: {
         "A0":base+"A0.mp3",  "C1":base+"C1.mp3",  "Eb1":base+"Ds1.mp3", "Gb1":base+"Fs1.mp3",

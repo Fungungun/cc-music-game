@@ -1,5 +1,5 @@
-/* Music Maestro — Service Worker v7.5 */
-var CACHE = 'music-maestro-v7-5';
+/* Music Maestro — Service Worker v7.6 */
+var CACHE = 'music-maestro-v7-6';
 
 /* On install: just pre-cache the offline shell assets.
    CSS/JS are handled network-first so they never go stale. */
@@ -33,20 +33,11 @@ self.addEventListener('fetch', function(e) {
   /* API calls — always straight to the network, never cached */
   if (new URL(url).pathname.indexOf('/api/') === 0) return;
 
-  /* CDN / audio samples — network first, cache fallback */
-  if (url.includes('cdn.jsdelivr') || url.includes('cdnjs') || url.includes('tonejs.github.io')) {
-    e.respondWith(
-      fetch(e.request)
-        .then(function(resp) {
-          if (resp && resp.status === 200) {
-            caches.open(CACHE).then(function(c){ c.put(e.request, resp.clone()); });
-          }
-          return resp;
-        })
-        .catch(function() { return caches.match(e.request); })
-    );
-    return;
-  }
+  /* Phase 1.2 (2026-08-17) vendored every third-party script and the
+     Salamander piano samples to same-origin (vendor/, audio/salamander/),
+     so the CDN/audio special case that used to live here is gone — those
+     requests now fall through to the same-origin network-first branch
+     below, which already does the identical fetch/cache/fallback dance. */
 
   /* HTML navigation — browser default, never intercept */
   if (e.request.mode === 'navigate') return;

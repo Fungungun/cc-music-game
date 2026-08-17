@@ -89,15 +89,15 @@
     <p>We do not use advertising cookies or third-party tracking scripts. A secure, HttpOnly first-party cookie keeps signed-in users authenticated. We store a random first-party visitor identifier to measure anonymous funnel steps; it contains no name, email address, or device fingerprint.</p>
 
     <h2>Third-party scripts loaded</h2>
-    <ul>
-      <li><strong>Tone.js</strong> (cdnjs.cloudflare.com) — piano audio</li>
-      <li><strong>Tonal.js &amp; abcjs</strong> (cdn.jsdelivr.net) — music theory and notation</li>
-      <li><strong>Salamander piano samples</strong> (tonejs.github.io) — audio files</li>
-      <li><strong>Google Fonts</strong> (fonts.googleapis.com) — Nunito typeface</li>
-    </ul>
-    <p>CDN providers may log standard request metadata (IP address, timestamp) as part of normal CDN operation.</p>
+    <p>None. As of 17 August 2026, every script this app runs — Tone.js (piano audio), Tonal.js
+    and abcjs (music theory and notation), and the Salamander piano samples — is hosted on our
+    own domain, not fetched from a third-party CDN. (Previously Tone.js, Tonal.js, abcjs and the
+    Salamander samples were loaded from cdnjs.cloudflare.com, cdn.jsdelivr.net and
+    tonejs.github.io respectively; those CDN providers no longer see any request from this app.)
+    Lesson pages in the Theory Lessons section may embed a YouTube video; loading that page
+    tells Google/YouTube you visited, per YouTube's own privacy policy.</p>
 
-    <p class="updated">Last updated: 16 July 2026</p>
+    <p class="updated">Last updated: 17 August 2026</p>
   </div>
 
   <script src="i18n.js"></script>
