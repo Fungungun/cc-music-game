@@ -1,8 +1,24 @@
 /* Stripe webhook — the ONLY code path that grants paid access.
    Configure in Stripe: endpoint https://music.vensoai.com/api/stripe-webhook,
-   event checkout.session.completed. Set STRIPE_WEBHOOK_SECRET in Pages env vars. */
+   events checkout.session.completed + charge.refunded. Set STRIPE_WEBHOOK_SECRET
+   in Pages env vars.
+
+   Guards (Phase 0 hardening — see ~/.claude/plans/silly-crafting-muffin.md):
+   - Every event is checked against stripe_events for a prior record before any
+     side effect runs, so a Stripe retry never reprocesses.
+   - event.livemode must be true unless STRIPE_REQUIRE_LIVEMODE=false is set
+     (local/dev/preview only). A test-mode event can never grant production access.
+   - checkout.session.completed must have mode='payment' — a future subscription
+     event pointed at this endpoint is recorded but does not grant access.
+   - The paid amount/currency must match STRIPE_EXPECTED_AMOUNT (cents, default
+     1499) / STRIPE_EXPECTED_CURRENCY (default 'aud') — a stray or misconfigured
+     product cannot unlock. This substitutes for a full line-item price-ID
+     allowlist, which needs a Stripe API key (STRIPE_SECRET_KEY) to fetch line
+     items; that lands with the Checkout Sessions API migration in Phase 6. */
 
 const TOLERANCE_SECONDS = 300;
+const DEFAULT_EXPECTED_AMOUNT = 1499; // cents — matches the current $14.99 AUD one-time price
+const DEFAULT_EXPECTED_CURRENCY = 'aud';
 
 async function verifyStripeSignature(payload, header, secret) {
   if (!header) return false;
@@ -52,6 +68,25 @@ export async function onRequestPost(context) {
   const eventId = String(event.id || '');
   if (!eventId) return new Response('Missing event id', { status: 400 });
 
+  /* Idempotency: read before any side effect. Stripe retries the same event on
+     any non-2xx or timeout; without this read, only the INSERT OR IGNORE on
+     stripe_events was silently absorbing duplicates while every other statement
+     (including the access grant) re-ran on every retry. */
+  const already = await env.DB.prepare('SELECT event_id FROM stripe_events WHERE event_id=?').bind(eventId).first();
+  if (already) {
+    console.log('stripe-webhook: duplicate event, skipping', eventId);
+    return new Response('Already processed', { status: 200 });
+  }
+
+  /* Livemode guard: a test-mode event must never grant, modify or revoke real
+     access. STRIPE_REQUIRE_LIVEMODE=false is the explicit, deliberate opt-out
+     for local/dev/preview testing only — never set it in production. */
+  const requireLive = env.STRIPE_REQUIRE_LIVEMODE !== 'false';
+  if (requireLive && !event.livemode) {
+    console.log('stripe-webhook: rejected test-mode event on a live-only endpoint', eventId);
+    return new Response('Test-mode events are not accepted on this endpoint', { status: 200 });
+  }
+
   if (event.type === 'charge.refunded') {
     const charge = event.data && event.data.object;
     const paymentIntentId = charge && (typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent && charge.payment_intent.id);
@@ -79,6 +114,16 @@ export async function onRequestPost(context) {
     return new Response('Not paid', { status: 200 });
   }
 
+  /* mode guard: this endpoint currently only understands one-time payments.
+     A subscription or setup-mode session (e.g. a future price misconfigured
+     onto this same payment link/endpoint) is recorded, never granted. */
+  if (session.mode && session.mode !== 'payment') {
+    await env.DB.prepare('INSERT OR IGNORE INTO stripe_events (event_id,event_type,livemode) VALUES (?,?,?)')
+      .bind(eventId, event.type, event.livemode ? 1 : 0).run();
+    console.log('stripe-webhook: rejected non-payment-mode session', session.id, session.mode);
+    return new Response('Unsupported session mode — access not granted', { status: 200 });
+  }
+
   const customerId = typeof session.customer === 'string' ? session.customer : '';
   const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : '';
   const userId = session.client_reference_id || '';
@@ -103,12 +148,27 @@ export async function onRequestPost(context) {
       .bind('stripe-' + eventId, 'successful_payment', matched && matched.id || null, '/checkout', 'stripe')
   ];
 
+  /* Amount/currency guard: only the recognised product grants access. The
+     payment is still recorded as financial truth (for reconciliation/refunds)
+     even when it doesn't match — it just never reaches the grant statement. */
+  const expectedAmount = Number(env.STRIPE_EXPECTED_AMOUNT || DEFAULT_EXPECTED_AMOUNT);
+  const expectedCurrency = String(env.STRIPE_EXPECTED_CURRENCY || DEFAULT_EXPECTED_CURRENCY).toLowerCase();
+  const amountMatches = Number(session.amount_total || 0) === expectedAmount
+    && String(session.currency || '').toLowerCase() === expectedCurrency;
+
   if (!matched) {
     /* Preserve the payment as financial truth even when account matching fails.
        The owner report surfaces it for manual reconciliation. */
     await env.DB.batch(paymentStatements);
     console.log('stripe-webhook: payment recorded without matching user', session.id, 'ref=', userId, 'email=', email);
     return new Response('Payment recorded — account reconciliation needed', { status: 200 });
+  }
+
+  if (!amountMatches) {
+    await env.DB.batch(paymentStatements);
+    console.log('stripe-webhook: payment recorded but amount/currency mismatch — access not granted',
+      session.id, session.amount_total, session.currency);
+    return new Response('Payment recorded — amount mismatch, access not granted', { status: 200 });
   }
 
   paymentStatements.push(
