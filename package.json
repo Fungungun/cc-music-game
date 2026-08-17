@@ -1,0 +1,13 @@
+{
+  "name": "music-maestro",
+  "private": true,
+  "type": "module",
+  "description": "AMEB music theory learning app — pure HTML/CSS/JS, Cloudflare Pages + Functions + D1. No build step.",
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node tests/browser-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

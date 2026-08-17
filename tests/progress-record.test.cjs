@@ -43,6 +43,12 @@ assert.equal(empty.modules.length, 0);
 const html = fs.readFileSync(new URL('../progress.html', `file://${__filename}`), 'utf8');
 assert.match(html, /name="robots" content="noindex,follow"/);
 assert.doesNotMatch(html, /linear-gradient|Suggested focus areas|Overall Progress/i);
-assert.doesNotMatch(fs.readFileSync(new URL('../game.js', `file://${__filename}`), 'utf8'), /APP_VERSION|footer\.textContent/);
+/* Guards a deliberate design decision (commit f78ac73, "Redesign Parent View
+   as a practice record"): no visible version footer on any page. APP_VERSION
+   itself now lives in engine/version.js (tests/version-sync.test.mjs), which
+   game.js still does not reference — this assertion stays narrowly about the
+   footer-injection pattern so it doesn't forbid legitimate future use of the
+   term "APP_VERSION" elsewhere in game.js. */
+assert.doesNotMatch(fs.readFileSync(new URL('../game.js', `file://${__filename}`), 'utf8'), /footer\.textContent\s*=\s*APP_VERSION/);
 
 console.log('progress record tests passed');
