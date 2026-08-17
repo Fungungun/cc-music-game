@@ -6,3 +6,19 @@ compatibility_date = "2026-07-01"
 binding = "DB"
 database_name = "music-game"
 database_id = "36c80cb5-49a5-4b6d-bb2d-94749e917652"
+
+# Preview deployments currently share the production database above — a
+# preview-branch webhook or test run writes to live tables. The CI workflow
+# (.github/workflows/deploy.yml) always deploys with --branch main, so this
+# block is inert for the normal deploy path and only matters for a manual
+# `wrangler pages deploy --branch <other>`. Still worth fixing before any
+# preview branch is ever deployed. To activate:
+#   1. npx wrangler d1 create music-game-preview
+#   2. npx wrangler d1 execute music-game-preview --remote --file=migrations/0001_init.sql
+#      (repeat for every migrations/*.sql file, in order)
+#   3. Replace REPLACE_WITH_PREVIEW_DATABASE_ID below with the id it prints
+#      and uncomment the block.
+# [env.preview.d1_databases]]
+# binding = "DB"
+# database_name = "music-game-preview"
+# database_id = "REPLACE_WITH_PREVIEW_DATABASE_ID"

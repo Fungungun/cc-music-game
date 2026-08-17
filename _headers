@@ -1,3 +1,21 @@
+# Phase 0.2 security headers — applied to every response.
+# CSP is permissive on script-src/style-src ('unsafe-inline' + 'unsafe-eval')
+# because ~29 pages use inline <script> blocks and onclick handlers, and the
+# vendored notation/markdown libraries (abcjs, marked) are minified bundles
+# whose internals haven't been audited for eval usage yet. Tightening this
+# to nonces/hashes is real work for Phase 4, once styles/scripts are split
+# out of the HTML files. Origins below are every external host this app
+# actually loads from today (verified by grepping every <script src>,
+# <iframe src>, fetch(), and the Tone.Sampler audio base URL) — self-hosting
+# them (Phase 1.2) will let this list shrink to 'self' plus YouTube.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Permissions-Policy: geolocation=(), camera=(), usb=(), payment=(), microphone=(self), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://tonejs.github.io; media-src 'self' https://tonejs.github.io; frame-src https://www.youtube.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+
 /ameb-grade-2-piano-theory-practice
   X-Robots-Tag: index, follow
   Cache-Control: public, max-age=0, must-revalidate
