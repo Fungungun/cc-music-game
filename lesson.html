@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lesson — Music Maestro</title>
+  <meta name="robots" content="noindex,follow">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Phase 3.3 — first real slice of the new engine, one skill only
+       (g1-treble-notes) while the render/*.js layer is still being
+       built out. Styling deliberately reuses existing component
+       classes (.staff-container, .btn, .page-header) rather than
+       inventing a parallel system — the visual redesign is Phase 4,
+       not this page. */
+    .lesson-main { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    .lesson-section { background: var(--white); border: 1px solid #d2c9bc; border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+    #teach-content img { max-width: 100%; }
+    #teach-content .lesson-video iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: var(--radius-sm); }
+    .lesson-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; font-weight: 700; }
+    .lesson-hearts { display: flex; gap: 4px; }
+    .mm-choice4-staff { text-align: center; margin-bottom: 12px; }
+    .mm-choice4-prompt { font-size: 1.15rem; font-weight: 700; text-align: center; margin-bottom: 16px; }
+    .mm-choice4-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 420px; margin: 0 auto; }
+    .mm-choice4-btn { min-height: 52px; font-size: 1.05rem; font-weight: 700; border: 2px solid #d2c9bc; border-radius: var(--radius-sm); background: var(--white); cursor: pointer; font-family: inherit; }
+    .mm-choice4-btn:hover:not(:disabled) { border-color: var(--text); }
+    .mm-choice4-btn:disabled { cursor: default; }
+    .mm-choice4-btn.mm-choice4-correct { background: #b8f0c8; border-color: #4caf50; }
+    .mm-choice4-btn.mm-choice4-wrong { background: #fdd; border-color: #f44336; }
+    .mm-choice4-btn:focus-visible { outline: 3px solid #4a90e2; outline-offset: 3px; }
+    .mm-choice4-feedback { min-height: 1.5em; text-align: center; margin-top: 14px; font-weight: 600; }
+    .mm-choice4-feedback-correct { color: #2e7d32; }
+    .mm-choice4-feedback-wrong { color: #c62828; }
+    .lesson-finish { text-align: center; }
+    .lesson-finish .big-score { font-size: 3rem; font-weight: 900; margin: 12px 0; }
+    .lesson-unsupported { text-align: center; color: var(--text-light); padding: 30px 0; }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <a href="index.html" class="back-btn" aria-label="Back to home">←</a>
+    <div style="flex:1;">
+      <h1 id="skill-title">Loading…</h1>
+      <div class="subtitle" id="skill-subtitle"></div>
+    </div>
+  </header>
+
+  <main class="lesson-main">
+    <section class="lesson-section" id="teach-section">
+      <div id="teach-content"><p>Loading lesson…</p></div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="btn btn-primary" id="start-practice-btn" style="display:none;">Start Practice →</button>
+      </div>
+    </section>
+
+    <section class="lesson-section" id="practice-section" style="display:none;">
+      <div class="lesson-progress">
+        <span id="lesson-progress-text">Question 1 of 8</span>
+        <span class="lesson-hearts" id="lesson-hearts" aria-label="Hearts remaining"></span>
+      </div>
+      <div id="item-container"></div>
+    </section>
+
+    <section class="lesson-section lesson-finish" id="finish-section" style="display:none;">
+      <h2>Session complete!</h2>
+      <div class="big-score" id="finish-score"></div>
+      <p id="finish-detail"></p>
+      <div style="margin-top:20px;">
+        <a href="index.html" class="btn btn-primary">Back to home</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="vendor/tone/Tone.min.js"></script>
+  <script src="vendor/tonal/tonal.min.js"></script>
+  <script src="vendor/abcjs/abcjs-basic-min.js"></script>
+  <script src="vendor/marked/marked.min.js"></script>
+  <script type="module">
+    import { getSkill } from './engine/curriculum.js';
+    import { buildItem, explainItem, ITEM_TYPES } from './engine/items.js';
+    import { createSession, currentItem, answerCurrent, isSessionOver, summary, earnedStreakCredit, DEFAULT_HEARTS } from './engine/session.js';
+    import { loadState, saveState, defaultStorage, recordConceptAttempt, recordDailyActivity } from './engine/state.js';
+    import { createRng } from './engine/rng.js';
+    import { renderChoice4, showChoice4Result } from './engine/render/choice4.js';
+
+    const QUESTIONS_PER_SESSION = 8;
+    // choice4 is the only renderer built so far — see the previous
+    // session's Phase 2 stopping note. A skill whose itemTypes are all
+    // outside this list (e.g. g3-form, which has none at all) shows the
+    // "not ready yet" message instead of a broken practice session.
+    const SUPPORTED_TYPES = new Set(Object.keys(ITEM_TYPES).filter((t) => t !== 'note-find' && t !== 'note-play'));
+
+    const params = new URLSearchParams(location.search);
+    const skillId = params.get('skill') || 'g1-treble-notes';
+    const skill = getSkill(skillId);
+
+    const storage = defaultStorage();
+    let learnerState = loadState(storage);
+
+    async function loadTeachContent(lesson) {
+      const el = document.getElementById('teach-content');
+      try {
+        const res = await fetch(`course/${lesson}.md`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const raw = await res.text();
+        const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+        const body = match ? match[2] : raw;
+        el.innerHTML = marked.parse(body);
+        // Render any ```abc fenced blocks the lesson markdown contains,
+        // matching course.html's proven renderAbcBlocks() pattern.
+        let i = 0;
+        el.querySelectorAll('pre code.language-abc').forEach((codeEl) => {
+          const abcText = codeEl.textContent || '';
+          const div = document.createElement('div');
+          div.className = 'staff-container';
+          div.id = `lesson-abc-${i}`;
+          codeEl.closest('pre').replaceWith(div);
+          try {
+            ABCJS.renderAbc(div.id, abcText, { scale: 1.6, staffwidth: 420 });
+          } catch (e) { div.style.display = 'none'; }
+          i += 1;
+        });
+      } catch (e) {
+        el.innerHTML = '<p>Could not load this lesson right now.</p>';
+      }
+    }
+
+    function buildSessionItems(rng) {
+      const supportedTypes = skill.itemTypes.filter((t) => SUPPORTED_TYPES.has(t));
+      const items = [];
+      for (let i = 0; i < QUESTIONS_PER_SESSION && supportedTypes.length; i++) {
+        const type = supportedTypes[i % supportedTypes.length];
+        const item = buildItem(type, skill.params, rng);
+        if (item) items.push(item);
+      }
+      return items;
+    }
+
+    function renderHearts(hearts) {
+      const el = document.getElementById('lesson-hearts');
+      el.innerHTML = '';
+      for (let i = 0; i < DEFAULT_HEARTS; i++) {
+        const span = document.createElement('span');
+        span.textContent = i < hearts ? '♥' : '♡';
+        span.setAttribute('aria-hidden', 'true');
+        el.appendChild(span);
+      }
+    }
+
+    let session = null;
+
+    function showItem() {
+      const item = currentItem(session);
+      if (!item) { finishSession(); return; }
+      document.getElementById('lesson-progress-text').textContent =
+        `Question ${session.index + 1} of ${session.items.length}`;
+      renderHearts(session.hearts);
+      const container = document.getElementById('item-container');
+      renderChoice4(container, item, (given) => onAnswered(item, given));
+    }
+
+    function onAnswered(item, given) {
+      const correct = given === item.answer;
+      const explanation = explainItem(item.type, item, given);
+      showChoice4Result(document.getElementById('item-container'), item, given, explanation);
+      learnerState = recordConceptAttempt(learnerState, item.concept, correct, Date.now());
+      saveState(storage, learnerState);
+      session = answerCurrent(session, correct);
+      setTimeout(() => {
+        if (isSessionOver(session)) finishSession();
+        else showItem();
+      }, 1400);
+    }
+
+    function finishSession() {
+      document.getElementById('practice-section').style.display = 'none';
+      document.getElementById('finish-section').style.display = 'block';
+      const sum = summary(session);
+      const pct = sum.accuracy != null ? Math.round(sum.accuracy * 100) : 0;
+      document.getElementById('finish-score').textContent = `${sum.correctCount}/${sum.correctCount + sum.wrongCount}`;
+      document.getElementById('finish-detail').textContent =
+        sum.endReason === 'completed'
+          ? `${pct}% correct · +${sum.xp} XP`
+          : `Out of hearts — let's pick this up next time. +${sum.xp} XP so far.`;
+      if (earnedStreakCredit(session)) {
+        learnerState = recordDailyActivity(learnerState, Date.now());
+      }
+      learnerState = { ...learnerState, xp: learnerState.xp + sum.xp };
+      saveState(storage, learnerState);
+    }
+
+    function startPractice() {
+      document.getElementById('teach-section').style.display = 'none';
+      document.getElementById('practice-section').style.display = 'block';
+      const rng = createRng(Date.now());
+      const items = buildSessionItems(rng);
+      session = createSession(items, { hearts: DEFAULT_HEARTS });
+      showItem();
+    }
+
+    async function init() {
+      if (!skill) {
+        document.getElementById('skill-title').textContent = 'Skill not found';
+        document.getElementById('teach-content').innerHTML = '<p>That skill doesn\'t exist.</p>';
+        return;
+      }
+      document.title = `${skill.title} — Music Maestro`;
+      document.getElementById('skill-title').textContent = skill.title;
+      document.getElementById('skill-subtitle').textContent = `Grade ${skill.params.grade || 1}`;
+
+      const supportedTypes = skill.itemTypes.filter((t) => SUPPORTED_TYPES.has(t));
+      await loadTeachContent(skill.lesson);
+
+      if (supportedTypes.length === 0) {
+        const notice = document.createElement('p');
+        notice.className = 'lesson-unsupported';
+        notice.textContent = 'Practice for this skill is coming soon.';
+        document.getElementById('teach-content').appendChild(notice);
+        return;
+      }
+      const btn = document.getElementById('start-practice-btn');
+      btn.style.display = 'inline-block';
+      btn.addEventListener('click', startPractice);
+    }
+
+    // Minimal test hook for tests/lesson-e2e.test.mjs's CDP-driven
+    // session — exposes just enough to drive a real answer sequence
+    // deterministically without duplicating the module's private state.
+    window.__mmTestHooks = {
+      getCurrentAnswer: () => (session ? currentItem(session)?.answer : null),
+      getSession: () => session,
+    };
+
+    init();
+  </script>
+</body>
+</html>
