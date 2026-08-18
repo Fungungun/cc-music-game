@@ -22,6 +22,8 @@ import nameToKeySig from './items/name-to-key-sig.js';
 import intervalId from './items/interval-id.js';
 import triadId from './items/triad-id.js';
 import cadenceId from './items/cadence-id.js';
+import termMeaning from './items/term-meaning.js';
+import termName from './items/term-name.js';
 
 export const ITEM_TYPES = {
   'note-name': noteName,
@@ -38,6 +40,8 @@ export const ITEM_TYPES = {
   'interval-id': intervalId,
   'triad-id': triadId,
   'cadence-id': cadenceId,
+  'term-meaning': termMeaning,
+  'term-name': termName,
 };
 
 const MCQ_MODES = new Set(['choice4']);
