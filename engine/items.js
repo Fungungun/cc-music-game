@@ -24,6 +24,7 @@ import triadId from './items/triad-id.js';
 import cadenceId from './items/cadence-id.js';
 import termMeaning from './items/term-meaning.js';
 import termName from './items/term-name.js';
+import scaleId from './items/scale-id.js';
 
 export const ITEM_TYPES = {
   'note-name': noteName,
@@ -42,6 +43,7 @@ export const ITEM_TYPES = {
   'cadence-id': cadenceId,
   'term-meaning': termMeaning,
   'term-name': termName,
+  'scale-id': scaleId,
 };
 
 const MCQ_MODES = new Set(['choice4']);
